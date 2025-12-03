@@ -731,7 +731,7 @@ Book now — don't miss out!`);
               </h3>
               {countSlots > 0 && (
                 <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
-                  {countSlots} slots available
+                  {countSlots} Slots Available
                 </Badge>
               )}
             </div>
