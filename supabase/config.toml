@@ -1,0 +1,4 @@
+project_id = "dygljrvbxvbrqrihrxyn"
+
+[functions.hyper-api]
+verify_jwt = false
