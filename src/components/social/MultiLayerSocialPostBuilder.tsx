@@ -624,10 +624,7 @@ export function MultiLayerSocialPostBuilder({
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <Image className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">Create visual posts for social media.</p>
-            </div>
+            <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="pt-5">
@@ -657,10 +654,7 @@ export function MultiLayerSocialPostBuilder({
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <Image className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">Create visual posts for social media.</p>
-            </div>
+            <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
           </div>
           
           <div className="flex items-center gap-3">
