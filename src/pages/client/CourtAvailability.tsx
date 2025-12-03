@@ -736,7 +736,7 @@ Book now — don't miss out!`);
             <div className="flex items-center gap-3">
               <Label htmlFor="whatsappGroup" className="text-sm font-medium whitespace-nowrap">WhatsApp Group</Label>
               <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="flex-1 h-9 rounded-lg border-border/50 bg-background text-sm" />
-              <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 h-9 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+              <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 h-9 bg-primary/10 border border-primary text-primary hover:bg-primary/20 whitespace-nowrap px-4">
                 {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Send Now
               </Button>
