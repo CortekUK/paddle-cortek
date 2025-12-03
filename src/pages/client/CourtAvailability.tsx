@@ -624,7 +624,12 @@ Book now — don't miss out!`);
         {/* Inline Search Bar */}
         <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-            <h3 className="text-sm font-semibold text-foreground whitespace-nowrap">Find Availability</h3>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
+                <Search className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground whitespace-nowrap">Find Availability</h3>
+            </div>
             
             <div className="flex items-center gap-2 flex-1">
               {(['today', 'tomorrow'] as const).map((preset) => (
