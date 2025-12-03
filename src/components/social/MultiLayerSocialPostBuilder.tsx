@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { buildSummary, getTokenReplacements, compileMessage } from "@/lib/buildSummary";
 import { useOrganizationAuth } from "@/hooks/useOrganizationAuth";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Image, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface MultiLayerSocialPostBuilderProps {
   source: string;
@@ -609,22 +610,68 @@ export function MultiLayerSocialPostBuilder({
     return layer.content?.includes('{{summary}}');
   };
 
+  const navigate = useNavigate();
+
+  // Premium card styling
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden";
+
+  // Empty state when no templates
+  if (templates.length === 0) {
+    return (
+      <Card className={cardClass}>
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <Image className="h-4 w-4 text-primary" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">Create visual posts for social media.</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-5">
+          <div className="flex flex-col items-center justify-center py-12 px-8">
+            <div className="p-4 rounded-2xl bg-muted/30 dark:bg-muted/20 mb-4">
+              <Image className="h-10 w-10 text-muted-foreground/50" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No templates yet</h3>
+            <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
+              Create your first social media template in the Social Media Library to start building visual posts.
+            </p>
+            <Button variant="outline" className="rounded-lg border-border/50 hover:bg-primary/10" onClick={() => navigate('/client/social-media-library')}>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Go to Social Media Library
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="p-6">
-      <div className="space-y-6">
-        {/* Header with Template and Canvas Presets */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Social Post Builder</h2>
+    <Card className={cardClass}>
+      <CardHeader className="pb-0">
+        <div className="flex items-center justify-between pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <Image className="h-4 w-4 text-primary" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">Create visual posts for social media.</p>
+            </div>
+          </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Label className="text-sm">Template:</Label>
+              <Label className="text-sm text-muted-foreground">Template:</Label>
               <Select value={selectedTemplateId} onValueChange={(value) => {
                 setSelectedTemplateId(value);
                 const template = templates.find(t => t.id === value);
                 setCurrentTemplate(template || null);
               }}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 h-9 rounded-lg border-border/50 bg-white dark:bg-background">
                   <SelectValue placeholder="Select template..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -643,67 +690,72 @@ export function MultiLayerSocialPostBuilder({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="pt-5 space-y-5">
+        {/* Controls row */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Label className="text-sm text-muted-foreground">Canvas:</Label>
+            <Select value={canvasPreset} onValueChange={(value: CanvasPreset) => setCanvasPreset(value)}>
+              <SelectTrigger className="w-40 h-9 rounded-lg border-border/50 bg-white dark:bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CANVAS_PRESETS).map(([key, preset]) => (
+                  <SelectItem key={key} value={key}>
+                    {preset.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
+          {canvasPreset === 'custom' && (
             <div className="flex items-center gap-2">
-              <Label className="text-sm">Canvas Size:</Label>
-              <Select value={canvasPreset} onValueChange={(value: CanvasPreset) => setCanvasPreset(value)}>
-                <SelectTrigger className="w-44">
+              <Input
+                type="number"
+                value={customWidth}
+                onChange={(e) => setCustomWidth(parseInt(e.target.value) || 1080)}
+                className="w-16 h-9 rounded-lg border-border/50 bg-white dark:bg-background"
+                min={200}
+                max={2000}
+              />
+              <span className="text-xs text-muted-foreground">×</span>
+              <Input
+                type="number"
+                value={customHeight}
+                onChange={(e) => setCustomHeight(parseInt(e.target.value) || 1080)}
+                className="w-16 h-9 rounded-lg border-border/50 bg-white dark:bg-background"
+                min={200}
+                max={2000}
+              />
+            </div>
+          )}
+
+          {summaryVariants.length > 1 && (
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground">Variant:</Label>
+              <Select value={selectedVariant} onValueChange={(value) => {
+                setSelectedVariant(value);
+                onVariantChange(value);
+              }}>
+                <SelectTrigger className="w-32 h-9 rounded-lg border-border/50 bg-white dark:bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(CANVAS_PRESETS).map(([key, preset]) => (
-                    <SelectItem key={key} value={key}>
-                      {preset.name}
+                  {summaryVariants.map((variant) => (
+                    <SelectItem key={variant} value={variant}>
+                      {variant.charAt(0).toUpperCase() + variant.slice(1)}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {canvasPreset === 'custom' && (
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  value={customWidth}
-                  onChange={(e) => setCustomWidth(parseInt(e.target.value) || 1080)}
-                  className="w-16 h-8"
-                  min={200}
-                  max={2000}
-                />
-                <span className="text-xs">×</span>
-                <Input
-                  type="number"
-                  value={customHeight}
-                  onChange={(e) => setCustomHeight(parseInt(e.target.value) || 1080)}
-                  className="w-16 h-8"
-                  min={200}
-                  max={2000}
-                />
-              </div>
-            )}
-
-            {summaryVariants.length > 1 && (
-              <div className="flex items-center gap-2">
-                <Label className="text-sm">Variant:</Label>
-                <Select value={selectedVariant} onValueChange={(value) => {
-                  setSelectedVariant(value);
-                  onVariantChange(value);
-                }}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {summaryVariants.map((variant) => (
-                      <SelectItem key={variant} value={variant}>
-                        {variant.charAt(0).toUpperCase() + variant.slice(1)}
-                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             )}
           </div>
-        </div>
 
         {currentTemplate && (
           <>
@@ -988,7 +1040,7 @@ export function MultiLayerSocialPostBuilder({
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </CardContent>
     </Card>
   );
 }

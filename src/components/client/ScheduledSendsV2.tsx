@@ -739,23 +739,28 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   }
   return <>
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+        <CardHeader className="pb-0">
+          <div className="flex items-center justify-between pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+                <Clock className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">Automate recurring availability messages.</p>
+              </div>
             </div>
-            <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
+            <Button onClick={() => {
+              resetForm();
+              setEditingSchedule(null);
+              setModalOpen(true);
+            }} size="sm" className="bg-primary hover:bg-primary/90">
+              <Plus className="h-4 w-4 mr-1" />
+              New Schedule
+            </Button>
           </div>
-          <Button onClick={() => {
-          resetForm();
-          setEditingSchedule(null);
-          setModalOpen(true);
-        }} size="sm">
-            <Plus className="h-4 w-4 mr-1" />
-            New Schedule
-          </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-5">
           {schedules.length === 0 ? <div className="text-center py-8 text-muted-foreground">
               No scheduled sends configured. Create your first schedule to get started.
             </div> : <Table>
@@ -819,15 +824,20 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
       {/* Test Instructions Section */}
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
-              <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
+        <CardHeader className="pb-0">
+          <div className="pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
+                <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">Verify that your WhatsApp messages deliver correctly.</p>
+              </div>
             </div>
-            <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-5 space-y-4">
           <div className="bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-400 p-4 rounded-xl">
             <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">How to Test:</h4>
             <ol className="list-decimal list-inside space-y-1 text-sm text-blue-700 dark:text-blue-400">
@@ -863,20 +873,23 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
       {/* Run Logs Section */}
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="pb-0">
+          <div className="flex items-center justify-between pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <Eye className="h-4 w-4 text-primary" strokeWidth={1.5} />
               </div>
-              <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
+              <div>
+                <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">View the latest scheduled message deliveries.</p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs}>
+            <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs} className="rounded-lg border-border/50">
               {loadingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-5">
           {loadingLogs ? <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div> : runLogs.length === 0 ? <div className="text-center py-8 text-muted-foreground">
               No runs yet. Create a schedule and wait for it to execute.
             </div> : <div className="space-y-2">
