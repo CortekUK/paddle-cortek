@@ -735,7 +735,7 @@ Book now — don't miss out!`);
           <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
 
           {/* Send Message Footer */}
-          <div className="space-y-4">
+          <div className="space-y-4 bg-muted/30 dark:bg-muted/20 -mx-6 px-6 py-5 rounded-b-lg">
             <div className="flex items-center gap-2">
               <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
               <span className="text-sm font-medium">Send Message</span>
