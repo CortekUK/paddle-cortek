@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
@@ -70,7 +71,7 @@ export function ClientLayout() {
   const orgName = organization?.name || 'Your Organization';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/40 to-blue-50/30 dark:from-background dark:via-purple-950/20 dark:to-blue-950/10">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -81,13 +82,13 @@ export function ClientLayout() {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 z-50 h-screen w-64 bg-card border-r transition-transform duration-200 ease-in-out",
+        "fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-card border-r border-border/50 shadow-sm transition-transform duration-200 ease-in-out",
         "lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-4 border-b border-border/50">
             <div>
               <h2 className="font-semibold text-foreground">CORTEK Client</h2>
               <p className="text-sm text-muted-foreground">Club Portal</p>
@@ -104,23 +105,25 @@ export function ClientLayout() {
 
           {/* Navigation */}
           <nav className="flex-1 p-4">
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {sidebarItems.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <li key={item.href}>
                     <Button
-                      variant={isActive ? "secondary" : "ghost"}
+                      variant="ghost"
                       className={cn(
-                        "w-full justify-start gap-3",
-                        isActive && "bg-primary/10 text-primary font-medium"
+                        "w-full justify-start gap-3 transition-colors",
+                        isActive 
+                          ? "bg-primary/10 text-primary font-medium hover:bg-primary/15" 
+                          : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
                       )}
                       onClick={() => {
                         navigate(item.href);
                         setSidebarOpen(false);
                       }}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className={cn("h-4 w-4", isActive && "text-primary")} />
                       {item.title}
                     </Button>
                   </li>
@@ -134,7 +137,7 @@ export function ClientLayout() {
       {/* Main content */}
       <div className="lg:ml-64">
         {/* Top header */}
-        <header className="bg-background border-b px-4 py-3">
+        <header className="bg-white/80 dark:bg-card/80 backdrop-blur-sm border-b border-border/50 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
@@ -148,7 +151,7 @@ export function ClientLayout() {
               <div>
                 <h1 className="font-semibold text-lg text-foreground">{orgName}</h1>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-0">
                     Trial Active
                   </Badge>
                 </div>
@@ -156,12 +159,13 @@ export function ClientLayout() {
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium">{user?.email}</p>
+                <p className="text-sm font-medium text-foreground">{user?.email}</p>
                 <p className="text-xs text-muted-foreground">Club Member</p>
               </div>
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-xs">
+              <Avatar className="h-8 w-8 border border-border/50">
+                <AvatarFallback className="text-xs bg-primary/10 text-primary">
                   {user?.email ? getInitials(user.email) : 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -169,7 +173,7 @@ export function ClientLayout() {
                 variant="ghost"
                 size="sm"
                 onClick={handleSignOut}
-                className="gap-2"
+                className="gap-2 text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign Out</span>
