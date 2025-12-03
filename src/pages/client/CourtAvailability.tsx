@@ -683,7 +683,7 @@ Book now — don't miss out!`);
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : summaryText ? (
-            <div className="bg-muted/20 dark:bg-muted/10 rounded-xl p-4 border border-border/30">
+            <div className="bg-purple-50/40 dark:bg-purple-900/10 rounded-xl p-4 border border-purple-200/30 dark:border-purple-800/20">
               <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
                 {summaryText}
               </pre>
