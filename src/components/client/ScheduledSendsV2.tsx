@@ -743,8 +743,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         <CardHeader className="pb-4 border-b border-border/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30">
+                <Clock className="h-4 w-4 text-purple-500" strokeWidth={1.5} />
               </div>
               <CardTitle className="text-lg font-semibold">Scheduled Messages</CardTitle>
             </div>
@@ -836,8 +836,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
         <CardHeader className="pb-4 border-b border-border/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
-              <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
+            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30">
+              <AlertCircle className="h-4 w-4 text-purple-500" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
           </div>
@@ -881,8 +881,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         <CardHeader className="pb-4 border-b border-border/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30">
+                <Eye className="h-4 w-4 text-purple-500" strokeWidth={1.5} />
               </div>
               <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
             </div>
