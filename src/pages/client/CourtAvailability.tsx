@@ -637,7 +637,7 @@ Book now — don't miss out!`);
                   className={cn(
                     "rounded-full px-4 h-9 text-sm font-medium transition-all flex-1",
                     activePreset === preset
-                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm"
+                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
                       : "bg-background hover:bg-muted/60 border-border/50"
                   )}
                 >
@@ -730,7 +730,7 @@ Book now — don't miss out!`);
                 {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
               </h3>
               {countSlots > 0 && (
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold text-xs mt-1">
+                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs mt-1">
                   {countSlots} slots available
                 </Badge>
               )}
@@ -761,8 +761,8 @@ Book now — don't miss out!`);
       <Card className={cardClass}>
         <CardHeader className="pb-0">
           <div className="flex items-center gap-3 pb-4 border-b border-border/30">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <MessageSquare className="h-4 w-4 text-primary" strokeWidth={1.5} />
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-lg font-semibold">Message Template</CardTitle>
           </div>
