@@ -623,7 +623,7 @@ Book now — don't miss out!`);
       <Card className={cardClass}>
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]">
           {/* Left Panel - Search Controls */}
-          <div className="p-5 lg:border-r border-border/40 bg-muted/5 dark:bg-muted/10">
+          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10">
             <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
             
             {/* Preset pills */}
