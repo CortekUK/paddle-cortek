@@ -646,61 +646,6 @@ Book now — don't miss out!`);
               ))}
             </div>
 
-            {/* Date range selector */}
-            <div className="space-y-3 mb-4">
-              <div className="flex items-center gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "h-9 flex-1 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
-                        !fromDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      {fromDate ? format(fromDate, "MMM d, yyyy") : "Start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={fromDate}
-                      onSelect={handleFromDateSelect}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "h-9 flex-1 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
-                        !toDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      {toDate ? format(toDate, "MMM d, yyyy") : "End date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={toDate}
-                      onSelect={handleToDateSelect}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
             {error && (
               <Alert variant="destructive" className="rounded-xl mb-4">
                 <AlertCircle className="h-4 w-4" />
