@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -256,6 +264,7 @@ export function ClientLayout() {
           <header className="sticky top-0 z-30 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/30 shadow-sm">
             <div className="px-6 py-4">
               <div className="flex items-center justify-between">
+                {/* Left: Mobile menu + Org info with left border accent */}
                 <div className="flex items-center gap-4">
                   <Button
                     variant="ghost"
@@ -265,34 +274,71 @@ export function ClientLayout() {
                   >
                     <Menu className="h-4 w-4" />
                   </Button>
-                  <div>
+                  <div className="border-l-2 border-primary/30 pl-4">
                     <h1 className="font-bold text-xl text-foreground tracking-tight">{orgName}</h1>
-                    <p className="text-sm text-muted-foreground/80 mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {greeting}, <span className="font-medium text-foreground">{firstName}</span>
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Right: Theme toggle + separator + User dropdown */}
+                <div className="flex items-center gap-4">
                   <ThemeToggle />
-                  <div className="hidden md:block text-right">
-                    <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                    <p className="text-xs text-muted-foreground/70">Club Member</p>
-                  </div>
-                  <Avatar className="h-10 w-10 border-2 border-primary/20 ring-2 ring-primary/5">
-                    <AvatarFallback className="text-sm bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold">
-                      {user?.email ? getInitials(user.email) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="gap-2 text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span className="hidden sm:inline">Sign Out</span>
-                  </Button>
+                  
+                  {/* Subtle separator */}
+                  <div className="h-6 w-px bg-border/50 hidden md:block" />
+                  
+                  {/* User dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="flex items-center gap-3 px-2 py-1.5 h-auto hover:bg-muted/50 rounded-xl"
+                      >
+                        <div className="hidden md:block text-right">
+                          <p className="text-sm font-medium text-foreground">{user?.email}</p>
+                          <p className="text-xs text-muted-foreground">Club Member</p>
+                        </div>
+                        <Avatar className="h-9 w-9 border-2 border-primary/20">
+                          <AvatarFallback className="text-sm bg-gradient-to-br from-primary/30 to-purple-500/30 text-primary font-semibold">
+                            {user?.email ? getInitials(user.email) : 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 rounded-xl">
+                      <DropdownMenuLabel>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback className="bg-gradient-to-br from-primary/30 to-purple-500/30 text-primary font-semibold">
+                              {user?.email ? getInitials(user.email) : 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="font-medium text-foreground">{firstName}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                          </div>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/client/settings')} 
+                        className="cursor-pointer rounded-lg"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={handleSignOut} 
+                        className="cursor-pointer rounded-lg text-destructive focus:text-destructive focus:bg-destructive/10"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
