@@ -564,10 +564,21 @@ Book now — don't miss out!`);
   // Premium card styling
   const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden";
 
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <div className="relative space-y-8">
       {/* Page Header */}
-      <div className="space-y-1">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          {(organization as any)?.club_name || organization?.name || 'Your Club'} / {getGreeting()}
+        </p>
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20">
             <Calendar className="h-6 w-6 text-primary" strokeWidth={1.5} />
@@ -575,7 +586,7 @@ Book now — don't miss out!`);
           <div>
             <h1 className="text-3xl font-bold text-foreground">Court Availability</h1>
             <p className="text-muted-foreground">
-              Search for available courts and send WhatsApp notifications
+              Search for available courts and send WhatsApp notifications.
             </p>
           </div>
         </div>
@@ -583,15 +594,15 @@ Book now — don't miss out!`);
 
       {/* Section 1 – Availability Search */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
             <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <Search className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-lg font-semibold">Find Availability</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="pt-5 space-y-5">
           {/* Today/Tomorrow pills */}
           <div className="flex gap-2">
             <Button
@@ -656,15 +667,15 @@ Book now — don't miss out!`);
 
       {/* Section 2 – Summary Preview */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
             <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <FileText className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <FileText className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-lg font-semibold">Summary Preview</CardTitle>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-5">
           <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 font-mono text-sm whitespace-pre-wrap border border-border/30">
             {summaryText ? (
               <div className="flex gap-3">
@@ -676,7 +687,7 @@ Book now — don't miss out!`);
                 </div>
               </div>
             ) : (
-              <span className="text-muted-foreground/70">Run a search to preview availability</span>
+              <span className="text-muted-foreground/60 italic">Run a search to preview availability</span>
             )}
           </div>
         </CardContent>
@@ -684,15 +695,15 @@ Book now — don't miss out!`);
 
       {/* Section 3 – Message Builder */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
             <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <MessageSquare className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
             <CardTitle className="text-lg font-semibold">Message Template</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="pt-5 space-y-4">
           {/* Template controls row */}
           <div className="flex flex-wrap gap-2 items-center">
             <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
@@ -728,10 +739,10 @@ Book now — don't miss out!`);
           </div>
 
           {/* Two-column layout: Editor + Preview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Left side - Template editor */}
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-3">
+              <div className="space-y-1.5">
                 <Label htmlFor="templateName" className="text-sm font-medium">Name</Label>
                 <Input
                   id="templateName"
@@ -742,7 +753,7 @@ Book now — don't miss out!`);
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="templateContent" className="text-sm font-medium">Content</Label>
                 <Textarea
                   ref={textareaRef}
@@ -751,7 +762,7 @@ Book now — don't miss out!`);
                   onChange={(e) => setTemplateContent(e.target.value)}
                   rows={8}
                   placeholder="Enter your message template..."
-                  className="rounded-lg border-border/50 bg-white dark:bg-background min-h-[180px] resize-none"
+                  className="rounded-lg border-border/50 bg-white dark:bg-background min-h-[160px] resize-none"
                 />
                 <div className="text-xs text-muted-foreground">
                   {templateContent.length} characters
@@ -759,9 +770,9 @@ Book now — don't miss out!`);
               </div>
 
               {/* Token chips and emoji picker */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="text-sm font-medium">Insert tokens:</Label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {[
                     '{{club_name}}',
                     '{{date_display_short}}', 
@@ -774,7 +785,7 @@ Book now — don't miss out!`);
                       variant="outline"
                       size="sm"
                       onClick={() => insertToken(token)}
-                      className="text-xs rounded-full px-3 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+                      className="text-xs rounded-full px-3 py-1 h-7 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
                     >
                       <Hash className="h-3 w-3 mr-1" />
                       {token}
@@ -786,22 +797,17 @@ Book now — don't miss out!`);
             </div>
 
             {/* Right side - Live Preview */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Live Preview</Label>
-                <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)} className="h-8 w-8 p-0">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-400 p-4 rounded-xl">
-                <div className="font-mono text-sm whitespace-pre-wrap text-foreground">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold text-foreground">Live Preview</Label>
+              <div className="bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/30 p-5 rounded-xl min-h-[200px]">
+                <div className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
                   {summaryText ? renderTemplate(templateContent) : (
-                    <span className="text-muted-foreground">Run a search to preview with real data</span>
+                    <span className="text-muted-foreground/60 italic">Run a search to preview with real data</span>
                   )}
                 </div>
               </div>
               {!summaryText && templateContent && (
-                <div className="text-xs text-muted-foreground mt-2">
+                <div className="text-xs text-muted-foreground">
                   💡 Add {`{{summary}}`} to include the breakdown
                 </div>
               )}
@@ -812,15 +818,18 @@ Book now — don't miss out!`);
 
       {/* Section 4 – Manual Send */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
             <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Send className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
-            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
+            <div>
+              <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">Send a one-time availability update.</p>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-5 space-y-4">
           <div className="flex flex-col sm:flex-row gap-3 items-end">
             <div className="flex-1 space-y-2">
               <Label htmlFor="whatsappGroup" className="text-sm font-medium">WhatsApp Group</Label>
