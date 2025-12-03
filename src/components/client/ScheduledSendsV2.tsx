@@ -740,8 +740,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   }
   return <>
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-0">
-          <div className="flex items-center justify-between pb-4 border-b border-border/30">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
                 <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
@@ -837,16 +837,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
       {/* Test Instructions Section */}
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-0">
-          <div className="pb-4 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
-                <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
-              </div>
-              <div>
-                <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
-                <p className="text-sm text-muted-foreground mt-0.5">Verify that your WhatsApp messages deliver correctly.</p>
-              </div>
+        <CardHeader className="pb-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
+              <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">Verify that your WhatsApp messages deliver correctly.</p>
             </div>
           </div>
         </CardHeader>
@@ -886,8 +884,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
       {/* Run Logs Section */}
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-0">
-          <div className="flex items-center justify-between pb-4 border-b border-border/30">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
                 <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
