@@ -130,6 +130,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   // Log details modal state
   const [logDetailsModalOpen, setLogDetailsModalOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<any>(null);
+
+  // Test section collapsible state
+  const [testSectionOpen, setTestSectionOpen] = useState(true);
   useEffect(() => {
     if (organization?.id) {
       loadSchedules();
@@ -148,6 +151,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
   //   return () => clearInterval(interval);
   // }, [organization?.id, category]);
+
+  // Auto-collapse test section after successful test
+  useEffect(() => {
+    if (lastTestResult?.status === 'success') {
+      const timer = setTimeout(() => setTestSectionOpen(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastTestResult]);
 
   // Update form time when timezone is loaded and when creating new schedule
   useEffect(() => {
@@ -740,15 +751,6 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   if (loading) {
     return <div>Loading scheduled sends...</div>;
   }
-  const [testSectionOpen, setTestSectionOpen] = useState(true);
-
-  // Auto-collapse test section after successful test
-  useEffect(() => {
-    if (lastTestResult?.status === 'success') {
-      const timer = setTimeout(() => setTestSectionOpen(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [lastTestResult]);
 
   return <>
       {/* Test Connection Section */}
