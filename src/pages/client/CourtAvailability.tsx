@@ -623,7 +623,7 @@ Book now — don't miss out!`);
       <Card className={cardClass}>
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]">
           {/* Left Panel - Search Controls */}
-          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10 flex flex-col min-h-[280px]">
+          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10 flex flex-col justify-center min-h-[280px]">
             <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
             
             {/* Preset pills */}
@@ -707,9 +707,6 @@ Book now — don't miss out!`);
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
-            {/* Spacer to push button to bottom */}
-            <div className="flex-1" />
 
             {/* Search button */}
             <Button
