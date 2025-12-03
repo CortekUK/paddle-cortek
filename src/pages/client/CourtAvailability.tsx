@@ -760,18 +760,12 @@ Book now — don't miss out!`);
                     <Plus className="h-3.5 w-3.5 mr-2" />
                     Save as new...
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId}>
+                    <Star className={`h-3.5 w-3.5 mr-2 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : ''}`} />
+                    Set as default
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleSetDefault} 
-                disabled={!selectedTemplateId} 
-                className="h-8 w-8 hover:bg-muted/50"
-              >
-                <Star className={`h-3.5 w-3.5 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground'}`} />
-              </Button>
               
               <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
                 <Plus className="h-3.5 w-3.5 mr-1.5" />
