@@ -621,8 +621,8 @@ export function MultiLayerSocialPostBuilder({
       <Card className={cardClass}>
         <CardHeader className="pb-0">
           <div className="flex items-center gap-3 pb-4 border-b border-border/30">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Image className="h-4 w-4 text-primary" strokeWidth={1.5} />
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <Image className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
             <div>
               <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
@@ -654,8 +654,8 @@ export function MultiLayerSocialPostBuilder({
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between pb-4 border-b border-border/30">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Image className="h-4 w-4 text-primary" strokeWidth={1.5} />
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <Image className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
             <div>
               <CardTitle className="text-lg font-semibold">Social Post Builder</CardTitle>
