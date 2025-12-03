@@ -723,9 +723,7 @@ Book now — don't miss out!`);
                   {summaryText ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
                 </div>
               </div>
-              {!summaryText && templateContent && <p className="text-xs text-muted-foreground pt-2">
-                  Tip: Add {`{{summary}}`} to include the availability breakdown
-                </p>}
+              {!summaryText && templateContent}
             </div>
           </div>
         </CardContent>
