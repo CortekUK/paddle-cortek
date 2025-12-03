@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 import { 
   Calendar, 
   Users, 
-  Trophy, 
-  MessageCircle, 
+  Flag, 
+  Send, 
   Clock,
   ArrowRight,
-  Sparkles,
+  ArrowUpRight,
   TrendingUp,
-  Zap,
+  BarChart3,
   Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -28,19 +28,15 @@ export default function ClientDashboard() {
       status: 'Active', 
       icon: Users,
       href: '/client/partial-matches',
-      accentColor: 'border-l-primary',
-      iconBg: 'bg-primary/10',
-      iconColor: 'text-primary'
+      accentColor: 'border-l-primary/50'
     },
     {
       title: 'Competitions',
       description: 'Tournament & academy updates',
       status: 'Active',
-      icon: Trophy, 
+      icon: Flag, 
       href: '/client/competitions-academies',
-      accentColor: 'border-l-accent',
-      iconBg: 'bg-accent/10',
-      iconColor: 'text-accent'
+      accentColor: 'border-l-accent/50'
     }
   ];
 
@@ -88,8 +84,8 @@ export default function ClientDashboard() {
             <div className="grid grid-cols-2 gap-6">
               {/* Automations */}
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/15 to-green-400/10">
-                  <Zap className="h-5 w-5 text-emerald-600" />
+                <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-foreground">3</div>
@@ -98,8 +94,8 @@ export default function ClientDashboard() {
               </div>
               {/* Messages */}
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-accent/15 to-purple-400/10">
-                  <MessageCircle className="h-5 w-5 text-accent" />
+                <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
+                  <Send className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                 </div>
                 <div>
                   <div className="flex items-baseline gap-2">
@@ -153,8 +149,8 @@ export default function ClientDashboard() {
             
             <CardContent className="p-8 h-full flex flex-col relative">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/15 to-green-400/10 shadow-inner group-hover:scale-105 transition-transform duration-300">
-                  <Calendar className="h-8 w-8 text-emerald-600" />
+                <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-muted/70 transition-colors duration-300">
+                  <Calendar className="h-6 w-6 text-foreground" strokeWidth={1.5} />
                 </div>
                 <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 animate-pulse-soft">
                   Active
@@ -176,7 +172,7 @@ export default function ClientDashboard() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 group-hover:shadow-xl group-hover:shadow-emerald-600/30 transition-all"
+                  className="rounded-xl"
                 >
                   Manage
                   <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-1" />
@@ -198,10 +194,10 @@ export default function ClientDashboard() {
             >
               <CardContent className="p-5 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={cn("p-3 rounded-xl", card.iconBg)}>
-                    <card.icon className={cn("h-5 w-5", card.iconColor)} />
+                  <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
+                    <card.icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                   </div>
-                  <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px]">
+                  <Badge variant="outline" className="border-border text-muted-foreground bg-muted/30 text-[10px]">
                     {card.status}
                   </Badge>
                 </div>
@@ -212,7 +208,7 @@ export default function ClientDashboard() {
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
-                  <ArrowRight className={cn("h-4 w-4 transition-transform duration-300 group-hover:translate-x-1", card.iconColor)} />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </CardContent>
             </Card>
@@ -221,22 +217,22 @@ export default function ClientDashboard() {
       </div>
 
       {/* Coming Soon - Slim Accent Strip */}
-      <div className="p-[1px] rounded-xl bg-gradient-to-r from-primary/20 via-accent/30 to-primary/20">
+      <div className="p-[1px] rounded-xl bg-gradient-to-r from-border via-border/50 to-border">
         <Card className="bg-white/80 dark:bg-card/80 backdrop-blur-sm rounded-xl border-0">
-          <CardContent className="py-5 px-6">
+          <CardContent className="py-4 px-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 animate-float">
-                  <Sparkles className="h-5 w-5 text-primary" />
+                <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    More Magic Coming Soon
+                  <h3 className="text-sm font-medium text-foreground">
+                    New Features in Development
                   </h3>
                   <p className="text-xs text-muted-foreground">Advanced analytics & custom automation rules</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 rounded-lg text-xs">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-lg text-xs">
                 Learn more
                 <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Button>
