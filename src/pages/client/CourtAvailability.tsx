@@ -638,7 +638,7 @@ Book now — don't miss out!`);
                     "rounded-full px-4 h-9 text-sm font-medium transition-all flex-1",
                     activePreset === preset
                       ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
-                      : "bg-background text-foreground hover:bg-muted border-border/50"
+                      : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50"
                   )}
                 >
                   {preset === 'today' ? 'Today' : 'Tomorrow'}
