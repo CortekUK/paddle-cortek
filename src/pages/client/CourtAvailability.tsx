@@ -21,39 +21,43 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
 export default function CourtAvailability() {
-  const { organization } = useOrganizationAuth();
-  const { toast } = useToast();
+  const {
+    organization
+  } = useOrganizationAuth();
+  const {
+    toast
+  } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Search results state
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [summaryText, setSummaryText] = useState('');
   const [dateDisplayShort, setDateDisplayShort] = useState('');
   const [countSlots, setCountSlots] = useState(0);
-  
+
   // Template state
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   const [templateName, setTemplateName] = useState('');
   const [templateContent, setTemplateContent] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  
+
   // Send state  
   const [sendingMessage, setSendingMessage] = useState(false);
-  const [sendResult, setSendResult] = useState<{ status: string; message: string } | null>(null);
+  const [sendResult, setSendResult] = useState<{
+    status: string;
+    message: string;
+  } | null>(null);
   const [whatsappGroup, setWhatsappGroup] = useState('');
   const [orgSettings, setOrgSettings] = useState<any>(null);
-  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Default to current date and time + 2 hours
   const now = new Date();
   const defaultFromDate = format(now, "yyyy-MM-dd'T'HH:mm:ss");
   const defaultToDate = format(new Date(now.getTime() + 2 * 60 * 60 * 1000), "yyyy-MM-dd'T'HH:mm:ss");
-
   const [dateFrom, setDateFrom] = useState(defaultFromDate);
   const [dateTo, setDateTo] = useState(defaultToDate);
 
@@ -65,25 +69,21 @@ export default function CourtAvailability() {
     const parts = timeStr.split(':').map(n => parseInt(n));
     return parts[0] * 60 + (parts[1] || 0);
   };
-
   const minutesToHHMM = (minutes: number): string => {
     const totalMins = minutes % 1440;
     const hours = Math.floor(totalMins / 60);
     const mins = totalMins % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
   };
-
   const addMinutesLocal = (timeStr: string, offsetMins: number): string => {
     const baseMins = hhmmToMinutes(timeStr);
     const adjustedMins = (baseMins + offsetMins + 1440) % 1440;
     return minutesToHHMM(adjustedMins);
   };
-
   const formatCompactAmPm = (minutes: number): string => {
-    const totalMins = ((minutes % 1440) + 1440) % 1440;
+    const totalMins = (minutes % 1440 + 1440) % 1440;
     const hours = Math.floor(totalMins / 60);
     const mins = totalMins % 60;
-    
     if (hours === 0) {
       return mins === 0 ? "12am" : `12:${mins.toString().padStart(2, '0')}am`;
     } else if (hours < 12) {
@@ -95,18 +95,23 @@ export default function CourtAvailability() {
       return mins === 0 ? `${displayHour}pm` : `${displayHour}:${mins.toString().padStart(2, '0')}pm`;
     }
   };
-
   const DAY_PART_BOUNDARIES = {
-    morning: { start: 360, end: 720 },
-    afternoon: { start: 720, end: 1020 },
-    evening: { start: 1020, end: 1380 }
+    morning: {
+      start: 360,
+      end: 720
+    },
+    afternoon: {
+      start: 720,
+      end: 1020
+    },
+    evening: {
+      start: 1020,
+      end: 1380
+    }
   };
-
   const extractRawSlots = (data: any[]) => {
     if (!Array.isArray(data) || data.length === 0) return [];
-    
     const slots = [];
-    
     for (const item of data) {
       if (item.slots && Array.isArray(item.slots)) {
         slots.push(...item.slots);
@@ -114,13 +119,10 @@ export default function CourtAvailability() {
         slots.push(item);
       }
     }
-    
     return slots;
   };
-
   const parseSlotTime = (slot: any) => {
     let startTime = null;
-    
     if (slot.start_date && slot.start_time) {
       startTime = slot.start_time;
     } else if (slot.start_time) {
@@ -128,16 +130,12 @@ export default function CourtAvailability() {
     } else if (slot.startTime) {
       startTime = slot.startTime;
     }
-    
     if (!startTime) return null;
-    
     const baseTime = startTime.split(':').slice(0, 2).join(':');
     const duration = slot.duration || slot.duration_minutes || slot.length || 90;
-    
     const adjustedStartHHMM = addMinutesLocal(baseTime, playtomicOffsetMinutes);
     const adjustedStartMin = hhmmToMinutes(adjustedStartHHMM);
     const adjustedEndMin = (adjustedStartMin + duration) % 1440;
-    
     return {
       startTimeHHMM: baseTime,
       adjustedStartHHMM,
@@ -147,26 +145,20 @@ export default function CourtAvailability() {
       duration
     };
   };
-
   const generateSummary = (data: any[]) => {
     return generateAvailabilitySummary(data, playtomicOffsetMinutes);
   };
-
   const toShortDate = (from: Date, to: Date, tz = 'Europe/London') => {
     const f = formatInTimeZone(from, tz, 'EEE d LLL');
     const t = formatInTimeZone(to, tz, 'EEE d LLL');
     return f === t ? f : `${f} – ${t}`;
   };
-
   const [activePreset, setActivePreset] = useState<'today' | 'tomorrow' | 'week' | null>(null);
-
   const setPreset = (preset: 'today' | 'tomorrow' | 'week') => {
     const now = new Date();
     const timezone = 'Europe/London';
-    
     let targetStart: Date;
     let targetEnd: Date;
-    
     if (preset === 'today') {
       targetStart = startOfDay(now);
       targetEnd = endOfDay(now);
@@ -175,12 +167,12 @@ export default function CourtAvailability() {
       targetEnd = endOfDay(addDays(now, 1));
     } else {
       targetStart = startOfDay(now);
-      targetEnd = endOfWeek(now, { weekStartsOn: 1 });
+      targetEnd = endOfWeek(now, {
+        weekStartsOn: 1
+      });
     }
-    
     const startLocal = formatInTimeZone(targetStart, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
     const endLocal = formatInTimeZone(targetEnd, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
-    
     setDateFrom(startLocal);
     setDateTo(endLocal);
     setActivePreset(preset);
@@ -189,7 +181,6 @@ export default function CourtAvailability() {
   // Parse dates for calendar display
   const fromDate = dateFrom ? new Date(dateFrom) : undefined;
   const toDate = dateTo ? new Date(dateTo) : undefined;
-
   const handleFromDateSelect = (date: Date | undefined) => {
     if (date) {
       const timezone = 'Europe/London';
@@ -198,7 +189,6 @@ export default function CourtAvailability() {
       setActivePreset(null);
     }
   };
-
   const handleToDateSelect = (date: Date | undefined) => {
     if (date) {
       const timezone = 'Europe/London';
@@ -207,26 +197,21 @@ export default function CourtAvailability() {
       setActivePreset(null);
     }
   };
-
   useEffect(() => {
     if (organization?.id) {
       loadTemplatesAndSettings();
     }
   }, [organization?.id]);
-
   const loadTemplatesAndSettings = async () => {
     try {
-      const { data: templatesData, error: templatesError } = await supabase
-        .from('message_templates')
-        .select('*')
-        .eq('category', 'AVAILABILITY')
-        .eq('org_id', organization!.id)
-        .order('created_at', { ascending: false });
-
+      const {
+        data: templatesData,
+        error: templatesError
+      } = await supabase.from('message_templates').select('*').eq('category', 'AVAILABILITY').eq('org_id', organization!.id).order('created_at', {
+        ascending: false
+      });
       if (templatesError) throw templatesError;
-      
       setTemplates(templatesData || []);
-
       const defaultTemplate = templatesData?.find(t => t.is_default);
       if (defaultTemplate) {
         setSelectedTemplateId(defaultTemplate.id);
@@ -241,20 +226,16 @@ export default function CourtAvailability() {
 
 Book now — don't miss out!`);
       }
-
-      const { data: settingsData, error: settingsError } = await supabase
-        .from('org_automation_settings')
-        .select('*')
-        .eq('org_id', organization!.id)
-        .single();
-
+      const {
+        data: settingsData,
+        error: settingsError
+      } = await supabase.from('org_automation_settings').select('*').eq('org_id', organization!.id).single();
       if (settingsError && settingsError.code !== 'PGRST116') {
         console.error('Error loading settings:', settingsError);
       } else {
         setOrgSettings(settingsData);
         setWhatsappGroup(settingsData?.wa_group_availability || '');
       }
-
     } catch (err) {
       console.error('Error loading templates and settings:', err);
       toast({
@@ -264,28 +245,26 @@ Book now — don't miss out!`);
       });
     }
   };
-
   const handleSearch = async () => {
     if (!organization?.tenant_id) {
       setError('Club tenant information not found. Please contact support.');
       return;
     }
-
     setLoading(true);
     setError('');
     setSendResult(null);
-
     try {
       const fromDate = new Date(dateFrom);
       const toDate = new Date(dateTo);
-
       if (fromDate >= toDate) {
         setError('End date must be after start date');
         setLoading(false);
         return;
       }
-
-      const { data, error: fetchError } = await supabase.functions.invoke('playtomic-fetch', {
+      const {
+        data,
+        error: fetchError
+      } = await supabase.functions.invoke('playtomic-fetch', {
         body: {
           endpoint: 'availability',
           tenant_id: organization.tenant_id,
@@ -294,18 +273,14 @@ Book now — don't miss out!`);
           start_max: toDate.toISOString()
         }
       });
-
       if (fetchError) {
         throw new Error(fetchError.message || 'Failed to fetch availability data');
       }
-
       if (data?.error) {
         throw new Error(data.error);
       }
-
       if (data?.raw && Array.isArray(data.raw)) {
         setSearchResults(data.raw);
-        
         if (data.raw.length === 0) {
           setSummaryText('0 slots available for this day');
           setCountSlots(0);
@@ -313,9 +288,7 @@ Book now — don't miss out!`);
           const totalSlots = data.raw.reduce((count, resource) => {
             return count + (resource.slots?.length || 0);
           }, 0);
-          
           setCountSlots(totalSlots);
-          
           if (totalSlots === 0) {
             setSummaryText('0 slots available for this day');
           } else {
@@ -328,9 +301,7 @@ Book now — don't miss out!`);
         setCountSlots(0);
         setSearchResults([]);
       }
-
       setDateDisplayShort(toShortDate(fromDate, toDate));
-
     } catch (err: any) {
       console.error('Availability search error:', err);
       setError(err.message || 'An error occurred while searching for availability');
@@ -338,7 +309,6 @@ Book now — don't miss out!`);
       setLoading(false);
     }
   };
-
   const renderTemplate = (template: string): string => {
     const context = {
       summary: summaryText || 'No summary available',
@@ -347,33 +317,26 @@ Book now — don't miss out!`);
       sport: 'PADEL',
       count_slots: countSlots.toString()
     };
-
     return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key) => {
       return (context as any)[key] || '';
     });
   };
-
   const insertToken = (token: string) => {
     if (!textareaRef.current) return;
-    
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const before = templateContent.substring(0, start);
     const after = templateContent.substring(end);
-    
     setTemplateContent(before + token + after);
-    
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(start + token.length, start + token.length);
     }, 0);
   };
-
   const insertEmoji = (emoji: string) => {
     insertToken(emoji);
   };
-
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
@@ -382,13 +345,11 @@ Book now — don't miss out!`);
       setTemplateContent(template.content);
     }
   };
-
   const handleNewTemplate = () => {
     setSelectedTemplateId('');
     setTemplateName('');
     setTemplateContent('');
   };
-
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) {
       toast({
@@ -398,7 +359,6 @@ Book now — don't miss out!`);
       });
       return;
     }
-
     try {
       const templateData = {
         org_id: organization!.id,
@@ -406,28 +366,23 @@ Book now — don't miss out!`);
         name: templateName,
         content: templateContent
       };
-
       if (selectedTemplateId) {
-        const { error } = await supabase
-          .from('message_templates')
-          .update(templateData)
-          .eq('id', selectedTemplateId);
+        const {
+          error
+        } = await supabase.from('message_templates').update(templateData).eq('id', selectedTemplateId);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase
-          .from('message_templates')
-          .insert(templateData)
-          .select()
-          .single();
+        const {
+          data,
+          error
+        } = await supabase.from('message_templates').insert(templateData).select().single();
         if (error) throw error;
         setSelectedTemplateId(data.id);
       }
-
       toast({
         title: "Success",
         description: `Template ${selectedTemplateId ? 'updated' : 'saved'} successfully`
       });
-
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error saving template:', err);
@@ -438,7 +393,6 @@ Book now — don't miss out!`);
       });
     }
   };
-
   const handleSaveAsTemplate = async () => {
     if (!templateName.trim()) {
       toast({
@@ -448,28 +402,22 @@ Book now — don't miss out!`);
       });
       return;
     }
-
     try {
-      const { data, error } = await supabase
-        .from('message_templates')
-        .insert({
-          org_id: organization!.id,
-          category: 'AVAILABILITY',
-          name: templateName,
-          content: templateContent
-        })
-        .select()
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('message_templates').insert({
+        org_id: organization!.id,
+        category: 'AVAILABILITY',
+        name: templateName,
+        content: templateContent
+      }).select().single();
       if (error) throw error;
-
       setSelectedTemplateId(data.id);
-      
       toast({
         title: "Success",
         description: "New template created successfully"
       });
-
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error creating template:', err);
@@ -480,36 +428,29 @@ Book now — don't miss out!`);
       });
     }
   };
-
   const handleSetDefault = async () => {
     if (!selectedTemplateId) {
       toast({
-        title: "Error", 
+        title: "Error",
         description: "Please save the template first",
         variant: "destructive"
       });
       return;
     }
-
     try {
-      await supabase
-        .from('message_templates')
-        .update({ is_default: false })
-        .eq('org_id', organization!.id)
-        .eq('category', 'AVAILABILITY');
-
-      const { error } = await supabase
-        .from('message_templates')
-        .update({ is_default: true })
-        .eq('id', selectedTemplateId);
-
+      await supabase.from('message_templates').update({
+        is_default: false
+      }).eq('org_id', organization!.id).eq('category', 'AVAILABILITY');
+      const {
+        error
+      } = await supabase.from('message_templates').update({
+        is_default: true
+      }).eq('id', selectedTemplateId);
       if (error) throw error;
-
       toast({
         title: "Success",
         description: "Template set as default"
       });
-
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error setting default template:', err);
@@ -520,7 +461,6 @@ Book now — don't miss out!`);
       });
     }
   };
-
   const handleSendMessage = async () => {
     if (!whatsappGroup.trim()) {
       toast({
@@ -530,7 +470,6 @@ Book now — don't miss out!`);
       });
       return;
     }
-
     if (!templateContent.trim()) {
       toast({
         title: "Error",
@@ -539,14 +478,14 @@ Book now — don't miss out!`);
       });
       return;
     }
-
     setSendingMessage(true);
     setSendResult(null);
-
     try {
       const renderedMessage = renderTemplate(templateContent);
-
-      const { data, error } = await supabase.functions.invoke('send-whatsapp-message', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('send-whatsapp-message', {
         body: {
           tenant_id: organization!.tenant_id,
           category: 'AVAILABILITY',
@@ -555,26 +494,23 @@ Book now — don't miss out!`);
           template_id: selectedTemplateId || null
         }
       });
-
       if (error) throw error;
-
       if (data.status === 'OK') {
-        setSendResult({ 
-          status: 'success', 
+        setSendResult({
+          status: 'success',
           message: `Message sent to "${whatsappGroup}"` + (data.log_id ? ` (Log #${data.log_id})` : '')
         });
         toast({
           title: "Success",
-          description: "Message sent to WhatsApp group",
+          description: "Message sent to WhatsApp group"
         });
       } else {
         const resultStr = JSON.stringify(data.result || {});
         const isTimeout = resultStr.includes('timeout') || resultStr.includes('aborted');
-        
         if (isTimeout) {
-          setSendResult({ 
-            status: 'success', 
-            message: `Message may have been sent (timeout occurred, please verify in WhatsApp)` 
+          setSendResult({
+            status: 'success',
+            message: `Message may have been sent (timeout occurred, please verify in WhatsApp)`
           });
           toast({
             title: "Warning",
@@ -582,9 +518,9 @@ Book now — don't miss out!`);
             variant: "default"
           });
         } else {
-          setSendResult({ 
-            status: 'error', 
-            message: `Send failed: ${resultStr.substring(0, 120)}` 
+          setSendResult({
+            status: 'error',
+            message: `Send failed: ${resultStr.substring(0, 120)}`
           });
           toast({
             title: "Error",
@@ -595,9 +531,9 @@ Book now — don't miss out!`);
       }
     } catch (err: any) {
       console.error('Error sending message:', err);
-      setSendResult({ 
-        status: 'error', 
-        message: err.message || 'Failed to send message' 
+      setSendResult({
+        status: 'error',
+        message: err.message || 'Failed to send message'
       });
     } finally {
       setSendingMessage(false);
@@ -606,9 +542,7 @@ Book now — don't miss out!`);
 
   // Premium card styling
   const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
-
-  return (
-    <div className="relative space-y-8">
+  return <div className="relative space-y-8">
       {/* Page Header Banner */}
       <div className="relative -mx-4 -mt-4 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
@@ -633,37 +567,17 @@ Book now — don't miss out!`);
             </div>
             
             <div className="flex items-center gap-2 flex-1">
-              {(['today', 'tomorrow'] as const).map((preset) => (
-                <Button
-                  key={preset}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPreset(preset)}
-                  className={cn(
-                    "rounded-full px-4 h-8 text-sm font-medium transition-all",
-                    activePreset === preset
-                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
-                      : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
-                  )}
-                >
+              {(['today', 'tomorrow'] as const).map(preset => <Button key={preset} variant="outline" size="sm" onClick={() => setPreset(preset)} className={cn("rounded-full px-4 h-8 text-sm font-medium transition-all", activePreset === preset ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm" : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border")}>
                   {preset === 'today' ? 'Today' : 'Tomorrow'}
-                </Button>
-              ))}
+                </Button>)}
             </div>
 
-            {error && (
-              <Alert variant="destructive" className="rounded-lg py-2 px-3 flex-shrink-0">
+            {error && <Alert variant="destructive" className="rounded-lg py-2 px-3 flex-shrink-0">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-xs">{error}</AlertDescription>
-              </Alert>
-            )}
+              </Alert>}
 
-            <Button
-              onClick={handleSearch}
-              disabled={loading}
-              size="sm"
-              className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4 sm:ml-auto"
-            >
+            <Button onClick={handleSearch} disabled={loading} size="sm" className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4 sm:ml-auto">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               Search Courts
             </Button>
@@ -675,32 +589,24 @@ Book now — don't miss out!`);
           {/* Results header with badge inline */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-foreground">
-              {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
+              {summaryText ? dateDisplayShort || 'Results' : 'Results'}
             </h3>
-            {countSlots > 0 && (
-              <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
+            {countSlots > 0 && <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
                 {countSlots} Slots Available
-              </Badge>
-            )}
+              </Badge>}
           </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
+          {loading ? <div className="flex items-center justify-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-          ) : summaryText ? (
-            <div className="bg-purple-50/40 dark:bg-purple-900/10 rounded-xl p-4 border border-purple-200/30 dark:border-purple-800/20">
+            </div> : summaryText ? <div className="bg-purple-50/40 dark:bg-purple-900/10 rounded-xl p-4 border border-purple-200/30 dark:border-purple-800/20">
               <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
                 {summaryText}
               </pre>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl">
+            </div> : <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl">
               <p className="text-sm text-muted-foreground/60">
                 Court availability will appear here
               </p>
-            </div>
-          )}
+            </div>}
         </div>
       </Card>
 
@@ -723,25 +629,18 @@ Book now — don't miss out!`);
                 <SelectValue placeholder="Select template" />
               </SelectTrigger>
               <SelectContent>
-                {templates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
+                {templates.map(template => <SelectItem key={template.id} value={template.id}>
                     <span className="flex items-center gap-2">
                       {template.name}
                       {template.is_default && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
                     </span>
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
             
             {/* Right: Name + Actions grouped */}
             <div className="flex items-center gap-2">
-              <Input
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                placeholder="Template name"
-                className="w-36 h-9 rounded-lg border-border/40 bg-background text-sm"
-              />
+              <Input value={templateName} onChange={e => setTemplateName(e.target.value)} placeholder="Template name" className="w-36 h-9 rounded-lg border-border/40 bg-background text-sm" />
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -780,36 +679,34 @@ Book now — don't miss out!`);
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
-                <span className="text-xs text-muted-foreground">{templateContent.length} chars</span>
+                
               </div>
-              <Textarea
-                ref={textareaRef}
-                id="templateContent"
-                value={templateContent}
-                onChange={(e) => setTemplateContent(e.target.value)}
-                rows={8}
-                placeholder="Enter your message template..."
-                className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed"
-              />
+              <Textarea ref={textareaRef} id="templateContent" value={templateContent} onChange={e => setTemplateContent(e.target.value)} rows={8} placeholder="Enter your message template..." className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed" />
               {/* Token chips */}
               <div className="space-y-2 pt-2">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { token: '{{club_name}}', label: 'club_name' },
-                    { token: '{{date_display_short}}', label: 'date' },
-                    { token: '{{summary}}', label: 'summary' },
-                    { token: '{{count_slots}}', label: 'count' },
-                    { token: '{{sport}}', label: 'sport' }
-                  ].map(({ token, label }) => (
-                    <button
-                      key={token}
-                      onClick={() => insertToken(token)}
-                      className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors"
-                    >
+                  {[{
+                  token: '{{club_name}}',
+                  label: 'club_name'
+                }, {
+                  token: '{{date_display_short}}',
+                  label: 'date'
+                }, {
+                  token: '{{summary}}',
+                  label: 'summary'
+                }, {
+                  token: '{{count_slots}}',
+                  label: 'count'
+                }, {
+                  token: '{{sport}}',
+                  label: 'sport'
+                }].map(({
+                  token,
+                  label
+                }) => <button key={token} onClick={() => insertToken(token)} className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors">
                       {label}
-                    </button>
-                  ))}
+                    </button>)}
                   <EmojiPicker onEmojiSelect={insertEmoji} />
                 </div>
               </div>
@@ -823,16 +720,12 @@ Book now — don't miss out!`);
               </div>
               <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
                 <div className="text-sm whitespace-pre-wrap text-foreground/85 leading-relaxed">
-                  {summaryText ? renderTemplate(templateContent) : (
-                    <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>
-                  )}
+                  {summaryText ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
                 </div>
               </div>
-              {!summaryText && templateContent && (
-                <p className="text-xs text-muted-foreground pt-2">
+              {!summaryText && templateContent && <p className="text-xs text-muted-foreground pt-2">
                   Tip: Add {`{{summary}}`} to include the availability breakdown
-                </p>
-              )}
+                </p>}
             </div>
           </div>
         </CardContent>
@@ -855,68 +748,41 @@ Book now — don't miss out!`);
           <div className="flex flex-col sm:flex-row gap-3 items-end">
             <div className="flex-1 space-y-2">
               <Label htmlFor="whatsappGroup" className="text-sm font-medium">WhatsApp Group</Label>
-              <Input
-                id="whatsappGroup"
-                value={whatsappGroup}
-                onChange={(e) => setWhatsappGroup(e.target.value)}
-                placeholder="Group name"
-                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-              />
+              <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="h-10 rounded-lg border-border/50 bg-white dark:bg-background" />
             </div>
-            <Button 
-              onClick={handleSendMessage}
-              disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()}
-              className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap"
-            >
+            <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
               {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Send Message
             </Button>
           </div>
 
-          {!orgSettings?.wa_group_availability && (
-            <div className="text-xs text-muted-foreground">
+          {!orgSettings?.wa_group_availability && <div className="text-xs text-muted-foreground">
               Set up WhatsApp groups in Settings to enable sending
-            </div>
-          )}
+            </div>}
 
-          {sendResult && (
-            <Alert 
-              variant={sendResult.status === 'success' ? 'default' : 'destructive'} 
-              className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}
-            >
+          {sendResult && <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}>
               <AlertDescription className="flex items-center gap-2">
                 {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
               </AlertDescription>
-            </Alert>
-          )}
+            </Alert>}
         </CardContent>
       </Card>
 
       {/* Scheduled Sends V2 */}
-      <ScheduledSendsV2 
-        templates={templates} 
-        defaultWhatsappGroup={orgSettings?.wa_group_availability}
-        category="AVAILABILITY"
-      />
+      <ScheduledSendsV2 templates={templates} defaultWhatsappGroup={orgSettings?.wa_group_availability} category="AVAILABILITY" />
 
       {/* Social Post Builder */}
-      <SocialPostBuilder
-        source="COURT_AVAILABILITY"
-        pageData={{
-          category: 'COURT_AVAILABILITY' as const,
-          data: searchResults || [],
-          variant: 'basic',
-          target: 'TODAY' as const,
-          tz: 'Europe/London',
-          playtomicOffset: playtomicOffsetMinutes,
-          clubName: (organization as any)?.club_name || organization?.name || 'Club',
-          dateDisplayShort: dateDisplayShort || 'No date selected',
-          sport: 'Padel',
-          countSlots: countSlots
-        }}
-        summaryVariants={['basic']}
-        onVariantChange={() => {}}
-      />
-    </div>
-  );
+      <SocialPostBuilder source="COURT_AVAILABILITY" pageData={{
+      category: 'COURT_AVAILABILITY' as const,
+      data: searchResults || [],
+      variant: 'basic',
+      target: 'TODAY' as const,
+      tz: 'Europe/London',
+      playtomicOffset: playtomicOffsetMinutes,
+      clubName: (organization as any)?.club_name || organization?.name || 'Club',
+      dateDisplayShort: dateDisplayShort || 'No date selected',
+      sport: 'Padel',
+      countSlots: countSlots
+    }} summaryVariants={['basic']} onVariantChange={() => {}} />
+    </div>;
 }
