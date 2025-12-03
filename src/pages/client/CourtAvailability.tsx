@@ -747,12 +747,9 @@ Book now — don't miss out!`);
                 </pre>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="p-3 rounded-full bg-muted/30 mb-3">
-                  <CalendarIcon className="h-6 w-6 text-muted-foreground/60" />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Select dates and search to find available courts
+              <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl mx-2">
+                <p className="text-sm text-muted-foreground/60">
+                  Court availability will appear here
                 </p>
               </div>
             )}
