@@ -674,50 +674,55 @@ Book now — don't miss out!`);
           </div>
 
           {/* Two-column layout: Editor + Preview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left side - Template editor */}
             <div className="space-y-2">
-              <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+                
+              </div>
               <Textarea ref={textareaRef} id="templateContent" value={templateContent} onChange={e => setTemplateContent(e.target.value)} rows={8} placeholder="Enter your message template..." className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed" />
+              {/* Token chips */}
+              <div className="space-y-2 pt-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[{
+                  token: '{{club_name}}',
+                  label: 'club_name'
+                }, {
+                  token: '{{date_display_short}}',
+                  label: 'date'
+                }, {
+                  token: '{{summary}}',
+                  label: 'summary'
+                }, {
+                  token: '{{count_slots}}',
+                  label: 'count'
+                }, {
+                  token: '{{sport}}',
+                  label: 'sport'
+                }].map(({
+                  token,
+                  label
+                }) => <button key={token} onClick={() => insertToken(token)} className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors">
+                      {label}
+                    </button>)}
+                  <EmojiPicker onEmojiSelect={insertEmoji} />
+                </div>
+              </div>
             </div>
 
             {/* Right side - Live Preview */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+                <span className="text-xs text-muted-foreground invisible">placeholder</span>
+              </div>
               <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
                 <div className="text-sm whitespace-pre-wrap text-foreground/85 leading-relaxed">
                   {summaryText ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Token chips - centered below grid */}
-          <div className="pt-4 flex flex-col items-center">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Insert</Label>
-            <div className="flex flex-wrap gap-1.5 justify-center">
-              {[{
-                token: '{{club_name}}',
-                label: 'club_name'
-              }, {
-                token: '{{date_display_short}}',
-                label: 'date'
-              }, {
-                token: '{{summary}}',
-                label: 'summary'
-              }, {
-                token: '{{count_slots}}',
-                label: 'count'
-              }, {
-                token: '{{sport}}',
-                label: 'sport'
-              }].map(({
-                token,
-                label
-              }) => <button key={token} onClick={() => insertToken(token)} className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors">
-                    {label}
-                  </button>)}
-              <EmojiPicker onEmojiSelect={insertEmoji} />
             </div>
           </div>
         </CardContent>
