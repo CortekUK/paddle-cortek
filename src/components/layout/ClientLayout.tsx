@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   LayoutDashboard, 
@@ -17,6 +16,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const sidebarItems = [
   {
@@ -71,6 +71,11 @@ export function ClientLayout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F7F5FF] via-purple-50/30 to-white dark:from-background dark:via-purple-950/20 dark:to-background">
+      {/* Floating gradient orbs */}
+      <div className="fixed top-0 left-0 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="fixed bottom-0 right-0 w-96 h-96 bg-accent/10 dark:bg-accent/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+      <div className="fixed top-1/2 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      
       {/* Subtle vignette overlay */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.02)_100%)]" />
       
@@ -156,7 +161,8 @@ export function ClientLayout() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
               <div className="hidden md:block text-right">
                 <p className="text-sm font-medium text-foreground">{user?.email}</p>
                 <p className="text-xs text-muted-foreground/70">Club Member</p>
