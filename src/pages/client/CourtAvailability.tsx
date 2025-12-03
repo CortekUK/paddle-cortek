@@ -567,7 +567,7 @@ Book now — don't miss out!`);
   return (
     <div className="relative space-y-8">
       {/* Page Header Banner */}
-      <div className="relative -mx-4 -mt-4 px-6 py-8 mb-4 bg-gradient-to-r from-primary/8 via-purple-500/6 to-primary/4 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/10">
+      <div className="relative -mx-4 -mt-4 px-6 py-8 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
         <div className="relative">
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Court Availability</h1>
