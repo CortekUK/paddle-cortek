@@ -732,17 +732,10 @@ Book now — don't miss out!`);
           </div>
 
           {/* Send Message Footer */}
-          <div className="space-y-4 bg-muted/30 dark:bg-muted/20 -mx-6 px-6 py-5 rounded-b-lg">
-            <div className="flex items-center gap-2">
-              <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
-              <span className="text-sm font-medium">Send Message</span>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 items-end">
-              <div className="flex-1 max-w-xs space-y-1.5">
-                <Label htmlFor="whatsappGroup" className="text-xs font-medium text-muted-foreground">WhatsApp Group</Label>
-                <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="h-9 rounded-lg border-border/50 bg-background text-sm" />
-              </div>
+          <div className="space-y-3 bg-muted/30 dark:bg-muted/20 -mx-6 px-6 py-4 rounded-b-lg">
+            <div className="flex items-center gap-3">
+              <Label htmlFor="whatsappGroup" className="text-sm font-medium whitespace-nowrap">WhatsApp Group</Label>
+              <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="flex-1 h-9 rounded-lg border-border/50 bg-background text-sm" />
               <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 h-9 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
                 {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Send Now
