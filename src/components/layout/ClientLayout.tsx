@@ -260,12 +260,12 @@ export function ClientLayout() {
           "relative transition-all duration-200",
           collapsed ? "lg:ml-16" : "lg:ml-64"
         )}>
-          {/* Top header - glassmorphism */}
-          <header className="sticky top-0 z-30 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/30 shadow-sm">
-            <div className="px-6 py-4">
+          {/* Top header - minimal glassmorphism */}
+          <header className="sticky top-0 z-30 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/30">
+            <div className="px-6 py-3">
               <div className="flex items-center justify-between">
-                {/* Left: Mobile menu + Org info with left border accent */}
-                <div className="flex items-center gap-4">
+                {/* Left: Mobile menu + Org name only */}
+                <div className="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -274,34 +274,18 @@ export function ClientLayout() {
                   >
                     <Menu className="h-4 w-4" />
                   </Button>
-                  <div className="border-l-2 border-primary/30 pl-4">
-                    <h1 className="font-bold text-xl text-foreground tracking-tight">{orgName}</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {greeting}, <span className="font-medium text-foreground">{firstName}</span>
-                    </p>
-                  </div>
+                  <h1 className="font-semibold text-lg text-foreground">{orgName}</h1>
                 </div>
 
-                {/* Right: Theme toggle + separator + User dropdown */}
-                <div className="flex items-center gap-4">
+                {/* Right: Theme toggle + Avatar dropdown */}
+                <div className="flex items-center gap-2">
                   <ThemeToggle />
                   
-                  {/* Subtle separator */}
-                  <div className="h-6 w-px bg-border/50 hidden md:block" />
-                  
-                  {/* User dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        className="flex items-center gap-3 px-2 py-1.5 h-auto hover:bg-muted/50 rounded-xl"
-                      >
-                        <div className="hidden md:block text-right">
-                          <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                          <p className="text-xs text-muted-foreground">Club Member</p>
-                        </div>
-                        <Avatar className="h-9 w-9 border-2 border-primary/20">
-                          <AvatarFallback className="text-sm bg-gradient-to-br from-primary/30 to-purple-500/30 text-primary font-semibold">
+                      <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 p-0">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="text-xs bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary font-medium">
                             {user?.email ? getInitials(user.email) : 'U'}
                           </AvatarFallback>
                         </Avatar>
@@ -311,7 +295,7 @@ export function ClientLayout() {
                       <DropdownMenuLabel>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarFallback className="bg-gradient-to-br from-primary/30 to-purple-500/30 text-primary font-semibold">
+                            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary font-medium">
                               {user?.email ? getInitials(user.email) : 'U'}
                             </AvatarFallback>
                           </Avatar>
