@@ -831,7 +831,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                 <Button
                   onClick={handleTestSend}
                   disabled={testingMessage || !testGroupName.trim()}
-                  className="shrink-0"
+                  className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 shrink-0"
                 >
                   {testingMessage ? (
                     <>
