@@ -619,15 +619,14 @@ Book now — don't miss out!`);
         </div>
       </div>
 
-      {/* Section 1 – Search & Results Side-by-Side */}
+      {/* Section 1 – Search & Results */}
       <Card className={cardClass}>
-        <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]">
-          {/* Left Panel - Search Controls */}
-          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10 flex flex-col">
-            <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
+        {/* Inline Search Bar */}
+        <div className="p-4 border-b border-border/30 bg-muted/5 dark:bg-muted/10">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <h3 className="text-sm font-semibold text-foreground whitespace-nowrap">Find Availability</h3>
             
-            {/* Preset pills */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex items-center gap-2 flex-1">
               {(['today', 'tomorrow'] as const).map((preset) => (
                 <Button
                   key={preset}
@@ -635,7 +634,7 @@ Book now — don't miss out!`);
                   size="sm"
                   onClick={() => setPreset(preset)}
                   className={cn(
-                    "rounded-full px-4 h-9 text-sm font-medium transition-all flex-1",
+                    "rounded-full px-4 h-8 text-sm font-medium transition-all",
                     activePreset === preset
                       ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
                       : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
@@ -647,55 +646,55 @@ Book now — don't miss out!`);
             </div>
 
             {error && (
-              <Alert variant="destructive" className="rounded-xl mb-4">
+              <Alert variant="destructive" className="rounded-lg py-2 px-3 flex-shrink-0">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-xs">{error}</AlertDescription>
               </Alert>
             )}
 
-            {/* Search button */}
             <Button
               onClick={handleSearch}
               disabled={loading}
-              className="w-full h-10 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+              size="sm"
+              className="h-8 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:ml-auto"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               Search Courts
             </Button>
           </div>
+        </div>
 
-          {/* Right Panel - Results Display */}
-          <div className="p-5 min-h-[280px]">
-            {/* Results header with badge inline */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-foreground">
-                {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
-              </h3>
-              {countSlots > 0 && (
-                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
-                  {countSlots} Slots Available
-                </Badge>
-              )}
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              </div>
-            ) : summaryText ? (
-              <div className="bg-muted/20 dark:bg-muted/10 rounded-xl p-4 border border-border/30">
-                <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                  {summaryText}
-                </pre>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl mx-2">
-                <p className="text-sm text-muted-foreground/60">
-                  Court availability will appear here
-                </p>
-              </div>
+        {/* Results Section - Full Width */}
+        <div className="p-5">
+          {/* Results header with badge inline */}
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground">
+              {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
+            </h3>
+            {countSlots > 0 && (
+              <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
+                {countSlots} Slots Available
+              </Badge>
             )}
           </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : summaryText ? (
+            <div className="bg-muted/20 dark:bg-muted/10 rounded-xl p-4 border border-border/30">
+              <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
+                {summaryText}
+              </pre>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl">
+              <p className="text-sm text-muted-foreground/60">
+                Court availability will appear here
+              </p>
+            </div>
+          )}
         </div>
       </Card>
 
