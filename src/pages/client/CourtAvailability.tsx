@@ -604,7 +604,7 @@ Book now — don't miss out!`);
   };
 
   // Premium card styling
-  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden";
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
   return (
     <div className="relative space-y-8">
@@ -622,7 +622,7 @@ Book now — don't miss out!`);
       {/* Section 1 – Search & Results */}
       <Card className={cardClass}>
         {/* Inline Search Bar */}
-        <div className="p-4 border-b border-border/30 bg-muted/5 dark:bg-muted/10">
+        <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <h3 className="text-sm font-semibold text-foreground whitespace-nowrap">Find Availability</h3>
             
@@ -701,7 +701,7 @@ Book now — don't miss out!`);
       {/* Section 3 – Message Builder */}
       <Card className={cardClass}>
         <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
@@ -824,7 +824,7 @@ Book now — don't miss out!`);
       {/* Section 4 – Manual Send */}
       <Card className={cardClass}>
         <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
             <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
               <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
