@@ -171,15 +171,15 @@ export function OrganizationAuthProvider({ children }: { children: ReactNode }) 
 
       toast({
         title: "Success",
-        description: "Organization created successfully",
+        description: "Organisation created successfully",
       });
 
       return orgId as string;
     } catch (error) {
-      console.error('Error creating organization:', error);
+      console.error('Error creating organisation:', error);
       toast({
         title: "Error",
-        description: "Failed to create organization",
+        description: "Failed to create organisation",
         variant: "destructive",
       });
       throw error;
