@@ -45,7 +45,7 @@ export default function ClientDashboard() {
       {/* Bento Grid - Stats Row */}
       <div className="grid gap-5 grid-cols-1 md:grid-cols-4">
         {/* Trial Days - Compact */}
-        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border-0 overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden group hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Trial</span>
@@ -75,7 +75,7 @@ export default function ClientDashboard() {
         </Card>
 
         {/* Combined Stats Card - Wide (spans 2 columns) */}
-        <Card className="md:col-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border-0 overflow-hidden">
+        <Card className="md:col-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Performance</span>
@@ -113,7 +113,7 @@ export default function ClientDashboard() {
         </Card>
 
         {/* Club Status - Compact */}
-        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border-0 overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden group hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</span>
@@ -138,7 +138,7 @@ export default function ClientDashboard() {
         <div className="grid gap-5 grid-cols-1 md:grid-cols-3 auto-rows-fr">
           {/* Hero Card - Court Availability */}
           <Card 
-            className="md:col-span-2 md:row-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-3xl shadow-xl border-0 overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300 relative"
+            className="md:col-span-2 md:row-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-3xl shadow-xl border border-border/40 dark:border-white/[0.08] overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300 relative"
             onClick={() => navigate('/client/court-availability')}
           >
             {/* Decorative background pattern */}
@@ -186,7 +186,7 @@ export default function ClientDashboard() {
             <Card 
               key={card.title}
               className={cn(
-                "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border-0 border-l-4 overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300",
+                "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] border-l-4 overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300",
                 card.accentColor
               )}
               onClick={() => navigate(card.href)}
