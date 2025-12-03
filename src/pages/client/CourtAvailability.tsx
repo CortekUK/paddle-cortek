@@ -730,41 +730,43 @@ Book now — don't miss out!`);
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Section 4 – Manual Send */}
-      <Card className={cardClass}>
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
-            <div className="p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
+          {/* Subtle divider before send section */}
+          <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+
+          {/* Send Message Footer */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
               <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              <span className="text-sm font-medium">Send Message</span>
             </div>
-            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-5 space-y-5">
-          <div className="flex flex-col sm:flex-row gap-3 items-end">
-            <div className="flex-1 max-w-md space-y-2">
-              <Label htmlFor="whatsappGroup" className="text-sm font-medium">WhatsApp Group</Label>
-              <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="h-10 rounded-lg border-border/50 bg-white dark:bg-background" />
+            
+            <div className="flex flex-col sm:flex-row gap-3 items-end">
+              <div className="flex-1 max-w-xs space-y-1.5">
+                <Label htmlFor="whatsappGroup" className="text-xs font-medium text-muted-foreground">WhatsApp Group</Label>
+                <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="h-9 rounded-lg border-border/50 bg-background text-sm" />
+              </div>
+              <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 h-9 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+                {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Send Now
+              </Button>
             </div>
-            <Button onClick={handleSendMessage} disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
-              {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              Send Message
-            </Button>
+
+            {!orgSettings?.wa_group_availability && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5 flex-shrink-0" />
+                Set up WhatsApp groups in Settings to enable sending
+              </div>
+            )}
+
+            {sendResult && (
+              <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}>
+                <AlertDescription className="flex items-center gap-2">
+                  {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
-
-          {!orgSettings?.wa_group_availability && <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
-              <Info className="h-3.5 w-3.5 flex-shrink-0" />
-              Set up WhatsApp groups in Settings to enable sending
-            </div>}
-
-          {sendResult && <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}>
-              <AlertDescription className="flex items-center gap-2">
-                {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
-              </AlertDescription>
-            </Alert>}
         </CardContent>
       </Card>
 
