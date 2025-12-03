@@ -751,9 +751,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Enabled</Badge>;
+        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">Enabled</Badge>;
       case 'PAUSED':
-        return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Paused</Badge>;
+        return <Badge className="bg-muted text-muted-foreground border-border">Paused</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -775,9 +775,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
   return (
     <>
-      <Card>
+      <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Scheduled Sends</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
+          </div>
           <Button
             onClick={() => {
               resetForm();
@@ -896,14 +901,19 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       </Card>
 
       {/* Test Instructions Section */}
-      <Card>
+      <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
         <CardHeader>
-          <CardTitle>Test Instructions</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
+              <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">How to Test:</h4>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-blue-700">
+          <div className="bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-400 p-4 rounded-xl">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">How to Test:</h4>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-blue-700 dark:text-blue-400">
               <li>Create a WhatsApp group named "Cloud 29 Paddle" (or your chosen test name).</li>
               <li>Add this number to the group: +44 7757 658667.</li>
               <li>Add [Your Name] to the same group so we can verify delivery.</li>
@@ -911,20 +921,21 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             </ol>
           </div>
           
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="testGroup">Test WhatsApp Group</Label>
+          <div className="flex flex-col sm:flex-row gap-3 items-end">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="testGroup" className="text-sm font-medium">Test WhatsApp Group</Label>
               <Input
                 id="testGroup"
                 value={testGroupName}
                 onChange={(e) => setTestGroupName(e.target.value)}
                 placeholder="Cloud 29 Paddle"
+                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
               />
             </div>
             <Button 
               onClick={handleTestSend}
               disabled={testingMessage || !testGroupName.trim()}
-              className="gap-2"
+              className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {testingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Send test now
@@ -932,10 +943,10 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           </div>
           
           {lastTestResult && (
-            <div className={`p-3 rounded-lg ${
+            <div className={`p-3 rounded-xl ${
               lastTestResult.status === 'success' 
-                ? 'bg-green-50 border border-green-200 text-green-800' 
-                : 'bg-red-50 border border-red-200 text-red-800'
+                ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' 
+                : 'bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
             }`}>
               <div className="flex items-center gap-2">
                 {lastTestResult.status === 'success' ? (
@@ -954,10 +965,15 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       </Card>
 
       {/* Run Logs Section */}
-      <Card>
+      <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Runs</CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+                <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              </div>
+              <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -970,7 +986,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         </CardHeader>
         <CardContent>
           {loadingLogs ? (
-            <div className="text-center py-4">Loading recent runs...</div>
+            <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div>
           ) : runLogs.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No runs yet. Create a schedule and wait for it to execute.
@@ -978,17 +994,17 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           ) : (
             <div className="space-y-2">
               {runLogs.map((log) => (
-                <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={log.id} className="flex items-center justify-between p-4 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-xl hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
                     {log.status === 'OK' ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-emerald-600" />
                     ) : log.status === 'SKIPPED' ? (
-                      <Clock className="h-4 w-4 text-yellow-600" />
+                      <Clock className="h-4 w-4 text-amber-600" />
                     ) : (
                       <AlertCircle className="h-4 w-4 text-red-600" />
                     )}
                     <div>
-                      <div className="font-medium">
+                      <div className="font-medium text-foreground">
                         {log.scheduled_sends_v2?.name || 'Unknown Schedule'}
                       </div>
                       <div className="text-sm text-muted-foreground">
@@ -1000,8 +1016,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <Badge 
                       variant={log.status === 'OK' ? 'default' : log.status === 'SKIPPED' ? 'outline' : 'destructive'}
                       className={
-                        log.status === 'OK' ? 'bg-green-100 text-green-800 border-green-200' :
-                        log.status === 'SKIPPED' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                        log.status === 'OK' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' :
+                        log.status === 'SKIPPED' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800' :
                         ''
                       }
                     >
@@ -1016,7 +1032,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => handleViewLogDetails(log)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 hover:bg-muted/50"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>

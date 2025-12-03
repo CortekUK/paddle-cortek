@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, AlertCircle, Clock, Loader2, Copy, MessageSquare, Send, Settings, Plus, Save, Star, Eye, Hash } from 'lucide-react';
+import { Search, Calendar, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, Hash, FileText, Clock } from 'lucide-react';
 import { format, addDays, startOfDay, endOfDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -54,16 +53,16 @@ export default function CourtAvailability() {
   const [dateTo, setDateTo] = useState(defaultToDate);
 
   // Playtomic offset configuration - default to London offset
-  const playtomicOffsetMinutes = 60; // Could be made configurable based on organization
+  const playtomicOffsetMinutes = 60;
 
-  // Helper functions for wall-time math and formatting (copied from admin)
+  // Helper functions for wall-time math and formatting
   const hhmmToMinutes = (timeStr: string): number => {
     const parts = timeStr.split(':').map(n => parseInt(n));
     return parts[0] * 60 + (parts[1] || 0);
   };
 
   const minutesToHHMM = (minutes: number): string => {
-    const totalMins = minutes % 1440; // Wrap to 0-1439
+    const totalMins = minutes % 1440;
     const hours = Math.floor(totalMins / 60);
     const mins = totalMins % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
@@ -71,12 +70,12 @@ export default function CourtAvailability() {
 
   const addMinutesLocal = (timeStr: string, offsetMins: number): string => {
     const baseMins = hhmmToMinutes(timeStr);
-    const adjustedMins = (baseMins + offsetMins + 1440) % 1440; // Handle negatives
+    const adjustedMins = (baseMins + offsetMins + 1440) % 1440;
     return minutesToHHMM(adjustedMins);
   };
 
   const formatCompactAmPm = (minutes: number): string => {
-    const totalMins = ((minutes % 1440) + 1440) % 1440; // Wrap to 0–1439
+    const totalMins = ((minutes % 1440) + 1440) % 1440;
     const hours = Math.floor(totalMins / 60);
     const mins = totalMins % 60;
     
@@ -92,14 +91,12 @@ export default function CourtAvailability() {
     }
   };
 
-  // Non-overlapping day-part boundaries (in minutes) - copied from admin
   const DAY_PART_BOUNDARIES = {
-    morning: { start: 360, end: 720 }, // 06:00 - 12:00
-    afternoon: { start: 720, end: 1020 }, // 12:00 - 17:00  
-    evening: { start: 1020, end: 1380 } // 17:00 - 23:00
+    morning: { start: 360, end: 720 },
+    afternoon: { start: 720, end: 1020 },
+    evening: { start: 1020, end: 1380 }
   };
 
-  // Extract slots directly from raw JSON (copied from admin)
   const extractRawSlots = (data: any[]) => {
     if (!Array.isArray(data) || data.length === 0) return [];
     
@@ -107,10 +104,8 @@ export default function CourtAvailability() {
     
     for (const item of data) {
       if (item.slots && Array.isArray(item.slots)) {
-        // This is a resource with nested slots
         slots.push(...item.slots);
       } else if (item.start_time || item.startTime) {
-        // This is a direct slot
         slots.push(item);
       }
     }
@@ -118,13 +113,11 @@ export default function CourtAvailability() {
     return slots;
   };
 
-  // Parse time from raw slot data with Playtomic offset (copied from admin)
   const parseSlotTime = (slot: any) => {
     let startTime = null;
     
-    // Try different field combinations
     if (slot.start_date && slot.start_time) {
-      startTime = slot.start_time; // Use just the time part (HH:MM format)
+      startTime = slot.start_time;
     } else if (slot.start_time) {
       startTime = slot.start_time;
     } else if (slot.startTime) {
@@ -133,11 +126,9 @@ export default function CourtAvailability() {
     
     if (!startTime) return null;
     
-    // Extract base time and apply Playtomic offset
-    const baseTime = startTime.split(':').slice(0, 2).join(':'); // Get HH:MM
+    const baseTime = startTime.split(':').slice(0, 2).join(':');
     const duration = slot.duration || slot.duration_minutes || slot.length || 90;
     
-    // Apply offset to get adjusted times
     const adjustedStartHHMM = addMinutesLocal(baseTime, playtomicOffsetMinutes);
     const adjustedStartMin = hhmmToMinutes(adjustedStartHHMM);
     const adjustedEndMin = (adjustedStartMin + duration) % 1440;
@@ -152,23 +143,20 @@ export default function CourtAvailability() {
     };
   };
 
-  // Use admin logic for generating summary
   const generateSummary = (data: any[]) => {
     return generateAvailabilitySummary(data, playtomicOffsetMinutes);
   };
 
-  // Generate friendly date display 
   const toShortDate = (from: Date, to: Date, tz = 'Europe/London') => {
-    const f = formatInTimeZone(from, tz, 'EEE d LLL'); // Thu 4 Sep
+    const f = formatInTimeZone(from, tz, 'EEE d LLL');
     const t = formatInTimeZone(to, tz, 'EEE d LLL');
     return f === t ? f : `${f} – ${t}`;
   };
 
-  // Preset functions for Today/Tomorrow buttons
   const setPreset = (preset: 'today' | 'tomorrow') => {
     const now = new Date();
     const targetDate = preset === 'today' ? now : addDays(now, 1);
-    const timezone = 'Europe/London'; // Default timezone, could be made configurable
+    const timezone = 'Europe/London';
     
     const startOfDayLocal = formatInTimeZone(startOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
     const endOfDayLocal = formatInTimeZone(endOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
@@ -177,7 +165,6 @@ export default function CourtAvailability() {
     setDateTo(endOfDayLocal);
   };
 
-  // Load templates and settings on component mount
   useEffect(() => {
     if (organization?.id) {
       loadTemplatesAndSettings();
@@ -186,7 +173,6 @@ export default function CourtAvailability() {
 
   const loadTemplatesAndSettings = async () => {
     try {
-      // Load templates from new message_templates table
       const { data: templatesData, error: templatesError } = await supabase
         .from('message_templates')
         .select('*')
@@ -198,14 +184,12 @@ export default function CourtAvailability() {
       
       setTemplates(templatesData || []);
 
-      // Auto-select default template or show starter template
       const defaultTemplate = templatesData?.find(t => t.is_default);
       if (defaultTemplate) {
         setSelectedTemplateId(defaultTemplate.id);
         setTemplateName(defaultTemplate.name);
         setTemplateContent(defaultTemplate.content);
       } else if (templatesData?.length === 0) {
-        // Show default starter template if no templates exist
         setTemplateName('');
         setTemplateContent(`*COURT AVAILABILITY @ {{club_name}}*
 📅 {{date_display_short}}
@@ -215,7 +199,6 @@ export default function CourtAvailability() {
 Book now — don't miss out!`);
       }
 
-      // Load organization settings
       const { data: settingsData, error: settingsError } = await supabase
         .from('org_automation_settings')
         .select('*')
@@ -250,7 +233,6 @@ Book now — don't miss out!`);
     setSendResult(null);
 
     try {
-      // Convert dates to ISO format with seconds precision
       const fromDate = new Date(dateFrom);
       const toDate = new Date(dateTo);
 
@@ -260,7 +242,6 @@ Book now — don't miss out!`);
         return;
       }
 
-      // Call the existing playtomic-fetch edge function
       const { data, error: fetchError } = await supabase.functions.invoke('playtomic-fetch', {
         body: {
           endpoint: 'availability',
@@ -279,7 +260,6 @@ Book now — don't miss out!`);
         throw new Error(data.error);
       }
 
-      // Store raw results and generate summary
       if (data?.raw && Array.isArray(data.raw)) {
         setSearchResults(data.raw);
         
@@ -287,7 +267,6 @@ Book now — don't miss out!`);
           setSummaryText('0 slots available for this day');
           setCountSlots(0);
         } else {
-          // Count total slots across all resources
           const totalSlots = data.raw.reduce((count, resource) => {
             return count + (resource.slots?.length || 0);
           }, 0);
@@ -297,7 +276,6 @@ Book now — don't miss out!`);
           if (totalSlots === 0) {
             setSummaryText('0 slots available for this day');
           } else {
-            // Generate enhanced summary using admin logic - pass the raw array directly
             const enhanced = generateSummary(data.raw);
             setSummaryText(enhanced);
           }
@@ -308,7 +286,6 @@ Book now — don't miss out!`);
         setSearchResults([]);
       }
 
-      // Generate friendly date display
       setDateDisplayShort(toShortDate(fromDate, toDate));
 
     } catch (err: any) {
@@ -319,7 +296,6 @@ Book now — don't miss out!`);
     }
   };
 
-  // Template rendering helper
   const renderTemplate = (template: string): string => {
     const context = {
       summary: summaryText || 'No summary available',
@@ -334,7 +310,6 @@ Book now — don't miss out!`);
     });
   };
 
-  // Token insertion
   const insertToken = (token: string) => {
     if (!textareaRef.current) return;
     
@@ -346,19 +321,16 @@ Book now — don't miss out!`);
     
     setTemplateContent(before + token + after);
     
-    // Move cursor after inserted token
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(start + token.length, start + token.length);
     }, 0);
   };
 
-  // Emoji insertion
   const insertEmoji = (emoji: string) => {
     insertToken(emoji);
   };
 
-  // Template management functions
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
@@ -393,14 +365,12 @@ Book now — don't miss out!`);
       };
 
       if (selectedTemplateId) {
-        // Update existing template
         const { error } = await supabase
           .from('message_templates')
           .update(templateData)
           .eq('id', selectedTemplateId);
         if (error) throw error;
       } else {
-        // Create new template
         const { data, error } = await supabase
           .from('message_templates')
           .insert(templateData)
@@ -415,7 +385,6 @@ Book now — don't miss out!`);
         description: `Template ${selectedTemplateId ? 'updated' : 'saved'} successfully`
       });
 
-      // Reload templates
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error saving template:', err);
@@ -458,7 +427,6 @@ Book now — don't miss out!`);
         description: "New template created successfully"
       });
 
-      // Reload templates
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error creating template:', err);
@@ -481,14 +449,12 @@ Book now — don't miss out!`);
     }
 
     try {
-      // Clear all defaults for this org/category first
       await supabase
         .from('message_templates')
         .update({ is_default: false })
         .eq('org_id', organization!.id)
         .eq('category', 'AVAILABILITY');
 
-      // Set this template as default
       const { error } = await supabase
         .from('message_templates')
         .update({ is_default: true })
@@ -501,7 +467,6 @@ Book now — don't miss out!`);
         description: "Template set as default"
       });
 
-      // Reload templates
       loadTemplatesAndSettings();
     } catch (err: any) {
       console.error('Error setting default template:', err);
@@ -513,7 +478,6 @@ Book now — don't miss out!`);
     }
   };
 
-  // Send message function
   const handleSendMessage = async () => {
     if (!whatsappGroup.trim()) {
       toast({
@@ -561,7 +525,6 @@ Book now — don't miss out!`);
           description: "Message sent to WhatsApp group",
         });
       } else {
-        // If timeout but message might have been sent, show warning instead of error
         const resultStr = JSON.stringify(data.result || {});
         const isTimeout = resultStr.includes('timeout') || resultStr.includes('aborted');
         
@@ -598,260 +561,303 @@ Book now — don't miss out!`);
     }
   };
 
+  // Premium card styling
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden";
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Court Availability</h1>
-        <p className="text-muted-foreground mt-1">
-          Search for available courts and send WhatsApp notifications
-        </p>
+    <div className="relative space-y-8">
+      {/* Page Header */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20">
+            <Calendar className="h-6 w-6 text-primary" strokeWidth={1.5} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Court Availability</h1>
+            <p className="text-muted-foreground">
+              Search for available courts and send WhatsApp notifications
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* 1. Find Availability (Compact) */}
-      <Card className="bg-card shadow-sm">
+      {/* Section 1 – Availability Search */}
+      <Card className={cardClass}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Find Availability</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Find Availability</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Today/Tomorrow buttons */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPreset('today')}
-              >
-                Today
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPreset('tomorrow')}
-              >
-                Tomorrow
-              </Button>
-            </div>
-
-            {/* Date range inputs */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dateFrom">From</Label>
-                <Input
-                  id="dateFrom"
-                  type="datetime-local"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dateTo">To</Label>
-                <Input
-                  id="dateTo"
-                  type="datetime-local"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Button 
-              onClick={handleSearch} 
-              disabled={loading}
-              className="gap-2"
+        <CardContent className="space-y-5">
+          {/* Today/Tomorrow pills */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPreset('today')}
+              className="rounded-full px-4 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              Search Availability
+              Today
             </Button>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPreset('tomorrow')}
+              className="rounded-full px-4 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+            >
+              Tomorrow
+            </Button>
           </div>
+
+          {/* Date range inputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="dateFrom" className="text-sm font-medium">From</Label>
+              <Input
+                id="dateFrom"
+                type="datetime-local"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateTo" className="text-sm font-medium">To</Label>
+              <Input
+                id="dateTo"
+                type="datetime-local"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
+              />
+            </div>
+          </div>
+
+          <Button 
+            onClick={handleSearch} 
+            disabled={loading}
+            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            Search Availability
+          </Button>
+
+          {error && (
+            <Alert variant="destructive" className="rounded-xl">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
-      {/* 2. Summary Preview (Read-only) */}
-      <Card className="bg-card shadow-sm">
+      {/* Section 2 – Summary Preview */}
+      <Card className={cardClass}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Summary Preview</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <FileText className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Summary Preview</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="bg-muted rounded-lg p-4 font-mono text-sm whitespace-pre-wrap">
+          <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 font-mono text-sm whitespace-pre-wrap border border-border/30">
             {summaryText ? (
-              <>
-                📅 {dateDisplayShort}
-                {'\n'}
-                {summaryText}
-              </>
+              <div className="flex gap-3">
+                <Calendar className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-medium text-foreground">{dateDisplayShort}</span>
+                  {'\n'}
+                  {summaryText}
+                </div>
+              </div>
             ) : (
-              <span className="text-muted-foreground">Run a search to preview availability</span>
+              <span className="text-muted-foreground/70">Run a search to preview availability</span>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* 3. Message Template */}
-      <Card className="bg-card shadow-sm">
+      {/* Section 3 – Message Builder */}
+      <Card className={cardClass}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Message Template</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <MessageSquare className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Message Template</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Template controls */}
-            <div className="flex flex-wrap gap-2">
-              <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      {template.name} {template.is_default && <Star className="h-3 w-3 inline ml-1" />}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Button variant="outline" size="sm" onClick={handleSaveTemplate}>
+        <CardContent className="space-y-5">
+          {/* Template controls row */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+              <SelectTrigger className="w-48 h-10 rounded-lg border-border/50 bg-white dark:bg-background">
+                <SelectValue placeholder="Select template" />
+              </SelectTrigger>
+              <SelectContent>
+                {templates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.name} {template.is_default && <Star className="h-3 w-3 inline ml-1 text-amber-500" />}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex gap-1.5">
+              <Button variant="outline" size="sm" onClick={handleSaveTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
                 <Save className="h-4 w-4 mr-1" />
                 Save
               </Button>
-              <Button variant="outline" size="sm" onClick={handleSaveAsTemplate}>
+              <Button variant="outline" size="sm" onClick={handleSaveAsTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
                 Save as...
               </Button>
-              <Button variant="outline" size="sm" onClick={handleSetDefault} disabled={!selectedTemplateId}>
+              <Button variant="outline" size="sm" onClick={handleSetDefault} disabled={!selectedTemplateId} className="rounded-lg border-border/50 hover:bg-primary/10">
                 <Star className="h-4 w-4 mr-1" />
                 Set Default
               </Button>
-              <Button variant="outline" size="sm" onClick={handleNewTemplate}>
+              <Button variant="outline" size="sm" onClick={handleNewTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
                 <Plus className="h-4 w-4 mr-1" />
                 New
               </Button>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Left side - Template editor */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="templateName">Name</Label>
-                  <Input
-                    id="templateName"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="Template name"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="templateContent">Content</Label>
-                  <Textarea
-                    ref={textareaRef}
-                    id="templateContent"
-                    value={templateContent}
-                    onChange={(e) => setTemplateContent(e.target.value)}
-                    rows={8}
-                    placeholder="Enter your message template..."
-                  />
-                  <div className="text-xs text-muted-foreground">
-                    {templateContent.length} characters
-                  </div>
-                </div>
-
-                {/* Token chips and emoji picker */}
-                <div className="space-y-2">
-                  <Label className="text-sm">Insert tokens:</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      '{{club_name}}',
-                      '{{date_display_short}}', 
-                      '{{summary}}',
-                      '{{count_slots}}',
-                      '{{sport}}'
-                    ].map((token) => (
-                      <Button
-                        key={token}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => insertToken(token)}
-                        className="text-xs"
-                      >
-                        <Hash className="h-3 w-3 mr-1" />
-                        {token}
-                      </Button>
-                    ))}
-                    <EmojiPicker onEmojiSelect={insertEmoji} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right side - Preview */}
+          {/* Two-column layout: Editor + Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left side - Template editor */}
+            <div className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Live Preview</Label>
-                  <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg max-w-sm">
-                  <div className="font-mono text-sm whitespace-pre-wrap">
-                    {summaryText ? renderTemplate(templateContent) : (
-                      <span className="text-muted-foreground">Run a search to preview with real data</span>
-                    )}
-                  </div>
-                </div>
-                {!summaryText && templateContent && (
-                  <div className="text-xs text-muted-foreground mt-2">
-                    💡 Add {`{{summary}}`} to include the breakdown
-                  </div>
-                )}
+                <Label htmlFor="templateName" className="text-sm font-medium">Name</Label>
+                <Input
+                  id="templateName"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="Template name"
+                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
+                />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="templateContent" className="text-sm font-medium">Content</Label>
+                <Textarea
+                  ref={textareaRef}
+                  id="templateContent"
+                  value={templateContent}
+                  onChange={(e) => setTemplateContent(e.target.value)}
+                  rows={8}
+                  placeholder="Enter your message template..."
+                  className="rounded-lg border-border/50 bg-white dark:bg-background min-h-[180px] resize-none"
+                />
+                <div className="text-xs text-muted-foreground">
+                  {templateContent.length} characters
+                </div>
+              </div>
+
+              {/* Token chips and emoji picker */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Insert tokens:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    '{{club_name}}',
+                    '{{date_display_short}}', 
+                    '{{summary}}',
+                    '{{count_slots}}',
+                    '{{sport}}'
+                  ].map((token) => (
+                    <Button
+                      key={token}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => insertToken(token)}
+                      className="text-xs rounded-full px-3 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+                    >
+                      <Hash className="h-3 w-3 mr-1" />
+                      {token}
+                    </Button>
+                  ))}
+                  <EmojiPicker onEmojiSelect={insertEmoji} />
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Live Preview */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Live Preview</Label>
+                <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)} className="h-8 w-8 p-0">
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-400 p-4 rounded-xl">
+                <div className="font-mono text-sm whitespace-pre-wrap text-foreground">
+                  {summaryText ? renderTemplate(templateContent) : (
+                    <span className="text-muted-foreground">Run a search to preview with real data</span>
+                  )}
+                </div>
+              </div>
+              {!summaryText && templateContent && (
+                <div className="text-xs text-muted-foreground mt-2">
+                  💡 Add {`{{summary}}`} to include the breakdown
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* 4. Send (Manual) */}
-      <Card className="bg-card shadow-sm">
+      {/* Section 4 – Manual Send */}
+      <Card className={cardClass}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Send</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+              <Send className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsappGroup">WhatsApp Group</Label>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3 items-end">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="whatsappGroup" className="text-sm font-medium">WhatsApp Group</Label>
               <Input
                 id="whatsappGroup"
                 value={whatsappGroup}
                 onChange={(e) => setWhatsappGroup(e.target.value)}
                 placeholder="Group name"
+                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
               />
-              {!orgSettings?.wa_group_availability && (
-                <div className="text-xs text-muted-foreground">
-                  Set up WhatsApp groups in Settings to enable sending
-                </div>
-              )}
             </div>
-
             <Button 
               onClick={handleSendMessage}
               disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()}
-              className="gap-2"
+              className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap"
             >
               {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Send Message
             </Button>
-
-            {sendResult && (
-              <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'}>
-                <AlertDescription>
-                  {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
+
+          {!orgSettings?.wa_group_availability && (
+            <div className="text-xs text-muted-foreground">
+              Set up WhatsApp groups in Settings to enable sending
+            </div>
+          )}
+
+          {sendResult && (
+            <Alert 
+              variant={sendResult.status === 'success' ? 'default' : 'destructive'} 
+              className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}
+            >
+              <AlertDescription className="flex items-center gap-2">
+                {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
@@ -870,7 +876,7 @@ Book now — don't miss out!`);
           data: searchResults || [],
           variant: 'basic',
           target: 'TODAY' as const,
-          tz: 'Europe/London', // Default timezone - could be made configurable
+          tz: 'Europe/London',
           playtomicOffset: playtomicOffsetMinutes,
           clubName: (organization as any)?.club_name || organization?.name || 'Club',
           dateDisplayShort: dateDisplayShort || 'No date selected',
@@ -878,7 +884,7 @@ Book now — don't miss out!`);
           countSlots: countSlots
         }}
         summaryVariants={['basic']}
-        onVariantChange={() => {}} // No variant change needed for court availability
+        onVariantChange={() => {}}
       />
     </div>
   );
