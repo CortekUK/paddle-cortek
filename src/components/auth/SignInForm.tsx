@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
+import cortekLogo from '@/assets/cortek-logo.svg';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
@@ -20,16 +21,17 @@ export function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome to CORTEK</CardTitle>
-          <CardDescription className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
+      <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
+        <CardHeader className="space-y-1 text-center pb-2">
+          <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
+          <CardTitle className="text-2xl font-bold">Welcome to CORTEK</CardTitle>
+          <CardDescription>
             Sign in to your paddle club automation dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input
@@ -40,11 +42,12 @@ export function SignInForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11 rounded-lg"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full h-11 rounded-lg" 
               disabled={loading || !email}
               variant="hero"
             >

@@ -11,6 +11,7 @@ import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { ensureOrgForUser } from '@/services/bootstrap';
 import { routeAfterLogin } from '@/utils/routeGuards';
 import { supabase } from '@/integrations/supabase/client';
+import cortekLogo from '@/assets/cortek-logo.svg';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -47,7 +48,6 @@ export function AuthPage() {
     try {
       const { error } = await signInWithPassword(email, password);
       if (error) {
-        // Handle specific error cases
         if (error.message.includes('Invalid login credentials')) {
           setError('Invalid email or password. Please check your credentials and try again.');
         } else if (error.message.includes('Email not confirmed')) {
@@ -58,7 +58,6 @@ export function AuthPage() {
         return;
       }
       
-      // Navigate based on role and onboarding status
       const redirectPath = await routeAfterLogin();
       navigate(redirectPath);
     } catch (err: any) {
@@ -81,12 +80,11 @@ export function AuthPage() {
     setError('');
     
     try {
-      // First sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: undefined // Disable email confirmation
+          emailRedirectTo: undefined
         }
       });
       
@@ -95,7 +93,6 @@ export function AuthPage() {
         return;
       }
       
-      // If user is created, sign them in immediately to establish session
       if (data.user) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -107,7 +104,6 @@ export function AuthPage() {
           return;
         }
         
-        // Wait for session to be established, then create org
         setTimeout(async () => {
           try {
             await ensureOrgForUser(data.user.id);
@@ -153,16 +149,17 @@ export function AuthPage() {
 
   if (showResetForm) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
-            <CardDescription className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
+        <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
+          <CardHeader className="space-y-1 text-center pb-2">
+            <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
+            <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
+            <CardDescription>
               Enter your email to receive a password reset link
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleResetPassword} className="space-y-4">
+            <form onSubmit={handleResetPassword} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="resetEmail">Email address</Label>
                 <Input
@@ -173,13 +170,14 @@ export function AuthPage() {
                   onChange={(e) => setResetEmail(e.target.value)}
                   required
                   disabled={loading}
+                  className="h-11 rounded-lg"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button 
                   type="button" 
                   variant="outline" 
-                  className="flex-1"
+                  className="flex-1 h-11 rounded-lg"
                   onClick={() => setShowResetForm(false)}
                   disabled={loading}
                 >
@@ -187,7 +185,7 @@ export function AuthPage() {
                 </Button>
                 <Button 
                   type="submit" 
-                  className="flex-1" 
+                  className="flex-1 h-11 rounded-lg" 
                   disabled={loading || !resetEmail}
                   variant="hero"
                 >
@@ -202,11 +200,12 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome to CORTEK</CardTitle>
-          <CardDescription className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
+      <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
+        <CardHeader className="space-y-1 text-center pb-2">
+          <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
+          <CardTitle className="text-2xl font-bold">Welcome to CORTEK</CardTitle>
+          <CardDescription>
             Paddle Club Automation
           </CardDescription>
         </CardHeader>
@@ -218,13 +217,13 @@ export function AuthPage() {
             </Alert>
           )}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Log in</TabsTrigger>
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleLogin} className="space-y-4">
+            <TabsContent value="login" className="space-y-5 mt-0">
+              <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="loginEmail">Email address</Label>
                   <Input
@@ -235,6 +234,7 @@ export function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -248,6 +248,7 @@ export function AuthPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
+                      className="h-11 rounded-lg pr-10"
                     />
                     <Button
                       type="button"
@@ -263,7 +264,7 @@ export function AuthPage() {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full h-11 rounded-lg" 
                   disabled={loading || !email || !password}
                   variant="hero"
                 >
@@ -274,7 +275,7 @@ export function AuthPage() {
                 <Button 
                   type="button" 
                   variant="link" 
-                  className="text-sm"
+                  className="text-sm text-muted-foreground hover:text-primary"
                   onClick={() => setShowResetForm(true)}
                   disabled={loading}
                 >
@@ -283,8 +284,8 @@ export function AuthPage() {
               </div>
             </TabsContent>
             
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
+            <TabsContent value="signup" className="space-y-5 mt-0">
+              <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="signupEmail">Email address</Label>
                   <Input
@@ -295,6 +296,7 @@ export function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -309,6 +311,7 @@ export function AuthPage() {
                        required
                        minLength={8}
                        disabled={loading}
+                       className="h-11 rounded-lg pr-10"
                      />
                     <Button
                       type="button"
@@ -333,6 +336,7 @@ export function AuthPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={loading}
+                      className="h-11 rounded-lg pr-10"
                     />
                     <Button
                       type="button"
@@ -351,7 +355,7 @@ export function AuthPage() {
                 )}
                 <Button 
                    type="submit" 
-                   className="w-full" 
+                   className="w-full h-11 rounded-lg" 
                    disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8}
                    variant="hero"
                  >
