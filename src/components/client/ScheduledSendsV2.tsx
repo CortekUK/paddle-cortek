@@ -756,9 +756,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   return <>
       {/* Test Connection Section */}
       <Collapsible open={testSectionOpen} onOpenChange={setTestSectionOpen}>
-        <Card className="bg-purple-50/50 dark:bg-purple-950/20 backdrop-blur-sm rounded-2xl shadow-md border border-purple-200/50 dark:border-purple-800/30 mb-6">
+        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] mb-6">
           <CollapsibleTrigger asChild>
-            <CardHeader className="pb-3 cursor-pointer hover:bg-purple-100/30 dark:hover:bg-purple-900/20 transition-colors rounded-t-2xl">
+            <CardHeader className="pb-3 cursor-pointer hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
