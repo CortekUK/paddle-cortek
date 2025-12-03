@@ -566,18 +566,14 @@ Book now — don't miss out!`);
 
   return (
     <div className="relative space-y-8">
-      {/* Page Header */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 dark:from-primary/20 dark:to-primary/10 ring-1 ring-primary/10">
-            <Calendar className="h-7 w-7 text-primary" strokeWidth={1.5} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">Court Availability</h1>
-            <p className="text-muted-foreground mt-1">
-              Find open courts and notify your members instantly.
-            </p>
-          </div>
+      {/* Page Header Banner */}
+      <div className="relative -mx-4 -mt-4 px-6 py-8 mb-4 bg-gradient-to-r from-primary/8 via-purple-500/6 to-primary/4 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Court Availability</h1>
+          <p className="text-muted-foreground mt-1.5 max-w-lg">
+            Find open courts and notify your members instantly.
+          </p>
         </div>
       </div>
 
