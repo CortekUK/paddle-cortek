@@ -925,56 +925,61 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
-              {editingSchedule ? 'Edit Schedule' : 'New Schedule'}
-            </DialogTitle>
+          <DialogHeader className="pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <DialogTitle className="text-lg font-semibold">
+                {editingSchedule ? 'Edit Schedule' : 'New Schedule'}
+              </DialogTitle>
+            </div>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="name">Schedule name</Label>
-              <Input id="name" value={formData.name} onChange={e => setFormData({
+          <div className="space-y-5 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-sm font-medium">Schedule name</Label>
+              <Input id="name" className="h-11 rounded-lg" value={formData.name} onChange={e => setFormData({
               ...formData,
               name: e.target.value
             })} placeholder="Daily evening availability" />
             </div>
             
-            <div>
-              <Label htmlFor="time">Time</Label>
-              <Input id="time" type="time" value={formData.time_local} onChange={e => setFormData({
+            <div className="space-y-1.5">
+              <Label htmlFor="time" className="text-sm font-medium">Time</Label>
+              <Input id="time" type="time" className="h-11 rounded-lg" value={formData.time_local} onChange={e => setFormData({
               ...formData,
               time_local: e.target.value
             })} />
             </div>
             
             {/* Target field - only show for AVAILABILITY and PARTIAL_MATCHES, not for COMPETITIONS_ACADEMIES */}
-            {category !== 'COMPETITIONS_ACADEMIES' && <div>
-                <Label>Day to send</Label>
+            {category !== 'COMPETITIONS_ACADEMIES' && <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Day to send</Label>
                 <RadioGroup value={formData.target} onValueChange={value => setFormData({
               ...formData,
               target: value as 'TODAY' | 'TOMORROW'
             })} className="flex gap-6 mt-2">
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="TODAY" id="today" />
-                    <Label htmlFor="today">TODAY</Label>
+                    <RadioGroupItem value="TODAY" id="today" className="border-purple-500 text-purple-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600" />
+                    <Label htmlFor="today" className="text-sm">Today</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="TOMORROW" id="tomorrow" />
-                    <Label htmlFor="tomorrow">TOMORROW</Label>
+                    <RadioGroupItem value="TOMORROW" id="tomorrow" className="border-purple-500 text-purple-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600" />
+                    <Label htmlFor="tomorrow" className="text-sm">Tomorrow</Label>
                   </div>
                 </RadioGroup>
               </div>}
             
-            <div>
-              <Label htmlFor="group">WhatsApp Group</Label>
-              <Input id="group" value={formData.whatsapp_group} onChange={e => setFormData({
+            <div className="space-y-1.5">
+              <Label htmlFor="group" className="text-sm font-medium">WhatsApp Group</Label>
+              <Input id="group" className="h-11 rounded-lg" value={formData.whatsapp_group} onChange={e => setFormData({
               ...formData,
               whatsapp_group: e.target.value
             })} placeholder="Group name" />
             </div>
             
-            <div>
-              <Label htmlFor="template">Template</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="template" className="text-sm font-medium">Template</Label>
               <Select value={formData.template_id} onValueChange={value => {
               const tpl = templates.find(t => t.id === value);
               if (tpl) {
@@ -993,10 +998,10 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                 });
               }
             }}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 rounded-lg">
                   <SelectValue placeholder="Select template" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {templates.map(template => <SelectItem key={template.id} value={template.id}>
                       {template.name}
                     </SelectItem>)}
@@ -1004,16 +1009,16 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               </Select>
             </div>
             {/* Category-specific fields */}
-            {category === 'PARTIAL_MATCHES' && <div>
-                <Label>Summary Variant</Label>
+            {category === 'PARTIAL_MATCHES' && <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Summary Variant</Label>
                 <Select value={formData.summary_variant || ''} onValueChange={value => setFormData({
               ...formData,
               summary_variant: value || undefined
             })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11 rounded-lg">
                     <SelectValue placeholder="Select variant" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-popover">
                     <SelectItem value="1_3_PLAYERS">Competitive — Open (1–3 players)</SelectItem>
                     <SelectItem value="1_PLAYER">Competitive — Open (1 player)</SelectItem>
                     <SelectItem value="2_PLAYERS">Competitive — Open (2 players)</SelectItem>
@@ -1022,27 +1027,27 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                 </Select>
               </div>}
 
-            {category === 'COMPETITIONS_ACADEMIES' && <div className="space-y-3">
-                <div>
-                  <Label>One-off send</Label>
+            {category === 'COMPETITIONS_ACADEMIES' && <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium">One-off send</Label>
                   <div className="flex items-center gap-2 mt-2">
-                    <Switch id="is_one_off" checked={!!formData.is_one_off} onCheckedChange={checked => setFormData({
+                    <Switch id="is_one_off" className="data-[state=checked]:bg-purple-600" checked={!!formData.is_one_off} onCheckedChange={checked => setFormData({
                   ...formData,
                   is_one_off: checked
                 })} />
-                    <Label htmlFor="is_one_off">Run at specific date/time</Label>
+                    <Label htmlFor="is_one_off" className="text-sm">Run at specific date/time</Label>
                   </div>
                 </div>
-                {formData.is_one_off ? <div>
-                    <Label htmlFor="runAt">Run At ({clubTimezone})</Label>
-                    <Input id="runAt" type="datetime-local" value={formData.run_at_date_local || ''} onChange={e => setFormData({
+                {formData.is_one_off ? <div className="space-y-1.5">
+                    <Label htmlFor="runAt" className="text-sm font-medium">Run At ({clubTimezone})</Label>
+                    <Input id="runAt" type="datetime-local" className="h-11 rounded-lg" value={formData.run_at_date_local || ''} onChange={e => setFormData({
                 ...formData,
                 run_at_date_local: e.target.value || undefined
-              })} />
+                })} />
                   </div> : <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="dateStart">Custom Range Start (UTC)</Label>
-                      <Input id="dateStart" type="datetime-local" className="w-full" value={isoToDatetimeLocal(formData.date_start_utc)} onInput={e => {
+                    <div className="space-y-1.5">
+                      <Label htmlFor="dateStart" className="text-sm font-medium">Custom Range Start (UTC)</Label>
+                      <Input id="dateStart" type="datetime-local" className="h-11 rounded-lg w-full" value={isoToDatetimeLocal(formData.date_start_utc)} onInput={e => {
                   // Handle input event as well for better browser compatibility
                   const target = e.target as HTMLInputElement;
                   if (target.value) {
@@ -1142,9 +1147,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                   }
                 }} />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dateEnd">Custom Range End (UTC)</Label>
-                      <Input id="dateEnd" type="datetime-local" className="w-full" value={isoToDatetimeLocal(formData.date_end_utc)} onInput={e => {
+                    <div className="space-y-1.5">
+                      <Label htmlFor="dateEnd" className="text-sm font-medium">Custom Range End (UTC)</Label>
+                      <Input id="dateEnd" type="datetime-local" className="h-11 rounded-lg w-full" value={isoToDatetimeLocal(formData.date_end_utc)} onInput={e => {
                   // Handle input event as well for better browser compatibility
                   const target = e.target as HTMLInputElement;
                   if (target.value) {
@@ -1247,20 +1252,20 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                   </div>}
               </div>}
             
-            <div className="flex items-center space-x-2">
-              <Switch id="enabled" checked={formData.enabled} onCheckedChange={checked => setFormData({
+            <div className="flex items-center space-x-2 pt-2 pb-2 px-3 bg-muted/30 rounded-lg">
+              <Switch id="enabled" className="data-[state=checked]:bg-purple-600" checked={formData.enabled} onCheckedChange={checked => setFormData({
               ...formData,
               enabled: checked
             })} />
-              <Label htmlFor="enabled">Enable schedule</Label>
+              <Label htmlFor="enabled" className="text-sm font-medium">Enable schedule</Label>
             </div>
             
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleSave} className="flex-1">
-                {editingSchedule ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">
+            <div className="flex gap-3 pt-4 border-t border-border/30">
+              <Button variant="ghost" onClick={() => setModalOpen(false)} className="flex-1 text-muted-foreground hover:bg-muted/50">
                 Cancel
+              </Button>
+              <Button onClick={handleSave} className="flex-1 shadow-sm hover:shadow-md transition-shadow">
+                {editingSchedule ? 'Update' : 'Create'}
               </Button>
             </div>
           </div>
