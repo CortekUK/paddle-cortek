@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
@@ -71,27 +70,30 @@ export function ClientLayout() {
   const orgName = organization?.name || 'Your Organization';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/40 to-blue-50/30 dark:from-background dark:via-purple-950/20 dark:to-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F5FF] via-purple-50/30 to-white dark:from-background dark:via-purple-950/20 dark:to-background">
+      {/* Subtle vignette overlay */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.02)_100%)]" />
+      
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+          className="fixed inset-0 bg-black/30 z-40 lg:hidden backdrop-blur-sm" 
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-card border-r border-border/50 shadow-sm transition-transform duration-200 ease-in-out",
+        "fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-card border-r border-border/30 shadow-sm transition-transform duration-200 ease-in-out",
         "lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b border-border/50">
+          <div className="flex items-center justify-between p-5 border-b border-border/30">
             <div>
-              <h2 className="font-semibold text-foreground">CORTEK Client</h2>
-              <p className="text-sm text-muted-foreground">Club Portal</p>
+              <h2 className="font-semibold text-primary">CORTEK Client</h2>
+              <p className="text-sm text-muted-foreground/70">Club Portal</p>
             </div>
             <Button
               variant="ghost"
@@ -105,7 +107,7 @@ export function ClientLayout() {
 
           {/* Navigation */}
           <nav className="flex-1 p-4">
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {sidebarItems.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
@@ -113,9 +115,9 @@ export function ClientLayout() {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start gap-3 transition-colors",
+                        "w-full justify-start gap-3 py-2.5 px-3 rounded-xl transition-all duration-200",
                         isActive 
-                          ? "bg-primary/10 text-primary font-medium hover:bg-primary/15" 
+                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15" 
                           : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
                       )}
                       onClick={() => {
@@ -123,7 +125,7 @@ export function ClientLayout() {
                         setSidebarOpen(false);
                       }}
                     >
-                      <item.icon className={cn("h-4 w-4", isActive && "text-primary")} />
+                      <item.icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-primary/70")} />
                       {item.title}
                     </Button>
                   </li>
@@ -135,9 +137,9 @@ export function ClientLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="lg:ml-64">
+      <div className="lg:ml-64 relative">
         {/* Top header */}
-        <header className="bg-white/80 dark:bg-card/80 backdrop-blur-sm border-b border-border/50 px-4 py-3">
+        <header className="bg-white dark:bg-card border-b border-border/30 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
@@ -149,23 +151,18 @@ export function ClientLayout() {
                 <Menu className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="font-semibold text-lg text-foreground">{orgName}</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-0">
-                    Trial Active
-                  </Badge>
-                </div>
+                <h1 className="font-bold text-lg text-foreground">{orgName}</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">Your CORTEK automation hub</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
+            <div className="flex items-center gap-4">
               <div className="hidden md:block text-right">
                 <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">Club Member</p>
+                <p className="text-xs text-muted-foreground/70">Club Member</p>
               </div>
-              <Avatar className="h-8 w-8 border border-border/50">
-                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+              <Avatar className="h-9 w-9 border-2 border-primary/10">
+                <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
                   {user?.email ? getInitials(user.email) : 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -173,7 +170,7 @@ export function ClientLayout() {
                 variant="ghost"
                 size="sm"
                 onClick={handleSignOut}
-                className="gap-2 text-muted-foreground hover:text-foreground"
+                className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -183,7 +180,7 @@ export function ClientLayout() {
         </header>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-8">
           <Outlet />
         </main>
       </div>

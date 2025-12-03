@@ -9,7 +9,8 @@ import {
   MessageCircle, 
   Clock,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -25,8 +26,8 @@ export default function ClientDashboard() {
       status: 'Active',
       icon: Calendar,
       href: '/client/court-availability',
-      gradient: 'from-green-500/20 to-emerald-500/20',
-      iconColor: 'text-green-600'
+      gradient: 'from-emerald-500/20 to-green-400/20',
+      iconColor: 'text-emerald-600'
     },
     {
       title: 'Partial Matches',
@@ -34,7 +35,7 @@ export default function ClientDashboard() {
       status: 'Active', 
       icon: Users,
       href: '/client/partial-matches',
-      gradient: 'from-primary/20 to-blue-500/20',
+      gradient: 'from-primary/20 to-blue-400/20',
       iconColor: 'text-primary'
     },
     {
@@ -43,86 +44,82 @@ export default function ClientDashboard() {
       status: 'Active',
       icon: Trophy, 
       href: '/client/competitions-academies',
-      gradient: 'from-accent/20 to-purple-500/20',
+      gradient: 'from-accent/20 to-purple-400/20',
       iconColor: 'text-accent'
     }
   ];
 
   return (
-    <div className="relative space-y-8">
-      {/* Floating gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl -z-10" />
-
+    <div className="relative space-y-10">
       {/* Dashboard Header */}
-      <div className="text-center pt-4 pb-2">
+      <div className="pt-2 pb-4">
         <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground/80 mt-1">
           Welcome to your CORTEK club automation hub
         </p>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-4">
         {/* Trial Days Remaining */}
-        <Card className="bg-white dark:bg-card shadow-md hover:shadow-lg transition-shadow border-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="bg-white dark:bg-card rounded-2xl shadow-lg shadow-primary/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 border-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">Trial Days Remaining</CardTitle>
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Clock className="h-4 w-4 text-primary" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/15 to-blue-400/15">
+              <Clock className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-semibold text-foreground">12</div>
-            <p className="text-xs text-muted-foreground mt-1">
+          <CardContent className="px-6 pb-6">
+            <div className="text-4xl font-bold text-foreground">12</div>
+            <p className="text-xs text-muted-foreground/70 mt-1.5">
               of 14 day trial
             </p>
           </CardContent>
         </Card>
 
         {/* Automation Categories */}
-        <Card className="bg-white dark:bg-card shadow-md hover:shadow-lg transition-shadow border-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="bg-white dark:bg-card rounded-2xl shadow-lg shadow-primary/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 border-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">Automation Categories</CardTitle>
-            <div className="p-2 rounded-lg bg-green-500/10">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500/15 to-emerald-400/15">
+              <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-semibold text-foreground">3</div>
-            <p className="text-xs text-muted-foreground mt-1">
+          <CardContent className="px-6 pb-6">
+            <div className="text-4xl font-bold text-foreground">3</div>
+            <p className="text-xs text-muted-foreground/70 mt-1.5">
               WhatsApp groups configured
             </p>
           </CardContent>
         </Card>
 
         {/* Messages Sent */}
-        <Card className="bg-white dark:bg-card shadow-md hover:shadow-lg transition-shadow border-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="bg-white dark:bg-card rounded-2xl shadow-lg shadow-primary/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 border-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">Messages Sent</CardTitle>
-            <div className="p-2 rounded-lg bg-primary/10">
-              <MessageCircle className="h-4 w-4 text-primary" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-accent/15 to-purple-400/15">
+              <MessageCircle className="h-5 w-5 text-accent" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-semibold text-foreground">247</div>
-            <p className="text-xs text-muted-foreground mt-1">
+          <CardContent className="px-6 pb-6">
+            <div className="text-4xl font-bold text-foreground">247</div>
+            <p className="text-xs text-muted-foreground/70 mt-1.5">
               this month
             </p>
           </CardContent>
         </Card>
 
         {/* Club Info */}
-        <Card className="bg-white dark:bg-card shadow-md hover:shadow-lg transition-shadow border-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="bg-white dark:bg-card rounded-2xl shadow-lg shadow-primary/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 border-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">Club Status</CardTitle>
-            <Badge className="bg-primary/10 text-primary border-0 hover:bg-primary/20">Active</Badge>
+            <Badge className="bg-green-500/10 text-green-600 border-0 hover:bg-green-500/20 font-medium">Active</Badge>
           </CardHeader>
-          <CardContent>
-            <div className="text-lg font-semibold text-foreground truncate">
+          <CardContent className="px-6 pb-6">
+            <div className="text-xl font-bold text-foreground truncate">
               {organization?.name || 'Your Club'}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground/70 mt-1.5">
               Automation enabled
             </p>
           </CardContent>
@@ -130,25 +127,25 @@ export default function ClientDashboard() {
       </div>
 
       {/* Automation Services */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
         {automationCards.map((card) => (
           <Card 
             key={card.title} 
-            className="bg-white dark:bg-card shadow-md hover:shadow-lg transition-all cursor-pointer border-0 group"
+            className="bg-white dark:bg-card rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer border-0 group"
             onClick={() => navigate(card.href)}
           >
-            <CardHeader className="pb-3">
+            <CardHeader className="p-6 pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className={cn(
-                    "p-3 rounded-xl bg-gradient-to-br",
+                    "p-4 rounded-2xl bg-gradient-to-br",
                     card.gradient
                   )}>
-                    <card.icon className={cn("h-5 w-5", card.iconColor)} />
+                    <card.icon className={cn("h-6 w-6", card.iconColor)} />
                   </div>
                   <div>
-                    <CardTitle className="text-base font-semibold text-foreground">{card.title}</CardTitle>
-                    <Badge variant="outline" className="mt-1.5 text-xs border-green-500/30 text-green-600 bg-green-500/10">
+                    <CardTitle className="text-lg font-semibold text-foreground">{card.title}</CardTitle>
+                    <Badge variant="outline" className="mt-2 text-xs border-green-500/30 text-green-600 bg-green-500/10">
                       {card.status}
                     </Badge>
                   </div>
@@ -156,30 +153,35 @@ export default function ClientDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary group-hover:bg-primary/10 transition-colors"
+                  className="text-primary group-hover:bg-primary/10 transition-all duration-200"
                 >
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="px-6 pb-6 pt-0">
               <CardDescription className="text-sm text-muted-foreground">{card.description}</CardDescription>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Coming Soon */}
-      <Card className="bg-white dark:bg-card shadow-sm border-0 rounded-2xl">
-        <CardContent className="py-8">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold text-foreground mb-2">More Features Coming Soon</h3>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Advanced analytics, custom automation rules, and detailed reporting are on the way.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Coming Soon - with gradient border */}
+      <div className="p-[1px] rounded-2xl bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20">
+        <Card className="bg-white dark:bg-card rounded-2xl border-0">
+          <CardContent className="py-10 px-8">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 mb-4">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-base font-medium text-foreground mb-2">More Features Coming Soon</h3>
+              <p className="text-sm text-muted-foreground/80 max-w-md mx-auto">
+                We're cooking up some exciting new features for you! Advanced analytics, custom automation rules, and detailed reporting are on the way.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
