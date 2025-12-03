@@ -8,7 +8,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, FileText, Clock, ChevronRight } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, FileText, Clock, ChevronRight, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format, addDays, startOfDay, endOfDay, endOfWeek, startOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -716,48 +717,62 @@ Book now — don't miss out!`);
         <CardContent className="pt-5 space-y-5">
           {/* Template controls row - streamlined */}
           <div className="flex flex-wrap gap-3 items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-                <SelectTrigger className="w-44 h-9 rounded-lg border-border/40 bg-background text-sm">
-                  <SelectValue placeholder="Select template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      <span className="flex items-center gap-2">
-                        {template.name}
-                        {template.is_default && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
+            {/* Left: Template selector */}
+            <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+              <SelectTrigger className="w-48 h-9 rounded-lg border-border/40 bg-background text-sm">
+                <SelectValue placeholder="Select template" />
+              </SelectTrigger>
+              <SelectContent>
+                {templates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    <span className="flex items-center gap-2">
+                      {template.name}
+                      {template.is_default && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {/* Right: Name + Actions grouped */}
+            <div className="flex items-center gap-2">
               <Input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
                 placeholder="Template name"
-                className="w-40 h-9 rounded-lg border-border/40 bg-background text-sm"
+                className="w-36 h-9 rounded-lg border-border/40 bg-background text-sm"
               />
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" onClick={handleSaveTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
-                <Save className="h-3.5 w-3.5 mr-1.5" />
-                Save
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleSaveAsTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
-                Save as
-              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50">
+                    <Save className="h-3.5 w-3.5 mr-1.5" />
+                    Save
+                    <ChevronDown className="h-3 w-3 ml-1.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-popover">
+                  <DropdownMenuItem onClick={handleSaveTemplate} disabled={!selectedTemplateId}>
+                    <Save className="h-3.5 w-3.5 mr-2" />
+                    Update current
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSaveAsTemplate}>
+                    <Plus className="h-3.5 w-3.5 mr-2" />
+                    Save as new...
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button 
                 variant="ghost" 
-                size="sm" 
+                size="icon" 
                 onClick={handleSetDefault} 
                 disabled={!selectedTemplateId} 
-                className="h-8 px-2 hover:bg-muted/50"
+                className="h-8 w-8 hover:bg-muted/50"
               >
                 <Star className={`h-3.5 w-3.5 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground'}`} />
               </Button>
+              
               <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
                 <Plus className="h-3.5 w-3.5 mr-1.5" />
                 New
