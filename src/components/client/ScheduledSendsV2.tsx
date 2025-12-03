@@ -10,7 +10,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock, MoreHorizontal, Link2 } from 'lucide-react';
+import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock, MoreHorizontal, Link2, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -739,63 +740,97 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   if (loading) {
     return <div>Loading scheduled sends...</div>;
   }
+  const [testSectionOpen, setTestSectionOpen] = useState(true);
+
+  // Auto-collapse test section after successful test
+  useEffect(() => {
+    if (lastTestResult?.status === 'success') {
+      const timer = setTimeout(() => setTestSectionOpen(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastTestResult]);
+
   return <>
       {/* Test Connection Section */}
-      <Card className="bg-blue-50/50 dark:bg-blue-950/20 backdrop-blur-sm rounded-2xl shadow-md border border-blue-200/50 dark:border-blue-800/30 mb-6">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-100/70 dark:bg-blue-900/30">
-              <Link2 className="h-4 w-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
-            </div>
-            <div>
-              <CardTitle className="text-base font-semibold">Test Your WhatsApp Connection</CardTitle>
-              <CardDescription className="text-sm">Verify your integration is working before creating schedules</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              placeholder="WhatsApp group name..."
-              value={testGroupName}
-              onChange={(e) => setTestGroupName(e.target.value)}
-              className="flex-1 h-10 bg-white dark:bg-background"
-            />
-            <Button
-              onClick={handleTestSend}
-              disabled={testingMessage || !testGroupName.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
-            >
-              {testingMessage ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" strokeWidth={1.5} />
-                  Send Test Message
-                </>
+      <Collapsible open={testSectionOpen} onOpenChange={setTestSectionOpen}>
+        <Card className="bg-blue-50/50 dark:bg-blue-950/20 backdrop-blur-sm rounded-2xl shadow-md border border-blue-200/50 dark:border-blue-800/30 mb-6">
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-3 cursor-pointer hover:bg-blue-100/30 dark:hover:bg-blue-900/20 transition-colors rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-100/70 dark:bg-blue-900/30">
+                    {lastTestResult?.status === 'success' ? (
+                      <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
+                    ) : (
+                      <Link2 className="h-4 w-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
+                    )}
+                  </div>
+                  <div>
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      Test Your WhatsApp Connection
+                      {lastTestResult?.status === 'success' && (
+                        <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs">
+                          Connected
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      {lastTestResult?.status === 'success' 
+                        ? 'Connection verified - click to expand' 
+                        : 'Verify your integration is working before creating schedules'}
+                    </CardDescription>
+                  </div>
+                </div>
+                <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${testSectionOpen ? 'rotate-180' : ''}`} />
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
+            <CardContent className="pt-0">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  placeholder="WhatsApp group name..."
+                  value={testGroupName}
+                  onChange={(e) => setTestGroupName(e.target.value)}
+                  className="flex-1 h-10 bg-white dark:bg-background"
+                />
+                <Button
+                  onClick={handleTestSend}
+                  disabled={testingMessage || !testGroupName.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+                >
+                  {testingMessage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" strokeWidth={1.5} />
+                      Send Test Message
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {lastTestResult && (
+                <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 text-sm ${
+                  lastTestResult.status === 'success' 
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' 
+                    : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/50'
+                }`}>
+                  {lastTestResult.status === 'success' ? (
+                    <CheckCircle className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                  )}
+                  {lastTestResult.message}
+                </div>
               )}
-            </Button>
-          </div>
-          
-          {lastTestResult && (
-            <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 text-sm ${
-              lastTestResult.status === 'success' 
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' 
-                : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/50'
-            }`}>
-              {lastTestResult.status === 'success' ? (
-                <CheckCircle className="h-4 w-4 shrink-0" />
-              ) : (
-                <AlertCircle className="h-4 w-4 shrink-0" />
-              )}
-              {lastTestResult.message}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Scheduled Messages Section */}
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
