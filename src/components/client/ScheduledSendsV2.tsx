@@ -763,8 +763,13 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               <TabsTrigger value="schedules" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4 pb-3">
                 Schedules
               </TabsTrigger>
-              <TabsTrigger value="recent-runs" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4 pb-3">
+              <TabsTrigger value="recent-runs" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4 pb-3 gap-2">
                 Recent Runs
+                {runLogs.length > 0 && (
+                  <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-muted text-muted-foreground">
+                    {runLogs.length}
+                  </Badge>
+                )}
               </TabsTrigger>
             </TabsList>
           </CardHeader>
