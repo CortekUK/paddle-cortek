@@ -780,7 +780,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                             <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80 text-sm" align="start">
+                        <PopoverContent className="w-96 text-sm" align="start">
                           <div className="space-y-3">
                             <h4 className="font-semibold">Setup Instructions</h4>
                             <ol className="list-decimal pl-4 space-y-2 text-muted-foreground">
