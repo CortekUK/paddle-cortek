@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, AlertCircle, Clock, Loader2, Copy, MessageSquare, Send, Settings, Plus, Save, Star, Eye, Hash } from 'lucide-react';
+import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Save, Star, Eye, Hash } from 'lucide-react';
 import { format, addDays, startOfDay, endOfDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -632,95 +632,105 @@ Join these matches - let's play!`);
     }
   };
 
+  // Premium card styling
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Partial Matches</h1>
-        <p className="text-muted-foreground mt-1">
-          Find and notify about incomplete matches that need more players
-        </p>
+    <div className="relative space-y-8">
+      {/* Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight text-left">Partial Matches</h1>
+          <p className="text-muted-foreground mt-1.5 text-left">
+            Find and notify about incomplete matches that need more players.
+          </p>
+        </div>
       </div>
 
       {/* Search Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Search Partial Matches
-          </CardTitle>
-          <CardDescription>
-            Find matches that need additional players
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Quick Picks */}
-          <div className="flex gap-2">
+      <Card className={cardClass}>
+        <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            
+            <div className="flex items-center gap-2 flex-1">
+              {(['today', 'tomorrow'] as const).map(preset => (
+                <Button
+                  key={preset}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPreset(preset)}
+                  className="rounded-full px-4 h-8 text-sm font-medium transition-all bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                >
+                  {preset === 'today' ? 'Today' : 'Tomorrow'}
+                </Button>
+              ))}
+            </div>
+
+            {error && (
+              <Alert variant="destructive" className="rounded-lg py-2 px-3 flex-shrink-0">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs">{error}</AlertDescription>
+              </Alert>
+            )}
+
             <Button
-              variant="outline"
+              onClick={handleSearch}
+              disabled={loading}
               size="sm"
-              onClick={() => setPreset('today')}
-              className="gap-2"
+              className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4 sm:ml-auto"
             >
-              <Calendar className="h-4 w-4" />
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreset('tomorrow')}
-              className="gap-2"
-            >
-              <Calendar className="h-4 w-4" />
-              Tomorrow
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              Search Matches
             </Button>
           </div>
+        </div>
 
-          {/* Date Range */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dateFrom">From Date & Time</Label>
-              <Input
-                id="dateFrom"
-                type="datetime-local"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateTo">To Date & Time</Label>
-              <Input
-                id="dateTo"
-                type="datetime-local"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-              />
-            </div>
+        {/* Results Section */}
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground">
+              {summaryText ? dateDisplayShort || 'Results' : 'Results'}
+            </h3>
+            {countSlots > 0 && (
+              <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
+                {countSlots} Matches Found
+              </Badge>
+            )}
           </div>
 
-          <Button onClick={handleSearch} disabled={loading} className="w-full gap-2">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            {loading ? 'Searching...' : 'Search Partial Matches'}
-          </Button>
-
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : summaryText ? (
+            <div className="bg-purple-50/40 dark:bg-purple-900/10 rounded-xl p-4 border border-purple-200/30 dark:border-purple-800/20">
+              <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
+                {summaryText}
+              </pre>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-12 border-2 border-dashed border-muted-foreground/15 rounded-xl">
+              <p className="text-sm text-muted-foreground/60">
+                Partial matches will appear here
+              </p>
+            </div>
           )}
-        </CardContent>
+        </div>
       </Card>
 
       {/* Results Summary */}
       {searchResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Hash className="h-5 w-5" />
-              Summary ({countSlots} matches)
-            </CardTitle>
+        <Card className={cardClass}>
+          <CardHeader className="pb-0">
+            <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Hash className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <CardTitle className="text-lg font-semibold">Summary ({countSlots} matches)</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-5">
             <div className="space-y-2">
               <Label>Summary Variant</Label>
               <Select value={selectedSummaryVariant} onValueChange={setSelectedSummaryVariant}>
@@ -738,8 +748,8 @@ Join these matches - let's play!`);
 
             <div className="space-y-2">
               <Label>Message Preview</Label>
-              <div className="p-4 bg-muted rounded-md border">
-                <pre className="whitespace-pre-wrap text-sm font-mono">
+              <div className="p-4 bg-purple-50/40 dark:bg-purple-900/10 rounded-xl border border-purple-200/30 dark:border-purple-800/20">
+                <pre className="whitespace-pre-wrap text-sm font-mono text-foreground/90">
                   {enhancedSummary || 'No summary available'}
                 </pre>
               </div>
@@ -747,8 +757,8 @@ Join these matches - let's play!`);
 
             <div className="flex gap-2">
               <Button
-                variant="outline"
                 size="sm"
+                className="bg-primary/10 border border-primary text-primary hover:bg-primary/20"
                 onClick={() => {
                   if (enhancedSummary) {
                     navigator.clipboard.writeText(enhancedSummary);
@@ -764,8 +774,8 @@ Join these matches - let's play!`);
                 Copy Summary
               </Button>
               <Button
-                variant="outline"
                 size="sm"
+                className="bg-primary/10 border border-primary text-primary hover:bg-primary/20"
                 onClick={() => setShowPreview(!showPreview)}
               >
                 <Eye className="h-4 w-4 mr-2" />
@@ -777,17 +787,16 @@ Join these matches - let's play!`);
       )}
 
       {/* Message Builder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            Message Builder
-          </CardTitle>
-          <CardDescription>
-            Create and customize your partial matches message
-          </CardDescription>
+      <Card className={cardClass}>
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-5">
           {/* Template Selection */}
           <div className="flex gap-2">
             <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
@@ -805,7 +814,7 @@ Join these matches - let's play!`);
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" onClick={handleNewTemplate}>
+            <Button size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20" onClick={handleNewTemplate}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -861,20 +870,20 @@ Join these matches - let's play!`);
 
           {/* Template Actions */}
           <div className="flex gap-2">
-            <Button onClick={handleSaveTemplate} variant="outline" className="gap-2">
+            <Button onClick={handleSaveTemplate} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2">
               <Save className="h-4 w-4" />
               Save Template
             </Button>
             {selectedTemplateId && (
-              <Button onClick={handleSetDefault} variant="outline" className="gap-2">
+              <Button onClick={handleSetDefault} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2">
                 <Star className="h-4 w-4" />
                 Set Default
               </Button>
             )}
             <Button
               onClick={() => setShowPreview(!showPreview)}
-              variant="outline"
-              className="gap-2"
+              size="sm"
+              className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2"
             >
               <Eye className="h-4 w-4" />
               {showPreview ? 'Hide' : 'Show'} Preview
@@ -885,7 +894,7 @@ Join these matches - let's play!`);
           {showPreview && (
             <div className="space-y-2">
               <Label>Preview</Label>
-              <div className="bg-muted p-4 rounded-md whitespace-pre-wrap font-mono text-sm">
+              <div className="bg-purple-50/40 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-200/30 dark:border-purple-800/20 whitespace-pre-wrap font-mono text-sm text-foreground/90">
                 {renderTemplate(templateContent)}
               </div>
             </div>
@@ -894,17 +903,16 @@ Join these matches - let's play!`);
       </Card>
 
       {/* Instant Send */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
-            Send Message
-          </CardTitle>
-          <CardDescription>
-            Send your message instantly to WhatsApp
-          </CardDescription>
+      <Card className={cardClass}>
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <Send className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-5">
           <div className="space-y-2">
             <Label htmlFor="whatsappGroup">WhatsApp Group</Label>
             <Input
