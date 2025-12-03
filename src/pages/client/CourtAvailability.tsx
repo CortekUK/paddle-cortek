@@ -675,6 +675,9 @@ Book now — don't miss out!`);
             </div>
           </div>
 
+          {/* Subtle divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+
           {/* Two-column layout: Editor + Preview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left side - Template editor */}
