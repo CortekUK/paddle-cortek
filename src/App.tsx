@@ -1,6 +1,6 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { OrganizationAuthProvider } from '@/hooks/useOrganizationAuth';
@@ -75,89 +75,91 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <OrganizationAuthProvider>
-          <Router>
-            <div className="min-h-screen bg-background">
-              <Routes>
-                {/* Landing and Auth Routes */}
-                <Route path="/" element={
-                  <PublicRoute>
-                    <Welcome />
-                  </PublicRoute>
-                } />
-                <Route path="/auth" element={
-                  <PublicRoute>
-                    <AuthPage />
-                  </PublicRoute>
-                } />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                
-                {/* Onboarding Routes */}
-                <Route path="/onboarding/step-1" element={
-                  <OnboardingRoute>
-                    <OnboardingStep1 />
-                  </OnboardingRoute>
-                } />
-                <Route path="/onboarding/step-2" element={
-                  <OnboardingRoute>
-                    <OnboardingStep2 />
-                  </OnboardingRoute>
-                } />
-                <Route path="/onboarding/step-3" element={
-                  <OnboardingRoute>
-                    <OnboardingStep3 />
-                  </OnboardingRoute>
-                } />
-                <Route path="/onboarding/complete" element={
-                  <OnboardingRoute>
-                    <OnboardingComplete />
-                  </OnboardingRoute>
-                } />
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <OrganizationAuthProvider>
+            <Router>
+              <div className="min-h-screen bg-background">
+                <Routes>
+                  {/* Landing and Auth Routes */}
+                  <Route path="/" element={
+                    <PublicRoute>
+                      <Welcome />
+                    </PublicRoute>
+                  } />
+                  <Route path="/auth" element={
+                    <PublicRoute>
+                      <AuthPage />
+                    </PublicRoute>
+                  } />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  
+                  {/* Onboarding Routes */}
+                  <Route path="/onboarding/step-1" element={
+                    <OnboardingRoute>
+                      <OnboardingStep1 />
+                    </OnboardingRoute>
+                  } />
+                  <Route path="/onboarding/step-2" element={
+                    <OnboardingRoute>
+                      <OnboardingStep2 />
+                    </OnboardingRoute>
+                  } />
+                  <Route path="/onboarding/step-3" element={
+                    <OnboardingRoute>
+                      <OnboardingStep3 />
+                    </OnboardingRoute>
+                  } />
+                  <Route path="/onboarding/complete" element={
+                    <OnboardingRoute>
+                      <OnboardingComplete />
+                    </OnboardingRoute>
+                  } />
 
-                {/* Legacy Dashboard Redirect */}
-                <Route path="/dashboard" element={<Navigate to="/client/dashboard" replace />} />
+                  {/* Legacy Dashboard Redirect */}
+                  <Route path="/dashboard" element={<Navigate to="/client/dashboard" replace />} />
 
-                {/* Client Portal Routes */}
-                <Route path="/client" element={
-                  <ClientRoute>
-                    <ClientLayout />
-                  </ClientRoute>
-                }>
-                  <Route path="dashboard" element={<ClientDashboard />} />
-                  <Route path="court-availability" element={<CourtAvailability />} />
-                  <Route path="partial-matches" element={<PartialMatches />} />
-                  <Route path="competitions-academies" element={<CompetitionsAcademies />} />
-                  <Route path="social-media-library" element={<SocialMediaLibrary />} />
-                  <Route path="settings" element={<ClientSettings />} />
-                  <Route index element={<Navigate to="dashboard" replace />} />
-                </Route>
+                  {/* Client Portal Routes */}
+                  <Route path="/client" element={
+                    <ClientRoute>
+                      <ClientLayout />
+                    </ClientRoute>
+                  }>
+                    <Route path="dashboard" element={<ClientDashboard />} />
+                    <Route path="court-availability" element={<CourtAvailability />} />
+                    <Route path="partial-matches" element={<PartialMatches />} />
+                    <Route path="competitions-academies" element={<CompetitionsAcademies />} />
+                    <Route path="social-media-library" element={<SocialMediaLibrary />} />
+                    <Route path="settings" element={<ClientSettings />} />
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                  </Route>
 
-                {/* Admin Routes - Admin Console with AppLayout */}
-                <Route path="/admin" element={
-                  <AdminRoute>
-                    <AppLayout />
-                  </AdminRoute>
-                }>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="billing" element={<Billing />} />
-                  <Route path="logs" element={<Logs />} />
-                  <Route path="send-message" element={<SendMessage />} />
-                  <Route path="emulator-test" element={<EmulatorTest />} />
-                  <Route path="playtomic-api" element={<PlaytomicAPI />} />
-                  <Route path="setup" element={<Setup />} />
-                  <Route path="users" element={<Users />} />
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
-            </div>
-          </Router>
-        </OrganizationAuthProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+                  {/* Admin Routes - Admin Console with AppLayout */}
+                  <Route path="/admin" element={
+                    <AdminRoute>
+                      <AppLayout />
+                    </AdminRoute>
+                  }>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="billing" element={<Billing />} />
+                    <Route path="logs" element={<Logs />} />
+                    <Route path="send-message" element={<SendMessage />} />
+                    <Route path="emulator-test" element={<EmulatorTest />} />
+                    <Route path="playtomic-api" element={<PlaytomicAPI />} />
+                    <Route path="setup" element={<Setup />} />
+                    <Route path="users" element={<Users />} />
+                  </Route>
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Toaster />
+              </div>
+            </Router>
+          </OrganizationAuthProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

@@ -77,44 +77,56 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    /* CORTEK Blue Primary */
-    --primary: 214 93% 57%;
+    /* CORTEK Blue Primary - Brighter in dark mode */
+    --primary: 214 93% 62%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 214 93% 65%;
+    --primary-glow: 214 93% 70%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    /* CORTEK Purple Accent */
-    --accent: 250 80% 60%;
+    /* CORTEK Purple Accent - Vibrant in dark mode */
+    --accent: 267 70% 65%;
     --accent-foreground: 0 0% 100%;
+    --accent-light: 267 50% 20%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 214 93% 57%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 217 33% 20%;
+    --input: 217 33% 17%;
+    --ring: 214 93% 62%;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(267 80% 75%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.15));
+    --gradient-onboarding: linear-gradient(135deg, hsl(222 47% 8%), hsl(217 50% 12%), hsl(250 40% 15%));
+    
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.2);
+    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+    --shadow-card-lg: 0 25px 50px -12px hsl(0 0% 0% / 0.5);
+
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 214 93% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 217 33% 15%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 214 93% 62%;
   }
 }
 

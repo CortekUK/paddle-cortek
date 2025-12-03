@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { ensureOrgForUser } from '@/services/bootstrap';
@@ -149,14 +150,19 @@ export function AuthPage() {
 
   // Shared background component with floating orbs
   const PremiumBackground = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-purple-50/40 to-blue-50/30 p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/40 to-blue-50/30 dark:from-background dark:via-purple-950/20 dark:to-blue-950/20 relative overflow-hidden">
       {/* Floating gradient orbs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-primary/5 to-accent/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 dark:bg-accent/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      
+      {/* Theme toggle in header */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
       
       {/* Content */}
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md mx-auto flex items-center justify-center min-h-screen p-4">
         {children}
       </div>
     </div>
@@ -164,8 +170,8 @@ export function AuthPage() {
 
   // Shared glassmorphism card wrapper
   const GlassCard = ({ children }: { children: React.ReactNode }) => (
-    <div className="p-[1px] rounded-3xl bg-gradient-to-br from-primary/20 via-white to-accent/20 shadow-2xl shadow-primary/10">
-      <Card className="bg-white/95 backdrop-blur-xl rounded-3xl border-0">
+    <div className="p-[1px] rounded-3xl bg-gradient-to-br from-primary/20 via-background to-accent/20 shadow-2xl shadow-primary/10 dark:shadow-primary/5">
+      <Card className="bg-card/95 backdrop-blur-xl rounded-3xl border-0">
         {children}
       </Card>
     </div>
