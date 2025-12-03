@@ -19,7 +19,6 @@ import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DateTime } from 'luxon';
-
 interface Schedule {
   id: string;
   name: string;
@@ -44,7 +43,6 @@ interface Schedule {
     name: string;
   };
 }
-
 interface Template {
   id: string;
   name: string;
@@ -54,19 +52,20 @@ interface Template {
   linked_event_id?: string | null;
   whatsapp_group?: string | null;
 }
-
 interface ScheduledSendsV2Props {
   templates: Template[];
   defaultWhatsappGroup?: string;
   category: 'AVAILABILITY' | 'PARTIAL_MATCHES' | 'COMPETITIONS_ACADEMIES';
 }
-
-export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({ 
-  templates, 
+export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
+  templates,
   defaultWhatsappGroup,
   category = 'AVAILABILITY'
 }) => {
-  const { organization, profile } = useOrganizationAuth();
+  const {
+    organization,
+    profile
+  } = useOrganizationAuth();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -79,12 +78,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
     const fetchClubTimezone = async () => {
       if (organization?.tenant_id) {
         try {
-          const { data: location } = await supabase
-            .from('locations')
-            .select('timezone')
-            .eq('tenant_id', organization.tenant_id)
-            .single();
-          
+          const {
+            data: location
+          } = await supabase.from('locations').select('timezone').eq('tenant_id', organization.tenant_id).single();
           if (location?.timezone) {
             setClubTimezone(location.timezone);
           }
@@ -94,14 +90,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         }
       }
     };
-    
     fetchClubTimezone();
   }, [organization?.tenant_id]);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    time_local: '09:00', // Default time, will be updated when timezone loads
+    time_local: '09:00',
+    // Default time, will be updated when timezone loads
     target: 'TODAY' as 'TODAY' | 'TOMORROW',
     whatsapp_group: defaultWhatsappGroup || '',
     template_id: '',
@@ -110,7 +106,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
     summary_variant: '' as string | undefined,
     event_id: '' as string | undefined,
     is_one_off: false,
-    run_at_date_local: '' as string | undefined, // Store raw datetime-local value
+    run_at_date_local: '' as string | undefined,
+    // Store raw datetime-local value
     date_start_utc: '' as string | undefined,
     date_end_utc: '' as string | undefined
   });
@@ -118,16 +115,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   // Test functionality state
   const [testGroupName, setTestGroupName] = useState('');
   const [testingMessage, setTestingMessage] = useState(false);
-  const [lastTestResult, setLastTestResult] = useState<{ status: string; message: string } | null>(null);
+  const [lastTestResult, setLastTestResult] = useState<{
+    status: string;
+    message: string;
+  } | null>(null);
 
   // Run logs state
   const [runLogs, setRunLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
-  
+
   // Log details modal state
   const [logDetailsModalOpen, setLogDetailsModalOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<any>(null);
-
   useEffect(() => {
     if (organization?.id) {
       loadSchedules();
@@ -152,28 +151,26 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
     if (clubTimezone && !editingSchedule) {
       const now = DateTime.now().setZone(clubTimezone);
       const currentTime = now.toFormat('HH:mm');
-      
       setFormData(prev => ({
         ...prev,
         time_local: currentTime
       }));
     }
   }, [clubTimezone, editingSchedule]);
-
   const loadSchedules = async () => {
     try {
-      const { data, error } = await supabase
-        .from('scheduled_sends_v2')
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('scheduled_sends_v2').select(`
           *,
           message_templates (id, name)
-        `)
-        .eq('org_id', organization!.id)
-        .eq('category', category) // Filter by category to show only relevant schedules
-        .order('created_at', { ascending: false });
-
+        `).eq('org_id', organization!.id).eq('category', category) // Filter by category to show only relevant schedules
+      .order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
-      
+
       // Ensure all fields are properly loaded
       const schedules = (data || []).map((schedule: any) => {
         const mappedSchedule = {
@@ -185,7 +182,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           summary_variant: schedule.summary_variant || undefined,
           event_id: schedule.event_id || undefined
         };
-        
+
         // Debug: Log dates for schedules that should have them
         if (schedule.category === 'COMPETITIONS_ACADEMIES' && !schedule.is_one_off) {
           console.log(`Loaded schedule ${schedule.name}:`, {
@@ -195,10 +192,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             raw_date_end_utc: schedule.date_end_utc
           });
         }
-        
         return mappedSchedule;
       });
-      
       setSchedules(schedules as Schedule[]);
     } catch (error) {
       console.error('Error loading schedules:', error);
@@ -207,30 +202,24 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       setLoading(false);
     }
   };
-
   const loadRunLogs = async () => {
     if (!organization?.id) return;
-    
     setLoadingLogs(true);
     try {
-      console.log('Loading run logs with:', { 
-        org_id: organization.id, 
-        category, 
-        tenant_id: organization.tenant_id 
+      console.log('Loading run logs with:', {
+        org_id: organization.id,
+        category,
+        tenant_id: organization.tenant_id
       });
-      
-      const { data, error } = await supabase
-        .from('send_logs_v2')
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('send_logs_v2').select(`
           *,
           scheduled_sends_v2 (name)
-        `)
-        .eq('org_id', organization.id)
-        .eq('category', category)
-        .not('schedule_id', 'is', null)
-        .order('sent_at', { ascending: false })
-        .limit(10);
-
+        `).eq('org_id', organization.id).eq('category', category).not('schedule_id', 'is', null).order('sent_at', {
+        ascending: false
+      }).limit(10);
       if (error) throw error;
       console.log('Found run logs:', data?.length || 0, 'logs');
       setRunLogs(data || []);
@@ -240,17 +229,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       setLoadingLogs(false);
     }
   };
-
   const handleViewLogDetails = (log: any) => {
     setSelectedLog(log);
     setLogDetailsModalOpen(true);
   };
-
   const resetForm = () => {
     // Get current time in club timezone
     const now = DateTime.now().setZone(clubTimezone);
     const currentTime = now.toFormat('HH:mm');
-    
     setFormData({
       name: '',
       time_local: currentTime,
@@ -266,15 +252,13 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       date_end_utc: undefined
     });
   };
-
   const handleSave = async () => {
-    console.log('handleSave called', { 
-      hasOrg: !!organization?.id, 
+    console.log('handleSave called', {
+      hasOrg: !!organization?.id,
       hasProfile: !!profile,
       templateId: formData.template_id,
-      formData 
+      formData
     });
-    
     if (!organization?.id || !profile) {
       console.error('Missing organization or profile');
       toast.error('Please refresh the page and try again');
@@ -297,30 +281,25 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       }
       // datetime-local gives us a string like "2025-11-03T10:45" (no timezone)
       // We need to interpret this in club timezone and convert to UTC
-      const localDateTime = DateTime.fromISO(formData.run_at_date_local, { zone: clubTimezone });
+      const localDateTime = DateTime.fromISO(formData.run_at_date_local, {
+        zone: clubTimezone
+      });
       if (!localDateTime.isValid) {
         toast.error('Invalid date/time selected');
         return;
       }
       computedRunAtUtc = localDateTime.toUTC().toISO();
     }
-
     try {
       // Only send date_start_utc and date_end_utc if is_one_off is false
       // When is_one_off is true, we use run_at_utc instead
       let dateStartUtc: string | null = null;
       let dateEndUtc: string | null = null;
-      
       if (!formData.is_one_off) {
         // For recurring schedules, use custom date ranges if provided
-        dateStartUtc = formData.date_start_utc && formData.date_start_utc.trim() !== '' 
-          ? formData.date_start_utc.trim() 
-          : null;
-        dateEndUtc = formData.date_end_utc && formData.date_end_utc.trim() !== '' 
-          ? formData.date_end_utc.trim() 
-          : null;
+        dateStartUtc = formData.date_start_utc && formData.date_start_utc.trim() !== '' ? formData.date_start_utc.trim() : null;
+        dateEndUtc = formData.date_end_utc && formData.date_end_utc.trim() !== '' ? formData.date_end_utc.trim() : null;
       }
-      
       console.log('Calling schedules-v2-upsert with:', {
         id: editingSchedule?.id || null,
         org_id: organization.id,
@@ -335,14 +314,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         formData_date_end_utc: formData.date_end_utc,
         formData_full: formData
       });
-      
+
       // For COMPETITIONS_ACADEMIES, default target to 'TODAY' if not set
       // (target field is hidden for this category)
-      const finalTarget = category === 'COMPETITIONS_ACADEMIES' 
-        ? (formData.target || 'TODAY')
-        : formData.target;
-
-      const { data, error } = await supabase.functions.invoke('schedules-v2-upsert', {
+      const finalTarget = category === 'COMPETITIONS_ACADEMIES' ? formData.target || 'TODAY' : formData.target;
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('schedules-v2-upsert', {
         body: {
           id: editingSchedule?.id || null,
           org_id: organization.id,
@@ -351,21 +330,27 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           tz: clubTimezone,
           target: finalTarget,
           whatsapp_group: formData.whatsapp_group,
-          template_id: formData.template_id?.trim() || null, // Convert empty string to null
+          template_id: formData.template_id?.trim() || null,
+          // Convert empty string to null
           status: formData.enabled ? 'ACTIVE' : 'PAUSED',
-          category: category, // Pass the category from props
+          category: category,
+          // Pass the category from props
           created_by: profile.user_id,
-          summary_variant: formData.summary_variant || null, // Convert empty to null
-          event_id: formData.event_id || null, // Convert empty to null
+          summary_variant: formData.summary_variant || null,
+          // Convert empty to null
+          event_id: formData.event_id || null,
+          // Convert empty to null
           is_one_off: formData.is_one_off,
           run_at_utc: computedRunAtUtc,
           date_start_utc: dateStartUtc,
           date_end_utc: dateEndUtc
         }
       });
+      console.log('Response from schedules-v2-upsert:', {
+        data,
+        error
+      });
 
-      console.log('Response from schedules-v2-upsert:', { data, error });
-      
       // Log the saved dates to verify they were saved
       if (data) {
         console.log('Saved schedule data:', {
@@ -376,12 +361,10 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           fullData: data
         });
       }
-
       if (error) {
         console.error('Error from edge function:', error);
         throw error;
       }
-
       toast.success(editingSchedule ? 'Schedule updated' : 'Schedule created');
       setModalOpen(false);
       setEditingSchedule(null);
@@ -398,7 +381,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
     if (!isoString) return '';
     try {
       // Parse UTC ISO string and convert to club timezone for display
-      const utcDate = DateTime.fromISO(isoString, { zone: 'utc' });
+      const utcDate = DateTime.fromISO(isoString, {
+        zone: 'utc'
+      });
       const localDate = utcDate.setZone(clubTimezone || 'Europe/London');
       return localDate.toFormat('yyyy-MM-dd\'T\'HH:mm');
     } catch (error) {
@@ -406,10 +391,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       return '';
     }
   };
-
   const handleEdit = (schedule: Schedule) => {
     setEditingSchedule(schedule);
-    
+
     // Debug: Log schedule data to see what we're getting
     console.log('Editing schedule:', {
       id: schedule.id,
@@ -420,16 +404,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       run_at_utc: (schedule as any).run_at_utc,
       fullSchedule: schedule
     });
-    
+
     // Convert run_at_utc (UTC) to local datetime-local format
     let runAtDateLocal: string | undefined = undefined;
     if ((schedule as any).run_at_utc) {
-      const utcDateTime = DateTime.fromISO((schedule as any).run_at_utc, { zone: 'utc' });
+      const utcDateTime = DateTime.fromISO((schedule as any).run_at_utc, {
+        zone: 'utc'
+      });
       const localDateTime = utcDateTime.setZone(schedule.tz || clubTimezone);
       // Format as datetime-local: YYYY-MM-DDTHH:mm
       runAtDateLocal = localDateTime.toFormat('yyyy-MM-dd\'T\'HH:mm');
     }
-    
+
     // Keep date_start_utc and date_end_utc as UTC ISO strings
     // The isoToDatetimeLocal function will convert them for display in the UI
     const formDataToSet = {
@@ -446,7 +432,6 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       date_start_utc: (schedule as any).date_start_utc || undefined,
       date_end_utc: (schedule as any).date_end_utc || undefined
     };
-    
     console.log('Setting form data:', {
       date_start_utc: formDataToSet.date_start_utc,
       date_end_utc: formDataToSet.date_end_utc,
@@ -454,16 +439,15 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       date_end_display: formDataToSet.date_end_utc ? isoToDatetimeLocal(formDataToSet.date_end_utc) : 'empty',
       clubTimezone
     });
-    
     setFormData(formDataToSet);
     setModalOpen(true);
   };
-
   const handleToggleStatus = async (schedule: Schedule) => {
     const newStatus = schedule.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
-    
     try {
-      const { error } = await supabase.functions.invoke('schedules-v2-upsert', {
+      const {
+        error
+      } = await supabase.functions.invoke('schedules-v2-upsert', {
         body: {
           id: schedule.id,
           org_id: organization!.id,
@@ -478,9 +462,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           created_by: profile?.user_id
         }
       });
-
       if (error) throw error;
-
       toast.success(`Schedule ${newStatus.toLowerCase()}`);
       loadSchedules();
     } catch (error) {
@@ -488,7 +470,6 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       toast.error('Failed to update schedule status');
     }
   };
-
   const handleDuplicate = (schedule: Schedule) => {
     setEditingSchedule(null);
     setFormData({
@@ -507,18 +488,13 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
     });
     setModalOpen(true);
   };
-
   const handleDelete = async () => {
     if (!deleteScheduleId) return;
-
     try {
-      const { error } = await supabase
-        .from('scheduled_sends_v2')
-        .delete()
-        .eq('id', deleteScheduleId);
-
+      const {
+        error
+      } = await supabase.from('scheduled_sends_v2').delete().eq('id', deleteScheduleId);
       if (error) throw error;
-
       toast.success('Schedule deleted');
       setDeleteScheduleId(null);
       loadSchedules();
@@ -534,29 +510,26 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       toast.error('Organization not found');
       return;
     }
-
     try {
       toast.info('Triggering scheduler manually...');
-      
+
       // First, set next_run_at_utc to past so it gets picked up
       const now = DateTime.now().toUTC();
-      const pastTime = now.minus({ minutes: 5 }).toISO(); // Set to 5 minutes ago to be safe
-      
-      const { data: updateData, error: updateError } = await supabase
-        .from('scheduled_sends_v2')
-        .update({
-          next_run_at_utc: pastTime,
-          updated_at: now.toISO()
-        })
-        .eq('id', schedule.id)
-        .select('next_run_at_utc, status')
-        .single();
+      const pastTime = now.minus({
+        minutes: 5
+      }).toISO(); // Set to 5 minutes ago to be safe
 
+      const {
+        data: updateData,
+        error: updateError
+      } = await supabase.from('scheduled_sends_v2').update({
+        next_run_at_utc: pastTime,
+        updated_at: now.toISO()
+      }).eq('id', schedule.id).select('next_run_at_utc, status').single();
       if (updateError) throw updateError;
 
       // Normalize the stored time for comparison (handle +00:00 vs Z format)
       const storedTime = updateData?.next_run_at_utc ? new Date(updateData.next_run_at_utc).toISOString() : null;
-      
       console.log('Updated schedule:', {
         next_run_at_utc: updateData?.next_run_at_utc,
         storedTimeNormalized: storedTime,
@@ -567,7 +540,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       });
 
       // Verify the update (compare normalized times)
-      if (!storedTime || (!storedTime.startsWith(pastTime.substring(0, 19)) && Math.abs(new Date(storedTime).getTime() - new Date(pastTime).getTime()) > 1000)) {
+      if (!storedTime || !storedTime.startsWith(pastTime.substring(0, 19)) && Math.abs(new Date(storedTime).getTime() - new Date(pastTime).getTime()) > 1000) {
         console.warn('Update verification failed - stored value differs from expected', {
           stored: storedTime,
           expected: pastTime,
@@ -581,16 +554,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Get session token for authentication
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Not authenticated - please sign in again');
       }
 
       // Call edge function directly with fetch for better error handling
       const functionUrl = `${SUPABASE_URL}/functions/v1/run-scheduled-sends-v2`;
-      
       console.log('Calling edge function:', functionUrl);
-      
       const fetchResponse = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -604,19 +579,22 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       // Parse response
       let data: any;
       const contentType = fetchResponse.headers.get('content-type');
-      
       try {
         if (contentType?.includes('application/json')) {
           data = await fetchResponse.json();
         } else {
           const textBody = await fetchResponse.text();
-          data = { error: textBody, raw: textBody };
+          data = {
+            error: textBody,
+            raw: textBody
+          };
         }
       } catch (parseError) {
         console.error('Error parsing response:', parseError);
-        data = { error: 'Failed to parse response' };
+        data = {
+          error: 'Failed to parse response'
+        };
       }
-
       console.log('Manual trigger response:', {
         httpStatus: fetchResponse.status,
         httpStatusText: fetchResponse.statusText,
@@ -629,13 +607,12 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         const errorDetails = data?.error || data?.message || JSON.stringify(data);
         throw new Error(`Edge Function returned HTTP ${fetchResponse.status}: ${errorDetails}`);
       }
-
       if (data?.processed === 0) {
         toast.warning('Scheduler ran but found 0 due schedules. Check if schedule is ACTIVE and next_run_at_utc is in the past.');
       } else {
         toast.success(`Scheduler processed ${data?.processed || 0} schedules! Checking logs...`);
       }
-      
+
       // Wait a moment then reload logs
       setTimeout(() => {
         loadRunLogs();
@@ -653,25 +630,22 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       toast.error('Organization not found');
       return;
     }
-
     try {
       // Set next_run_at_utc to 2 minutes from now
       const now = DateTime.now().toUTC();
-      const runAt = now.plus({ minutes: 2 });
-      
-      const { error } = await supabase
-        .from('scheduled_sends_v2')
-        .update({
-          next_run_at_utc: runAt.toISO(),
-          updated_at: now.toISO()
-        })
-        .eq('id', schedule.id);
-
+      const runAt = now.plus({
+        minutes: 2
+      });
+      const {
+        error
+      } = await supabase.from('scheduled_sends_v2').update({
+        next_run_at_utc: runAt.toISO(),
+        updated_at: now.toISO()
+      }).eq('id', schedule.id);
       if (error) throw error;
-
       const runTimeLocal = runAt.setZone(schedule.tz || 'Europe/London');
       toast.success(`Schedule "${schedule.name}" will run at ${runTimeLocal.toFormat('HH:mm')} (${schedule.tz || 'UTC'}). Check logs for results.`);
-      
+
       // Reload schedules to show updated next_run_at_utc
       loadSchedules();
     } catch (error) {
@@ -679,24 +653,23 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       toast.error('Failed to trigger schedule');
     }
   };
-
   const handleTestSend = async () => {
     if (!testGroupName.trim()) {
       toast.error('Please enter a WhatsApp group name for testing');
       return;
     }
-
     if (!organization?.tenant_id) {
       toast.error('Club tenant information not found');
       return;
     }
-
     setTestingMessage(true);
     setLastTestResult(null);
-
     try {
       // Use the same logic as manual send - call send-whatsapp-message function
-      const { data, error } = await supabase.functions.invoke('send-whatsapp-message', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('send-whatsapp-message', {
         body: {
           tenant_id: organization.tenant_id,
           category: 'AVAILABILITY',
@@ -705,40 +678,36 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           template_id: null
         }
       });
-
       if (error) throw error;
-
       if (data.status === 'OK') {
-        setLastTestResult({ 
-          status: 'success', 
+        setLastTestResult({
+          status: 'success',
           message: `Test message sent to "${testGroupName}" successfully! Check your WhatsApp group.`
         });
         toast.success('Test message sent successfully!');
         // Reload run logs to show the test result
         loadRunLogs();
       } else {
-        setLastTestResult({ 
-          status: 'error', 
-          message: `Test failed: ${JSON.stringify(data.result).substring(0, 120)}` 
+        setLastTestResult({
+          status: 'error',
+          message: `Test failed: ${JSON.stringify(data.result).substring(0, 120)}`
         });
         toast.error('Test message failed to send');
       }
     } catch (err: any) {
       console.error('Error sending test message:', err);
-      setLastTestResult({ 
-        status: 'error', 
-        message: err.message || 'Failed to send test message' 
+      setLastTestResult({
+        status: 'error',
+        message: err.message || 'Failed to send test message'
       });
       toast.error('Failed to send test message');
     } finally {
       setTestingMessage(false);
     }
   };
-
   const formatTimeInClubTz = (timeLocal: string) => {
     return timeLocal; // Already in club timezone format HH:mm
   };
-
   const formatNextRunInClubTz = (nextRunUtc: string, tz: string) => {
     try {
       const dt = DateTime.fromISO(nextRunUtc).setZone(tz);
@@ -747,7 +716,6 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
       return 'Invalid date';
     }
   };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -758,23 +726,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         return <Badge variant="outline">{status}</Badge>;
     }
   };
-
   const getLastStatusIcon = (lastStatus?: string) => {
     if (!lastStatus) return null;
-    
     if (lastStatus === 'OK') {
       return <CheckCircle className="h-4 w-4 text-green-600" />;
     } else {
       return <AlertCircle className="h-4 w-4 text-red-600" />;
     }
   };
-
   if (loading) {
     return <div>Loading scheduled sends...</div>;
   }
-
-  return (
-    <>
+  return <>
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-3">
@@ -783,25 +746,19 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             </div>
             <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
           </div>
-          <Button
-            onClick={() => {
-              resetForm();
-              setEditingSchedule(null);
-              setModalOpen(true);
-            }}
-            size="sm"
-          >
+          <Button onClick={() => {
+          resetForm();
+          setEditingSchedule(null);
+          setModalOpen(true);
+        }} size="sm">
             <Plus className="h-4 w-4 mr-1" />
             New Schedule
           </Button>
         </CardHeader>
         <CardContent>
-          {schedules.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+          {schedules.length === 0 ? <div className="text-center py-8 text-muted-foreground">
               No scheduled sends configured. Create your first schedule to get started.
-            </div>
-          ) : (
-            <Table>
+            </div> : <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -815,8 +772,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {schedules.map((schedule) => (
-                  <TableRow key={schedule.id}>
+                {schedules.map(schedule => <TableRow key={schedule.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         {schedule.name}
@@ -835,68 +791,29 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <TableCell>{formatNextRunInClubTz(schedule.next_run_at_utc, schedule.tz)}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(schedule)}
-                          title="Edit schedule"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleStatus(schedule)}
-                          title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'}
-                        >
-                          {schedule.status === 'ACTIVE' ? (
-                            <Pause className="h-4 w-4" />
-                          ) : (
-                            <Play className="h-4 w-4" />
-                          )}
+                        <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'}>
+                          {schedule.status === 'ACTIVE' ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRunNow(schedule)}
-                          title="Schedule for 2 minutes later"
-                          disabled={schedule.status !== 'ACTIVE'}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleRunNow(schedule)} title="Schedule for 2 minutes later" disabled={schedule.status !== 'ACTIVE'}>
                           <Clock className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleTriggerNow(schedule)}
-                          title="Trigger immediately (force run)"
-                          disabled={schedule.status !== 'ACTIVE'}
-                          className="text-blue-600 hover:text-blue-700"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately (force run)" disabled={schedule.status !== 'ACTIVE'} className="text-blue-600 hover:text-blue-700">
                           <Send className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDuplicate(schedule)}
-                          title="Duplicate schedule"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleDuplicate(schedule)} title="Duplicate schedule">
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeleteScheduleId(schedule.id)}
-                          title="Delete schedule"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteScheduleId(schedule.id)} title="Delete schedule">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
-                  </TableRow>
-                ))}
+                  </TableRow>)}
               </TableBody>
-            </Table>
-          )}
+            </Table>}
         </CardContent>
       </Card>
 
@@ -914,7 +831,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           <div className="bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-400 p-4 rounded-xl">
             <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">How to Test:</h4>
             <ol className="list-decimal list-inside space-y-1 text-sm text-blue-700 dark:text-blue-400">
-              <li>Create a WhatsApp group named "Cloud 29 Paddle" (or your chosen test name).</li>
+              <li>Create a WhatsApp group named "Cortek Padel" (or your chosen test name).</li>
               <li>Add this number to the group: +44 7757 658667.</li>
               <li>Add [Your Name] to the same group so we can verify delivery.</li>
               <li>Click "Send test now" to post the latest availability.</li>
@@ -924,43 +841,23 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           <div className="flex flex-col sm:flex-row gap-3 items-end">
             <div className="flex-1 space-y-2">
               <Label htmlFor="testGroup" className="text-sm font-medium">Test WhatsApp Group</Label>
-              <Input
-                id="testGroup"
-                value={testGroupName}
-                onChange={(e) => setTestGroupName(e.target.value)}
-                placeholder="Cloud 29 Paddle"
-                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-              />
+              <Input id="testGroup" value={testGroupName} onChange={e => setTestGroupName(e.target.value)} placeholder="Cloud 29 Paddle" className="h-10 rounded-lg border-border/50 bg-white dark:bg-background" />
             </div>
-            <Button 
-              onClick={handleTestSend}
-              disabled={testingMessage || !testGroupName.trim()}
-              className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
+            <Button onClick={handleTestSend} disabled={testingMessage || !testGroupName.trim()} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
               {testingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Send test now
             </Button>
           </div>
           
-          {lastTestResult && (
-            <div className={`p-3 rounded-xl ${
-              lastTestResult.status === 'success' 
-                ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' 
-                : 'bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
-            }`}>
+          {lastTestResult && <div className={`p-3 rounded-xl ${lastTestResult.status === 'success' ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'}`}>
               <div className="flex items-center gap-2">
-                {lastTestResult.status === 'success' ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <AlertCircle className="h-4 w-4" />
-                )}
+                {lastTestResult.status === 'success' ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                 <span className="font-medium">
                   {lastTestResult.status === 'success' ? 'Success!' : 'Failed'}
                 </span>
               </div>
               <p className="text-sm mt-1">{lastTestResult.message}</p>
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
 
@@ -974,35 +871,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               </div>
               <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadRunLogs}
-              disabled={loadingLogs}
-            >
+            <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs}>
               {loadingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          {loadingLogs ? (
-            <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div>
-          ) : runLogs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+          {loadingLogs ? <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div> : runLogs.length === 0 ? <div className="text-center py-8 text-muted-foreground">
               No runs yet. Create a schedule and wait for it to execute.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {runLogs.map((log) => (
-                <div key={log.id} className="flex items-center justify-between p-4 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-xl hover:bg-muted/30 transition-colors">
+            </div> : <div className="space-y-2">
+              {runLogs.map(log => <div key={log.id} className="flex items-center justify-between p-4 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-xl hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
-                    {log.status === 'OK' ? (
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    ) : log.status === 'SKIPPED' ? (
-                      <Clock className="h-4 w-4 text-amber-600" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-red-600" />
-                    )}
+                    {log.status === 'OK' ? <CheckCircle className="h-4 w-4 text-emerald-600" /> : log.status === 'SKIPPED' ? <Clock className="h-4 w-4 text-amber-600" /> : <AlertCircle className="h-4 w-4 text-red-600" />}
                     <div>
                       <div className="font-medium text-foreground">
                         {log.scheduled_sends_v2?.name || 'Unknown Schedule'}
@@ -1013,34 +893,18 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant={log.status === 'OK' ? 'default' : log.status === 'SKIPPED' ? 'outline' : 'destructive'}
-                      className={
-                        log.status === 'OK' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' :
-                        log.status === 'SKIPPED' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800' :
-                        ''
-                      }
-                    >
+                    <Badge variant={log.status === 'OK' ? 'default' : log.status === 'SKIPPED' ? 'outline' : 'destructive'} className={log.status === 'OK' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' : log.status === 'SKIPPED' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800' : ''}>
                       {log.status}
                     </Badge>
-                    {log.message_excerpt && (
-                      <div className="text-xs text-muted-foreground max-w-xs truncate">
+                    {log.message_excerpt && <div className="text-xs text-muted-foreground max-w-xs truncate">
                         {log.message_excerpt}
-                      </div>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewLogDetails(log)}
-                      className="h-8 w-8 p-0 hover:bg-muted/50"
-                    >
+                      </div>}
+                    <Button variant="ghost" size="sm" onClick={() => handleViewLogDetails(log)} className="h-8 w-8 p-0 hover:bg-muted/50">
                       <Eye className="h-4 w-4" />
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </CardContent>
       </Card>
 
@@ -1054,33 +918,27 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           <div className="space-y-4">
             <div>
               <Label htmlFor="name">Schedule name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Daily evening availability"
-              />
+              <Input id="name" value={formData.name} onChange={e => setFormData({
+              ...formData,
+              name: e.target.value
+            })} placeholder="Daily evening availability" />
             </div>
             
             <div>
               <Label htmlFor="time">Time</Label>
-              <Input
-                id="time"
-                type="time"
-                value={formData.time_local}
-                onChange={(e) => setFormData({ ...formData, time_local: e.target.value })}
-              />
+              <Input id="time" type="time" value={formData.time_local} onChange={e => setFormData({
+              ...formData,
+              time_local: e.target.value
+            })} />
             </div>
             
             {/* Target field - only show for AVAILABILITY and PARTIAL_MATCHES, not for COMPETITIONS_ACADEMIES */}
-            {category !== 'COMPETITIONS_ACADEMIES' && (
-              <div>
+            {category !== 'COMPETITIONS_ACADEMIES' && <div>
                 <Label>Day to send</Label>
-                <RadioGroup
-                  value={formData.target}
-                  onValueChange={(value) => setFormData({ ...formData, target: value as 'TODAY' | 'TOMORROW' })}
-                  className="flex gap-6 mt-2"
-                >
+                <RadioGroup value={formData.target} onValueChange={value => setFormData({
+              ...formData,
+              target: value as 'TODAY' | 'TOMORROW'
+            })} className="flex gap-6 mt-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="TODAY" id="today" />
                     <Label htmlFor="today">TODAY</Label>
@@ -1090,59 +948,53 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <Label htmlFor="tomorrow">TOMORROW</Label>
                   </div>
                 </RadioGroup>
-              </div>
-            )}
+              </div>}
             
             <div>
               <Label htmlFor="group">WhatsApp Group</Label>
-              <Input
-                id="group"
-                value={formData.whatsapp_group}
-                onChange={(e) => setFormData({ ...formData, whatsapp_group: e.target.value })}
-                placeholder="Group name"
-              />
+              <Input id="group" value={formData.whatsapp_group} onChange={e => setFormData({
+              ...formData,
+              whatsapp_group: e.target.value
+            })} placeholder="Group name" />
             </div>
             
             <div>
               <Label htmlFor="template">Template</Label>
-              <Select 
-                value={formData.template_id} 
-                onValueChange={(value) => {
-                  const tpl = templates.find(t => t.id === value);
-                  if (tpl) {
-                    // Auto-load template configuration
-                    setFormData({ 
-                      ...formData, 
-                      template_id: value,
-                      whatsapp_group: tpl?.whatsapp_group || formData.whatsapp_group,
-                      summary_variant: tpl?.summary_variant || formData.summary_variant,
-                      event_id: tpl?.linked_event_id || formData.event_id
-                    });
-                  } else {
-                    setFormData({ ...formData, template_id: value });
-                  }
-                }}
-              >
+              <Select value={formData.template_id} onValueChange={value => {
+              const tpl = templates.find(t => t.id === value);
+              if (tpl) {
+                // Auto-load template configuration
+                setFormData({
+                  ...formData,
+                  template_id: value,
+                  whatsapp_group: tpl?.whatsapp_group || formData.whatsapp_group,
+                  summary_variant: tpl?.summary_variant || formData.summary_variant,
+                  event_id: tpl?.linked_event_id || formData.event_id
+                });
+              } else {
+                setFormData({
+                  ...formData,
+                  template_id: value
+                });
+              }
+            }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select template" />
                 </SelectTrigger>
                 <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
+                  {templates.map(template => <SelectItem key={template.id} value={template.id}>
                       {template.name}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             {/* Category-specific fields */}
-            {category === 'PARTIAL_MATCHES' && (
-              <div>
+            {category === 'PARTIAL_MATCHES' && <div>
                 <Label>Summary Variant</Label>
-                <Select
-                  value={formData.summary_variant || ''}
-                  onValueChange={(value) => setFormData({ ...formData, summary_variant: value || undefined })}
-                >
+                <Select value={formData.summary_variant || ''} onValueChange={value => setFormData({
+              ...formData,
+              summary_variant: value || undefined
+            })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select variant" />
                   </SelectTrigger>
@@ -1153,231 +1005,238 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <SelectItem value="3_PLAYERS">Competitive — Open (3 players)</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            )}
+              </div>}
 
-            {category === 'COMPETITIONS_ACADEMIES' && (
-              <div className="space-y-3">
+            {category === 'COMPETITIONS_ACADEMIES' && <div className="space-y-3">
                 <div>
                   <Label>One-off send</Label>
                   <div className="flex items-center gap-2 mt-2">
-                    <Switch 
-                      id="is_one_off"
-                      checked={!!formData.is_one_off}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_one_off: checked })}
-                    />
+                    <Switch id="is_one_off" checked={!!formData.is_one_off} onCheckedChange={checked => setFormData({
+                  ...formData,
+                  is_one_off: checked
+                })} />
                     <Label htmlFor="is_one_off">Run at specific date/time</Label>
                   </div>
                 </div>
-                {formData.is_one_off ? (
-                  <div>
+                {formData.is_one_off ? <div>
                     <Label htmlFor="runAt">Run At ({clubTimezone})</Label>
-                    <Input
-                      id="runAt"
-                      type="datetime-local"
-                      value={formData.run_at_date_local || ''}
-                      onChange={(e) => setFormData({ ...formData, run_at_date_local: e.target.value || undefined })}
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-4">
+                    <Input id="runAt" type="datetime-local" value={formData.run_at_date_local || ''} onChange={e => setFormData({
+                ...formData,
+                run_at_date_local: e.target.value || undefined
+              })} />
+                  </div> : <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="dateStart">Custom Range Start (UTC)</Label>
-                      <Input
-                        id="dateStart"
-                        type="datetime-local"
-                        className="w-full"
-                        value={isoToDatetimeLocal(formData.date_start_utc)}
-                        onInput={(e) => {
-                          // Handle input event as well for better browser compatibility
-                          const target = e.target as HTMLInputElement;
-                          if (target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(target.value, { zone: clubTimezone });
-                              if (localDt.isValid) {
-                                const utcIso = localDt.toUTC().toISO();
-                                if (utcIso) {
-                                  setFormData(prev => {
-                                    if (prev.date_start_utc !== utcIso) {
-                                      console.log('dateStart onInput - updating date_start_utc:', utcIso);
-                                      return { ...prev, date_start_utc: utcIso };
-                                    }
-                                    return prev;
-                                  });
-                                }
-                              }
-                            } catch (error) {
-                              console.error('Error in dateStart onInput:', error);
+                      <Input id="dateStart" type="datetime-local" className="w-full" value={isoToDatetimeLocal(formData.date_start_utc)} onInput={e => {
+                  // Handle input event as well for better browser compatibility
+                  const target = e.target as HTMLInputElement;
+                  if (target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(target.value, {
+                        zone: clubTimezone
+                      });
+                      if (localDt.isValid) {
+                        const utcIso = localDt.toUTC().toISO();
+                        if (utcIso) {
+                          setFormData(prev => {
+                            if (prev.date_start_utc !== utcIso) {
+                              console.log('dateStart onInput - updating date_start_utc:', utcIso);
+                              return {
+                                ...prev,
+                                date_start_utc: utcIso
+                              };
                             }
-                          }
-                        }}
-                        onChange={(e) => {
-                          console.log('dateStart onChange triggered:', {
-                            value: e.target.value,
-                            currentFormData: formData.date_start_utc,
-                            clubTimezone
+                            return prev;
                           });
-                          
-                          // Convert datetime-local (local time) to UTC ISO string
-                          if (e.target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(e.target.value, { zone: clubTimezone });
-                              if (!localDt.isValid) {
-                                console.error('Invalid date:', e.target.value);
-                                return;
-                              }
-                              const utcIso = localDt.toUTC().toISO();
-                              console.log('Setting date_start_utc:', {
-                                input: e.target.value,
-                                localDt: localDt.toISO(),
-                                utcIso,
-                                clubTimezone,
-                                isValid: localDt.isValid
-                              });
-                              
-                              if (utcIso) {
-                                setFormData(prev => {
-                                  const updated = { ...prev, date_start_utc: utcIso };
-                                  console.log('Updated formData.date_start_utc:', updated.date_start_utc);
-                                  return updated;
-                                });
-                              }
-                            } catch (error) {
-                              console.error('Error converting date_start_utc:', error);
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error in dateStart onInput:', error);
+                    }
+                  }
+                }} onChange={e => {
+                  console.log('dateStart onChange triggered:', {
+                    value: e.target.value,
+                    currentFormData: formData.date_start_utc,
+                    clubTimezone
+                  });
+
+                  // Convert datetime-local (local time) to UTC ISO string
+                  if (e.target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(e.target.value, {
+                        zone: clubTimezone
+                      });
+                      if (!localDt.isValid) {
+                        console.error('Invalid date:', e.target.value);
+                        return;
+                      }
+                      const utcIso = localDt.toUTC().toISO();
+                      console.log('Setting date_start_utc:', {
+                        input: e.target.value,
+                        localDt: localDt.toISO(),
+                        utcIso,
+                        clubTimezone,
+                        isValid: localDt.isValid
+                      });
+                      if (utcIso) {
+                        setFormData(prev => {
+                          const updated = {
+                            ...prev,
+                            date_start_utc: utcIso
+                          };
+                          console.log('Updated formData.date_start_utc:', updated.date_start_utc);
+                          return updated;
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error converting date_start_utc:', error);
+                    }
+                  } else {
+                    console.log('Clearing date_start_utc');
+                    setFormData(prev => ({
+                      ...prev,
+                      date_start_utc: undefined
+                    }));
+                  }
+                }} onBlur={e => {
+                  // Also handle blur event to ensure date is saved when user clicks outside
+                  if (e.target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(e.target.value, {
+                        zone: clubTimezone
+                      });
+                      if (localDt.isValid) {
+                        const utcIso = localDt.toUTC().toISO();
+                        if (utcIso) {
+                          setFormData(prev => {
+                            if (prev.date_start_utc !== utcIso) {
+                              console.log('dateStart onBlur - updating date_start_utc:', utcIso);
+                              return {
+                                ...prev,
+                                date_start_utc: utcIso
+                              };
                             }
-                          } else {
-                            console.log('Clearing date_start_utc');
-                            setFormData(prev => ({ ...prev, date_start_utc: undefined }));
-                          }
-                        }}
-                        onBlur={(e) => {
-                          // Also handle blur event to ensure date is saved when user clicks outside
-                          if (e.target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(e.target.value, { zone: clubTimezone });
-                              if (localDt.isValid) {
-                                const utcIso = localDt.toUTC().toISO();
-                                if (utcIso) {
-                                  setFormData(prev => {
-                                    if (prev.date_start_utc !== utcIso) {
-                                      console.log('dateStart onBlur - updating date_start_utc:', utcIso);
-                                      return { ...prev, date_start_utc: utcIso };
-                                    }
-                                    return prev;
-                                  });
-                                }
-                              }
-                            } catch (error) {
-                              console.error('Error in dateStart onBlur:', error);
-                            }
-                          }
-                        }}
-                      />
+                            return prev;
+                          });
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error in dateStart onBlur:', error);
+                    }
+                  }
+                }} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="dateEnd">Custom Range End (UTC)</Label>
-                      <Input
-                        id="dateEnd"
-                        type="datetime-local"
-                        className="w-full"
-                        value={isoToDatetimeLocal(formData.date_end_utc)}
-                        onInput={(e) => {
-                          // Handle input event as well for better browser compatibility
-                          const target = e.target as HTMLInputElement;
-                          if (target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(target.value, { zone: clubTimezone });
-                              if (localDt.isValid) {
-                                const utcIso = localDt.toUTC().toISO();
-                                if (utcIso) {
-                                  setFormData(prev => {
-                                    if (prev.date_end_utc !== utcIso) {
-                                      console.log('dateEnd onInput - updating date_end_utc:', utcIso);
-                                      return { ...prev, date_end_utc: utcIso };
-                                    }
-                                    return prev;
-                                  });
-                                }
-                              }
-                            } catch (error) {
-                              console.error('Error in dateEnd onInput:', error);
+                      <Input id="dateEnd" type="datetime-local" className="w-full" value={isoToDatetimeLocal(formData.date_end_utc)} onInput={e => {
+                  // Handle input event as well for better browser compatibility
+                  const target = e.target as HTMLInputElement;
+                  if (target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(target.value, {
+                        zone: clubTimezone
+                      });
+                      if (localDt.isValid) {
+                        const utcIso = localDt.toUTC().toISO();
+                        if (utcIso) {
+                          setFormData(prev => {
+                            if (prev.date_end_utc !== utcIso) {
+                              console.log('dateEnd onInput - updating date_end_utc:', utcIso);
+                              return {
+                                ...prev,
+                                date_end_utc: utcIso
+                              };
                             }
-                          }
-                        }}
-                        onChange={(e) => {
-                          console.log('dateEnd onChange triggered:', {
-                            value: e.target.value,
-                            currentFormData: formData.date_end_utc,
-                            clubTimezone
+                            return prev;
                           });
-                          
-                          // Convert datetime-local (local time) to UTC ISO string
-                          if (e.target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(e.target.value, { zone: clubTimezone });
-                              if (!localDt.isValid) {
-                                console.error('Invalid date:', e.target.value);
-                                return;
-                              }
-                              const utcIso = localDt.toUTC().toISO();
-                              console.log('Setting date_end_utc:', {
-                                input: e.target.value,
-                                localDt: localDt.toISO(),
-                                utcIso,
-                                clubTimezone,
-                                isValid: localDt.isValid
-                              });
-                              
-                              if (utcIso) {
-                                setFormData(prev => {
-                                  const updated = { ...prev, date_end_utc: utcIso };
-                                  console.log('Updated formData.date_end_utc:', updated.date_end_utc);
-                                  return updated;
-                                });
-                              }
-                            } catch (error) {
-                              console.error('Error converting date_end_utc:', error);
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error in dateEnd onInput:', error);
+                    }
+                  }
+                }} onChange={e => {
+                  console.log('dateEnd onChange triggered:', {
+                    value: e.target.value,
+                    currentFormData: formData.date_end_utc,
+                    clubTimezone
+                  });
+
+                  // Convert datetime-local (local time) to UTC ISO string
+                  if (e.target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(e.target.value, {
+                        zone: clubTimezone
+                      });
+                      if (!localDt.isValid) {
+                        console.error('Invalid date:', e.target.value);
+                        return;
+                      }
+                      const utcIso = localDt.toUTC().toISO();
+                      console.log('Setting date_end_utc:', {
+                        input: e.target.value,
+                        localDt: localDt.toISO(),
+                        utcIso,
+                        clubTimezone,
+                        isValid: localDt.isValid
+                      });
+                      if (utcIso) {
+                        setFormData(prev => {
+                          const updated = {
+                            ...prev,
+                            date_end_utc: utcIso
+                          };
+                          console.log('Updated formData.date_end_utc:', updated.date_end_utc);
+                          return updated;
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error converting date_end_utc:', error);
+                    }
+                  } else {
+                    console.log('Clearing date_end_utc');
+                    setFormData(prev => ({
+                      ...prev,
+                      date_end_utc: undefined
+                    }));
+                  }
+                }} onBlur={e => {
+                  // Also handle blur event to ensure date is saved when user clicks outside
+                  if (e.target.value) {
+                    try {
+                      const localDt = DateTime.fromISO(e.target.value, {
+                        zone: clubTimezone
+                      });
+                      if (localDt.isValid) {
+                        const utcIso = localDt.toUTC().toISO();
+                        if (utcIso) {
+                          setFormData(prev => {
+                            if (prev.date_end_utc !== utcIso) {
+                              console.log('dateEnd onBlur - updating date_end_utc:', utcIso);
+                              return {
+                                ...prev,
+                                date_end_utc: utcIso
+                              };
                             }
-                          } else {
-                            console.log('Clearing date_end_utc');
-                            setFormData(prev => ({ ...prev, date_end_utc: undefined }));
-                          }
-                        }}
-                        onBlur={(e) => {
-                          // Also handle blur event to ensure date is saved when user clicks outside
-                          if (e.target.value) {
-                            try {
-                              const localDt = DateTime.fromISO(e.target.value, { zone: clubTimezone });
-                              if (localDt.isValid) {
-                                const utcIso = localDt.toUTC().toISO();
-                                if (utcIso) {
-                                  setFormData(prev => {
-                                    if (prev.date_end_utc !== utcIso) {
-                                      console.log('dateEnd onBlur - updating date_end_utc:', utcIso);
-                                      return { ...prev, date_end_utc: utcIso };
-                                    }
-                                    return prev;
-                                  });
-                                }
-                              }
-                            } catch (error) {
-                              console.error('Error in dateEnd onBlur:', error);
-                            }
-                          }
-                        }}
-                      />
+                            return prev;
+                          });
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error in dateEnd onBlur:', error);
+                    }
+                  }
+                }} />
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  </div>}
+              </div>}
             
             <div className="flex items-center space-x-2">
-              <Switch 
-                id="enabled"
-                checked={formData.enabled}
-                onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
-              />
+              <Switch id="enabled" checked={formData.enabled} onCheckedChange={checked => setFormData({
+              ...formData,
+              enabled: checked
+            })} />
               <Label htmlFor="enabled">Enable schedule</Label>
             </div>
             
@@ -1385,11 +1244,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               <Button onClick={handleSave} className="flex-1">
                 {editingSchedule ? 'Update' : 'Create'}
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setModalOpen(false)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">
                 Cancel
               </Button>
             </div>
@@ -1417,16 +1272,11 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {selectedLog?.status === 'OK' ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-red-600" />
-              )}
+              {selectedLog?.status === 'OK' ? <CheckCircle className="h-5 w-5 text-green-600" /> : <AlertCircle className="h-5 w-5 text-red-600" />}
               Log Details
             </DialogTitle>
           </DialogHeader>
-          {selectedLog && (
-            <div className="space-y-4">
+          {selectedLog && <div className="space-y-4">
               {/* Basic Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -1436,10 +1286,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground">Status</Label>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant={selectedLog.status === 'OK' ? 'default' : 'destructive'}
-                      className={selectedLog.status === 'OK' ? 'bg-green-100 text-green-800 border-green-200' : ''}
-                    >
+                    <Badge variant={selectedLog.status === 'OK' ? 'default' : 'destructive'} className={selectedLog.status === 'OK' ? 'bg-green-100 text-green-800 border-green-200' : ''}>
                       {selectedLog.status}
                     </Badge>
                   </div>
@@ -1463,92 +1310,63 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               </div>
 
               {/* Message Content */}
-              {(selectedLog.message || selectedLog.message_excerpt) && (
-                <div>
+              {(selectedLog.message || selectedLog.message_excerpt) && <div>
                   <Label className="text-sm font-medium text-muted-foreground">Complete Message Content</Label>
                   <div className="mt-1 p-3 bg-muted rounded-md">
                     <pre className="text-sm whitespace-pre-wrap font-sans">
                       {selectedLog.message || selectedLog.message_excerpt}
                     </pre>
                   </div>
-                </div>
-              )}
+                </div>}
 
               {/* Template ID */}
-              {selectedLog.template_id && (
-                <div>
+              {selectedLog.template_id && <div>
                   <Label className="text-sm font-medium text-muted-foreground">Template ID</Label>
                   <p className="text-sm font-mono">{selectedLog.template_id}</p>
-                </div>
-              )}
+                </div>}
 
               {/* Error Details */}
-              {(selectedLog.error_details || (selectedLog.status === 'ERROR' && selectedLog.response_text)) && (
-                <div>
+              {(selectedLog.error_details || selectedLog.status === 'ERROR' && selectedLog.response_text) && <div>
                   <Label className="text-sm font-medium text-muted-foreground">Error Reason</Label>
                   <div className="mt-1 p-3 bg-red-50 border border-red-200 rounded-md">
                     <pre className="text-sm whitespace-pre-wrap font-sans text-red-800">
-                      {selectedLog.error_details || 
-                        (selectedLog.response_text ? 
-                          (typeof selectedLog.response_text === 'string' ? 
-                            selectedLog.response_text : 
-                            JSON.stringify(selectedLog.response_text)
-                          ) : 
-                          'Unknown error'
-                        )
-                      }
+                      {selectedLog.error_details || (selectedLog.response_text ? typeof selectedLog.response_text === 'string' ? selectedLog.response_text : JSON.stringify(selectedLog.response_text) : 'Unknown error')}
                     </pre>
                   </div>
-                </div>
-              )}
+                </div>}
 
               {/* Raw Response */}
-              {selectedLog.raw_response && (
-                <div>
+              {selectedLog.raw_response && <div>
                   <Label className="text-sm font-medium text-muted-foreground">Raw Response</Label>
                   <div className="mt-1 p-3 bg-muted rounded-md">
                     <pre className="text-sm whitespace-pre-wrap font-mono">
-                      {typeof selectedLog.raw_response === 'string' 
-                        ? selectedLog.raw_response 
-                        : JSON.stringify(selectedLog.raw_response, null, 2)
-                      }
+                      {typeof selectedLog.raw_response === 'string' ? selectedLog.raw_response : JSON.stringify(selectedLog.raw_response, null, 2)}
                     </pre>
                   </div>
-                </div>
-              )}
+                </div>}
 
               {/* Additional Fields */}
               <div className="grid grid-cols-2 gap-4">
-                {selectedLog.tenant_id && (
-                  <div>
+                {selectedLog.tenant_id && <div>
                     <Label className="text-sm font-medium text-muted-foreground">Tenant ID</Label>
                     <p className="text-sm font-mono">{selectedLog.tenant_id}</p>
-                  </div>
-                )}
-                {selectedLog.org_id && (
-                  <div>
+                  </div>}
+                {selectedLog.org_id && <div>
                     <Label className="text-sm font-medium text-muted-foreground">Organization ID</Label>
                     <p className="text-sm font-mono">{selectedLog.org_id}</p>
-                  </div>
-                )}
-                {selectedLog.schedule_id && (
-                  <div>
+                  </div>}
+                {selectedLog.schedule_id && <div>
                     <Label className="text-sm font-medium text-muted-foreground">Schedule ID</Label>
                     <p className="text-sm font-mono">{selectedLog.schedule_id}</p>
-                  </div>
-                )}
-                {selectedLog.created_at && (
-                  <div>
+                  </div>}
+                {selectedLog.created_at && <div>
                     <Label className="text-sm font-medium text-muted-foreground">Created At</Label>
                     <p className="text-sm">{new Date(selectedLog.created_at).toLocaleString()}</p>
-                  </div>
-                )}
+                  </div>}
               </div>
 
-            </div>
-          )}
+            </div>}
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>;
 };
