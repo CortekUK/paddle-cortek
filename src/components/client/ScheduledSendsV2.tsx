@@ -746,10 +746,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
                 <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </div>
-              <div>
-                <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
-                <p className="text-sm text-muted-foreground mt-0.5">Automate recurring availability messages.</p>
-              </div>
+              <CardTitle className="text-lg font-semibold">Scheduled Messages</CardTitle>
             </div>
             <Button onClick={() => {
               resetForm();
