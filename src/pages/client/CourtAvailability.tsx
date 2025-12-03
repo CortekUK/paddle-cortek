@@ -627,7 +627,7 @@ Book now — don't miss out!`);
             <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
             
             {/* Preset pills */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-2">
               {(['today', 'tomorrow'] as const).map((preset) => (
                 <Button
                   key={preset}
