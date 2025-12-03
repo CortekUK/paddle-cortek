@@ -623,7 +623,7 @@ Book now — don't miss out!`);
       <Card className={cardClass}>
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]">
           {/* Left Panel - Search Controls */}
-          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10">
+          <div className="p-5 lg:border-r-2 border-border bg-muted/5 dark:bg-muted/10 flex flex-col min-h-[280px]">
             <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
             
             {/* Preset pills */}
@@ -701,6 +701,16 @@ Book now — don't miss out!`);
               </div>
             </div>
 
+            {error && (
+              <Alert variant="destructive" className="rounded-xl mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Spacer to push button to bottom */}
+            <div className="flex-1" />
+
             {/* Search button */}
             <Button
               onClick={handleSearch}
@@ -710,31 +720,19 @@ Book now — don't miss out!`);
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               Search Courts
             </Button>
-
-            {error && (
-              <Alert variant="destructive" className="rounded-xl mt-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
           </div>
 
           {/* Right Panel - Results Display */}
-          <div className="p-5">
-            {/* Results header with badge */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
-                </h3>
-                {countSlots > 0 && (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold text-xs">
-                    {countSlots} slots
-                  </Badge>
-                )}
-              </div>
+          <div className="p-5 min-h-[280px]">
+            {/* Results header with badge - centered */}
+            <div className="flex flex-col items-center justify-center mb-4">
+              <h3 className="text-sm font-semibold text-foreground">
+                {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
+              </h3>
               {countSlots > 0 && (
-                <span className="text-xs text-muted-foreground">Available courts</span>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold text-xs mt-1">
+                  {countSlots} slots available
+                </Badge>
               )}
             </div>
 
