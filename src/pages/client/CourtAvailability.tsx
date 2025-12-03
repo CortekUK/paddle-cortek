@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, Hash, FileText, Clock, ChevronRight } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, FileText, Clock, ChevronRight } from 'lucide-react';
 import { format, addDays, startOfDay, endOfDay, endOfWeek, startOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -708,58 +708,67 @@ Book now — don't miss out!`);
             <CardTitle className="text-lg font-semibold">Message Template</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-5 space-y-4">
-          {/* Template controls row */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-              <SelectTrigger className="w-48 h-10 rounded-lg border-border/50 bg-white dark:bg-background">
-                <SelectValue placeholder="Select template" />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.name} {template.is_default && <Star className="h-3 w-3 inline ml-1 text-amber-500" />}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <CardContent className="pt-5 space-y-5">
+          {/* Template controls row - streamlined */}
+          <div className="flex flex-wrap gap-3 items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+                <SelectTrigger className="w-44 h-9 rounded-lg border-border/40 bg-background text-sm">
+                  <SelectValue placeholder="Select template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      <span className="flex items-center gap-2">
+                        {template.name}
+                        {template.is_default && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Input
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Template name"
+                className="w-40 h-9 rounded-lg border-border/40 bg-background text-sm"
+              />
+            </div>
             
-            <div className="flex gap-1.5">
-              <Button variant="outline" size="sm" onClick={handleSaveTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
-                <Save className="h-4 w-4 mr-1" />
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={handleSaveTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
+                <Save className="h-3.5 w-3.5 mr-1.5" />
                 Save
               </Button>
-              <Button variant="outline" size="sm" onClick={handleSaveAsTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
-                Save as...
+              <Button variant="ghost" size="sm" onClick={handleSaveAsTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
+                Save as
               </Button>
-              <Button variant="outline" size="sm" onClick={handleSetDefault} disabled={!selectedTemplateId} className="rounded-lg border-border/50 hover:bg-primary/10">
-                <Star className="h-4 w-4 mr-1" />
-                Set Default
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleSetDefault} 
+                disabled={!selectedTemplateId} 
+                className="h-8 px-2 hover:bg-muted/50"
+              >
+                <Star className={`h-3.5 w-3.5 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground'}`} />
               </Button>
-              <Button variant="outline" size="sm" onClick={handleNewTemplate} className="rounded-lg border-border/50 hover:bg-primary/10">
-                <Plus className="h-4 w-4 mr-1" />
+              <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
                 New
               </Button>
             </div>
           </div>
 
           {/* Two-column layout: Editor + Preview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left side - Template editor */}
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="templateName" className="text-sm font-medium">Name</Label>
-                <Input
-                  id="templateName"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder="Template name"
-                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="templateContent" className="text-sm font-medium">Content</Label>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+                  <span className="text-xs text-muted-foreground">{templateContent.length} chars</span>
+                </div>
                 <Textarea
                   ref={textareaRef}
                   id="templateContent"
@@ -767,34 +776,28 @@ Book now — don't miss out!`);
                   onChange={(e) => setTemplateContent(e.target.value)}
                   rows={8}
                   placeholder="Enter your message template..."
-                  className="rounded-lg border-border/50 bg-white dark:bg-background min-h-[160px] resize-none"
+                  className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed"
                 />
-                <div className="text-xs text-muted-foreground">
-                  {templateContent.length} characters
-                </div>
               </div>
 
-              {/* Token chips and emoji picker */}
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Insert tokens:</Label>
+              {/* Token chips - simplified */}
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
                 <div className="flex flex-wrap gap-1.5">
                   {[
-                    '{{club_name}}',
-                    '{{date_display_short}}', 
-                    '{{summary}}',
-                    '{{count_slots}}',
-                    '{{sport}}'
-                  ].map((token) => (
-                    <Button
+                    { token: '{{club_name}}', label: 'club_name' },
+                    { token: '{{date_display_short}}', label: 'date' },
+                    { token: '{{summary}}', label: 'summary' },
+                    { token: '{{count_slots}}', label: 'count' },
+                    { token: '{{sport}}', label: 'sport' }
+                  ].map(({ token, label }) => (
+                    <button
                       key={token}
-                      variant="outline"
-                      size="sm"
                       onClick={() => insertToken(token)}
-                      className="text-xs rounded-full px-3 py-1 h-7 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+                      className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors"
                     >
-                      <Hash className="h-3 w-3 mr-1" />
-                      {token}
-                    </Button>
+                      {label}
+                    </button>
                   ))}
                   <EmojiPicker onEmojiSelect={insertEmoji} />
                 </div>
@@ -802,19 +805,19 @@ Book now — don't miss out!`);
             </div>
 
             {/* Right side - Live Preview */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold text-foreground">Live Preview</Label>
-              <div className="bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/30 p-5 rounded-xl min-h-[200px]">
-                <div className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+              <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
+                <div className="text-sm whitespace-pre-wrap text-foreground/85 leading-relaxed">
                   {summaryText ? renderTemplate(templateContent) : (
-                    <span className="text-muted-foreground/60 italic">Run a search to preview with real data</span>
+                    <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>
                   )}
                 </div>
               </div>
               {!summaryText && templateContent && (
-                <div className="text-xs text-muted-foreground">
-                  💡 Add {`{{summary}}`} to include the breakdown
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Tip: Add {`{{summary}}`} to include the availability breakdown
+                </p>
               )}
             </div>
           </div>
