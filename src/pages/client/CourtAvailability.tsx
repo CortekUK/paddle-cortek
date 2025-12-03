@@ -622,52 +622,54 @@ Book now — don't miss out!`);
         </CardHeader>
         <CardContent className="pt-5 space-y-5">
           {/* Template controls row - streamlined */}
-          <div className="flex flex-wrap gap-3 items-center justify-between">
+          <div className="flex flex-wrap gap-4 items-center justify-between">
             {/* Left: Template selector */}
             <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-              <SelectTrigger className="w-48 h-9 rounded-lg border-border/40 bg-background text-sm">
+              <SelectTrigger className="w-52 h-9 rounded-lg border-border/50 bg-background text-sm transition-colors hover:border-border">
                 <SelectValue placeholder="Select template" />
               </SelectTrigger>
               <SelectContent>
                 {templates.map(template => <SelectItem key={template.id} value={template.id}>
                     <span className="flex items-center gap-2">
                       {template.name}
-                      {template.is_default && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
+                      {template.is_default && <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />}
                     </span>
                   </SelectItem>)}
               </SelectContent>
             </Select>
             
             {/* Right: Name + Actions grouped */}
-            <div className="flex items-center gap-2">
-              <Input value={templateName} onChange={e => setTemplateName(e.target.value)} placeholder="Template name" className="w-36 h-9 rounded-lg border-border/40 bg-background text-sm" />
+            <div className="flex items-center gap-1.5">
+              <Input value={templateName} onChange={e => setTemplateName(e.target.value)} placeholder="Template name" className="w-40 h-9 rounded-lg border-border/50 bg-background text-sm transition-colors hover:border-border focus:border-primary" />
+              
+              <div className="h-6 w-px bg-border/50 mx-1.5" />
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50">
-                    <Save className="h-3.5 w-3.5 mr-1.5" />
+                  <Button variant="ghost" size="sm" className="h-9 px-3 text-xs font-medium rounded-lg transition-all hover:bg-muted/60 active:scale-[0.98]">
+                    <Save className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
                     Save
-                    <ChevronDown className="h-3 w-3 ml-1.5" />
+                    <ChevronDown className="h-3.5 w-3.5 ml-1.5 opacity-60" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover">
-                  <DropdownMenuItem onClick={handleSaveTemplate} disabled={!selectedTemplateId}>
-                    <Save className="h-3.5 w-3.5 mr-2" />
+                <DropdownMenuContent align="end" className="bg-popover min-w-[160px]">
+                  <DropdownMenuItem onClick={handleSaveTemplate} disabled={!selectedTemplateId} className="text-sm">
+                    <Save className="h-4 w-4 mr-2" strokeWidth={1.5} />
                     Update current
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSaveAsTemplate}>
-                    <Plus className="h-3.5 w-3.5 mr-2" />
+                  <DropdownMenuItem onClick={handleSaveAsTemplate} className="text-sm">
+                    <Plus className="h-4 w-4 mr-2" strokeWidth={1.5} />
                     Save as new...
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId}>
-                    <Star className={`h-3.5 w-3.5 mr-2 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : ''}`} />
+                  <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId} className="text-sm">
+                    <Star className={`h-4 w-4 mr-2 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : ''}`} strokeWidth={1.5} />
                     Set as default
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-8 px-3 text-xs hover:bg-muted/50">
-                <Plus className="h-3.5 w-3.5 mr-1.5" />
+              <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-9 px-3 text-xs font-medium rounded-lg transition-all hover:bg-muted/60 active:scale-[0.98]">
+                <Plus className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
                 New
               </Button>
             </div>
