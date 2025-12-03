@@ -839,10 +839,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
               <AlertCircle className="h-4 w-4 text-blue-500" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">Verify that your WhatsApp messages deliver correctly.</p>
-            </div>
+            <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="pt-5 space-y-4">
@@ -887,10 +884,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
                 <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </div>
-              <div>
-                <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
-                <p className="text-sm text-muted-foreground mt-0.5">View the latest scheduled message deliveries.</p>
-              </div>
+              <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
             </div>
             <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs} className="rounded-lg border-border/50">
               {loadingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
