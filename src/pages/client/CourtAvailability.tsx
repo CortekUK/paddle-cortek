@@ -617,7 +617,7 @@ Book now — don't miss out!`);
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <CardTitle className="text-lg font-semibold">Message Template</CardTitle>
+            <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="pt-5 space-y-5">
