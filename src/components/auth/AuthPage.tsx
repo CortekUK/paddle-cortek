@@ -250,13 +250,13 @@ export function AuthPage() {
             <TabsList className="grid w-full grid-cols-2 mb-8 h-12 rounded-xl bg-muted/50 p-1">
               <TabsTrigger 
                 value="login" 
-                className="rounded-lg h-10 font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+                className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
               >
                 Log in
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
-                className="rounded-lg h-10 font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+                className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
               >
                 Create account
               </TabsTrigger>
