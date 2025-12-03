@@ -13,7 +13,6 @@ import { ensureOrgForUser } from '@/services/bootstrap';
 import { routeAfterLogin } from '@/utils/routeGuards';
 import { supabase } from '@/integrations/supabase/client';
 import cortekLogo from '@/assets/cortek-logo.svg';
-
 export function AuthPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -29,25 +28,26 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [error, setError] = useState('');
-  
-  const { signInWithPassword, signUp, resetPassword } = useAuth();
-
+  const {
+    signInWithPassword,
+    signUp,
+    resetPassword
+  } = useAuth();
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab === 'login') {
       setActiveTab('login');
     }
   }, [searchParams]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
-    
     setLoading(true);
     setError('');
-    
     try {
-      const { error } = await signInWithPassword(email, password);
+      const {
+        error
+      } = await signInWithPassword(email, password);
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
           setError('Invalid email or password. Please check your credentials and try again.');
@@ -58,7 +58,6 @@ export function AuthPage() {
         }
         return;
       }
-      
       const redirectPath = await routeAfterLogin();
       navigate(redirectPath);
     } catch (err: any) {
@@ -67,44 +66,41 @@ export function AuthPage() {
       setLoading(false);
     }
   };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || password !== confirmPassword) return;
-    
     if (password.length < 8) {
       setError('Password must be at least 8 characters long');
       return;
     }
-    
     setLoading(true);
     setError('');
-    
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const {
+        data,
+        error
+      } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: undefined
         }
       });
-      
       if (error) {
         setError(error.message);
         return;
       }
-      
       if (data.user) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const {
+          error: signInError
+        } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        
         if (signInError) {
           setError('Account created but sign-in failed. Please try logging in manually.');
           return;
         }
-        
         setTimeout(async () => {
           try {
             await ensureOrgForUser(data.user.id);
@@ -121,18 +117,15 @@ export function AuthPage() {
       setLoading(false);
     }
   };
-
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetEmail) return;
-    
     setLoading(true);
     await resetPassword(resetEmail);
     setLoading(false);
     setShowResetForm(false);
     setResetEmail('');
   };
-
   const resetForm = () => {
     setEmail('');
     setPassword('');
@@ -141,7 +134,6 @@ export function AuthPage() {
     setShowConfirmPassword(false);
     setError('');
   };
-
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     resetForm();
@@ -149,8 +141,11 @@ export function AuthPage() {
   };
 
   // Shared background component with floating orbs
-  const PremiumBackground = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/40 to-blue-50/30 dark:from-background dark:via-purple-950/20 dark:to-blue-950/20 relative overflow-hidden">
+  const PremiumBackground = ({
+    children
+  }: {
+    children: React.ReactNode;
+  }) => <div className="min-h-screen bg-gradient-to-br from-background via-purple-50/40 to-blue-50/30 dark:from-background dark:via-purple-950/20 dark:to-blue-950/20 relative overflow-hidden">
       {/* Floating gradient orbs */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 dark:bg-accent/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
@@ -165,21 +160,20 @@ export function AuthPage() {
       <div className="relative z-10 w-full max-w-md mx-auto flex items-center justify-center min-h-screen p-4">
         {children}
       </div>
-    </div>
-  );
+    </div>;
 
   // Shared glassmorphism card wrapper
-  const GlassCard = ({ children }: { children: React.ReactNode }) => (
-    <div className="p-[1px] rounded-3xl bg-gradient-to-br from-primary/20 via-background to-accent/20 shadow-2xl shadow-primary/10 dark:shadow-primary/5">
+  const GlassCard = ({
+    children
+  }: {
+    children: React.ReactNode;
+  }) => <div className="p-[1px] rounded-3xl bg-gradient-to-br from-primary/20 via-background to-accent/20 shadow-2xl shadow-primary/10 dark:shadow-primary/5">
       <Card className="bg-card/95 backdrop-blur-xl rounded-3xl border-0">
         {children}
       </Card>
-    </div>
-  );
-
+    </div>;
   if (showResetForm) {
-    return (
-      <PremiumBackground>
+    return <PremiumBackground>
         <GlassCard>
           <CardHeader className="space-y-2 text-center pb-4 pt-8 px-8">
             <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-4" />
@@ -192,72 +186,39 @@ export function AuthPage() {
             <form onSubmit={handleResetPassword} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="resetEmail" className="font-medium text-sm">Email address</Label>
-                <Input
-                  id="resetEmail"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                />
+                <Input id="resetEmail" type="email" placeholder="your@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
               </div>
               <div className="flex gap-3">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="flex-1 h-12 rounded-xl border-muted-foreground/20 hover:bg-muted/50"
-                  onClick={() => setShowResetForm(false)}
-                  disabled={loading}
-                >
+                <Button type="button" variant="outline" className="flex-1 h-12 rounded-xl border-muted-foreground/20 hover:bg-muted/50" onClick={() => setShowResetForm(false)} disabled={loading}>
                   Back
                 </Button>
-                <Button 
-                  type="submit" 
-                  className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
-                  disabled={loading || !resetEmail}
-                  variant="hero"
-                >
+                <Button type="submit" className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" disabled={loading || !resetEmail} variant="hero">
                   {loading ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </div>
             </form>
           </CardContent>
         </GlassCard>
-      </PremiumBackground>
-    );
+      </PremiumBackground>;
   }
-
-  return (
-    <PremiumBackground>
+  return <PremiumBackground>
       <GlassCard>
         <CardHeader className="space-y-2 text-center pb-4 pt-8 px-8">
           <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-4" />
           <CardTitle className="text-xl font-semibold">Welcome to CORTEK</CardTitle>
-          <CardDescription className="font-medium text-muted-foreground">
-            Padel Club Automation
-          </CardDescription>
+          
         </CardHeader>
         <CardContent className="px-8 pb-8">
-          {error && (
-            <Alert variant="destructive" className="mb-6 rounded-xl">
+          {error && <Alert variant="destructive" className="mb-6 rounded-xl">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            </Alert>}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8 h-12 rounded-xl bg-muted/50 p-1">
-              <TabsTrigger 
-                value="login" 
-                className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-              >
+              <TabsTrigger value="login" className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
                 Log in
               </TabsTrigger>
-              <TabsTrigger 
-                value="signup" 
-                className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-              >
+              <TabsTrigger value="signup" className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
                 Create account
               </TabsTrigger>
             </TabsList>
@@ -266,59 +227,23 @@ export function AuthPage() {
               <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="loginEmail" className="font-medium text-sm">Email address</Label>
-                  <Input
-                    id="loginEmail"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                  />
+                  <Input id="loginEmail" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="loginPassword" className="font-medium text-sm">Password</Label>
                   <div className="relative">
-                    <Input
-                      id="loginPassword"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={loading}
-                      className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
+                    <Input id="loginPassword" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50" onClick={() => setShowPassword(!showPassword)} disabled={loading}>
                       {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
-                  disabled={loading || !email || !password}
-                  variant="hero"
-                >
+                <Button type="submit" className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" disabled={loading || !email || !password} variant="hero">
                   {loading ? 'Signing in...' : 'Log in'}
                 </Button>
               </form>
               <div className="text-center">
-                <Button 
-                  type="button" 
-                  variant="link" 
-                  className="text-sm text-primary hover:text-primary/80"
-                  onClick={() => setShowResetForm(true)}
-                  disabled={loading}
-                >
+                <Button type="button" variant="link" className="text-sm text-primary hover:text-primary/80" onClick={() => setShowResetForm(true)} disabled={loading}>
                   Forgot password?
                 </Button>
               </div>
@@ -328,39 +253,13 @@ export function AuthPage() {
               <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="signupEmail" className="font-medium text-sm">Email address</Label>
-                  <Input
-                    id="signupEmail"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                  />
+                  <Input id="signupEmail" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signupPassword" className="font-medium text-sm">Password</Label>
                   <div className="relative">
-                    <Input
-                       id="signupPassword"
-                       type={showPassword ? "text" : "password"}
-                       placeholder="Create a password (min 8 characters)"
-                       value={password}
-                       onChange={(e) => setPassword(e.target.value)}
-                       required
-                       minLength={8}
-                       disabled={loading}
-                       className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
+                    <Input id="signupPassword" type={showPassword ? "text" : "password"} placeholder="Create a password (min 8 characters)" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} disabled={loading} className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50" onClick={() => setShowPassword(!showPassword)} disabled={loading}>
                       {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
@@ -368,37 +267,14 @@ export function AuthPage() {
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="font-medium text-sm">Confirm password</Label>
                   <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={loading}
-                      className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      disabled={loading}
-                    >
+                    <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={loading} className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={loading}>
                       {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
-                {password && confirmPassword && password !== confirmPassword && (
-                  <p className="text-sm text-destructive">Passwords do not match</p>
-                )}
-                <Button 
-                   type="submit" 
-                   className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
-                   disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8}
-                   variant="hero"
-                 >
+                {password && confirmPassword && password !== confirmPassword && <p className="text-sm text-destructive">Passwords do not match</p>}
+                <Button type="submit" className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8} variant="hero">
                    {loading ? 'Creating account...' : 'Create account'}
                  </Button>
               </form>
@@ -406,6 +282,5 @@ export function AuthPage() {
           </Tabs>
         </CardContent>
       </GlassCard>
-    </PremiumBackground>
-  );
+    </PremiumBackground>;
 }
