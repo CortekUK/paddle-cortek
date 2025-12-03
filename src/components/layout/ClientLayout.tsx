@@ -262,7 +262,7 @@ export function ClientLayout() {
         )}>
           {/* Top header - minimal glassmorphism */}
           <header className="sticky top-0 z-30 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-b border-border/30">
-            <div className="px-6 py-3">
+            <div className="px-8 py-3">
               <div className="flex items-center justify-between">
                 {/* Left: Mobile menu + Org name only */}
                 <div className="flex items-center gap-3">
