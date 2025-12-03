@@ -577,24 +577,24 @@ Book now — don't miss out!`);
         </div>
       </div>
 
-      {/* Section 1 – Availability Search */}
+      {/* Section 1 – Search Availability (unified search + results) */}
       <Card className={cardClass}>
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <Search className="h-4 w-4 text-primary" strokeWidth={1.5} />
-            </div>
-            <CardTitle className="text-lg font-semibold">Find Availability</CardTitle>
-          </div>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">Search Availability</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">Find open court slots for your selected date range</p>
         </CardHeader>
-        <CardContent className="pt-5 space-y-5">
-          {/* Today/Tomorrow pills */}
+        <CardContent className="space-y-6">
+          {/* Quick date pills */}
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setPreset('today')}
-              className="rounded-full px-4 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+              className={`rounded-full px-5 transition-all ${
+                dateFrom.includes(format(new Date(), 'yyyy-MM-dd')) 
+                  ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
+                  : 'bg-muted/40 hover:bg-muted/60 border-border/50'
+              }`}
             >
               Today
             </Button>
@@ -602,40 +602,46 @@ Book now — don't miss out!`);
               variant="outline"
               size="sm"
               onClick={() => setPreset('tomorrow')}
-              className="rounded-full px-4 bg-muted/30 hover:bg-primary/10 hover:text-primary border-border/50"
+              className={`rounded-full px-5 transition-all ${
+                dateFrom.includes(format(addDays(new Date(), 1), 'yyyy-MM-dd'))
+                  ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
+                  : 'bg-muted/40 hover:bg-muted/60 border-border/50'
+              }`}
             >
               Tomorrow
             </Button>
           </div>
 
-          {/* Date range inputs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dateFrom" className="text-sm font-medium">From</Label>
-              <Input
-                id="dateFrom"
-                type="datetime-local"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateTo" className="text-sm font-medium">To</Label>
-              <Input
-                id="dateTo"
-                type="datetime-local"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-              />
+          {/* Date inputs grouped */}
+          <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-4 border border-border/30">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">From</Label>
+                <Input
+                  id="dateFrom"
+                  type="datetime-local"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To</Label>
+                <Input
+                  id="dateTo"
+                  type="datetime-local"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
+                />
+              </div>
             </div>
           </div>
 
           <Button 
             onClick={handleSearch} 
             disabled={loading}
-            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             Search Availability
@@ -647,32 +653,28 @@ Book now — don't miss out!`);
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Section 2 – Summary Preview */}
-      <Card className={cardClass}>
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/30">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-              <FileText className="h-4 w-4 text-primary" strokeWidth={1.5} />
-            </div>
-            <CardTitle className="text-lg font-semibold">Summary Preview</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-5">
-          <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 font-mono text-sm whitespace-pre-wrap border border-border/30">
+          {/* Results divider */}
+          <div className="border-t border-border/40 pt-6">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Results</p>
+            
             {summaryText ? (
-              <div className="flex gap-3">
-                <Calendar className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-medium text-foreground">{dateDisplayShort}</span>
-                  {'\n'}
-                  {summaryText}
+              <div className="border-l-2 border-primary/50 bg-muted/20 dark:bg-muted/10 rounded-r-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Calendar className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <div className="font-mono text-sm whitespace-pre-wrap">
+                    <span className="font-semibold text-foreground">{dateDisplayShort}</span>
+                    <span className="text-muted-foreground ml-2">• {countSlots} slots</span>
+                    {'\n\n'}
+                    <span className="text-foreground/90">{summaryText}</span>
+                  </div>
                 </div>
               </div>
             ) : (
-              <span className="text-muted-foreground/60 italic">Run a search to preview availability</span>
+              <div className="text-center py-10 text-muted-foreground bg-muted/10 rounded-xl border border-dashed border-border/40">
+                <Search className="mx-auto h-8 w-8 opacity-30 mb-3" />
+                <p className="text-sm">Search for courts to see availability</p>
+              </div>
             )}
           </div>
         </CardContent>
