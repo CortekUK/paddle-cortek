@@ -1264,7 +1264,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               <Button variant="ghost" onClick={() => setModalOpen(false)} className="flex-1 text-muted-foreground hover:bg-muted/50">
                 Cancel
               </Button>
-              <Button onClick={handleSave} className="flex-1 shadow-sm hover:shadow-md transition-shadow">
+              <Button onClick={handleSave} className="flex-1 bg-primary/10 border border-primary text-primary hover:bg-primary/20">
                 {editingSchedule ? 'Update' : 'Create'}
               </Button>
             </div>
