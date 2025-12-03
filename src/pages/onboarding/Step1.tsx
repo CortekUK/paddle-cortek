@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import cortekLogo from '@/assets/cortek-logo.svg';
 
 export default function OnboardingStep1() {
   const navigate = useNavigate();
@@ -50,21 +51,19 @@ export default function OnboardingStep1() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Welcome to CORTEK</CardTitle>
-          <CardDescription className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
+      <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
+        <CardHeader className="text-center pb-2">
+          <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground mb-2">Step 1 of 3</p>
+          <CardTitle className="text-2xl font-bold">Set up your Club</CardTitle>
+          <CardDescription>
             Let's get your club set up for automated messaging
           </CardDescription>
         </CardHeader>
         
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="text-center text-sm text-muted-foreground mb-4">
-              Step 1 of 3: Basic Information
-            </div>
-
+          <CardContent className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name *</Label>
               <Input
@@ -73,6 +72,7 @@ export default function OnboardingStep1() {
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 required
+                className="h-11 rounded-lg"
               />
             </div>
 
@@ -84,6 +84,7 @@ export default function OnboardingStep1() {
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 required
+                className="h-11 rounded-lg"
               />
             </div>
 
@@ -95,6 +96,7 @@ export default function OnboardingStep1() {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
+                className="h-11 rounded-lg"
               />
             </div>
 
@@ -106,6 +108,7 @@ export default function OnboardingStep1() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
+                className="h-11 rounded-lg"
               />
             </div>
 
@@ -127,11 +130,12 @@ export default function OnboardingStep1() {
             </div>
           </CardContent>
 
-          <CardFooter className="space-y-2">
+          <CardFooter className="flex flex-col gap-3 pt-2">
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full h-11 rounded-lg" 
               disabled={loading}
+              variant="hero"
             >
               {loading ? (
                 <>
@@ -146,7 +150,7 @@ export default function OnboardingStep1() {
               type="button"
               variant="ghost"
               onClick={() => navigate('/client/dashboard')}
-              className="w-full"
+              className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip to Dashboard
             </Button>

@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { Loader2, MessageSquare, Users } from 'lucide-react';
+import { Loader2, MessageSquare } from 'lucide-react';
+import cortekLogo from '@/assets/cortek-logo.svg';
 
 export default function OnboardingStep3() {
   const navigate = useNavigate();
@@ -71,25 +72,23 @@ export default function OnboardingStep3() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">WhatsApp Setup</CardTitle>
-          <CardDescription className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
+      <Card className="w-full max-w-lg shadow-xl rounded-2xl border-0">
+        <CardHeader className="text-center pb-2">
+          <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground mb-2">Step 3 of 3</p>
+          <CardTitle className="text-2xl font-bold">WhatsApp Setup</CardTitle>
+          <CardDescription>
             Configure your WhatsApp groups for automated messages
           </CardDescription>
         </CardHeader>
         
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            <div className="text-center text-sm text-muted-foreground mb-4">
-              Step 3 of 3: WhatsApp Setup
-            </div>
-
+          <CardContent className="space-y-5">
             {/* Bot Number Panel */}
-            <Alert>
-              <MessageSquare className="h-4 w-4" />
-              <AlertDescription>
+            <Alert className="bg-primary/5 border-primary/20">
+              <MessageSquare className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-foreground">
                 <strong>Add 07757658667 to each WhatsApp group where you want automated messages delivered.</strong>
               </AlertDescription>
             </Alert>
@@ -107,8 +106,8 @@ export default function OnboardingStep3() {
             </div>
 
             {/* Apply to All Helper */}
-            <div className="space-y-2 p-4 bg-muted rounded-lg">
-              <Label htmlFor="useOneNameForAll">Use one name for all groups (optional)</Label>
+            <div className="space-y-2 p-4 bg-muted/50 rounded-xl">
+              <Label htmlFor="useOneNameForAll" className="text-sm font-medium">Use one name for all groups (optional)</Label>
               <div className="flex gap-2">
                 <Input
                   id="useOneNameForAll"
@@ -116,8 +115,9 @@ export default function OnboardingStep3() {
                   value={useOneNameForAll}
                   onChange={(e) => setUseOneNameForAll(e.target.value)}
                   placeholder="Pure Padel"
+                  className="h-11 rounded-lg"
                 />
-                <Button type="button" onClick={applyToAll} variant="outline">
+                <Button type="button" onClick={applyToAll} variant="outline" className="h-11 rounded-lg">
                   Apply to All
                 </Button>
               </div>
@@ -134,6 +134,7 @@ export default function OnboardingStep3() {
                   onChange={(e) => setGroupNames({ ...groupNames, courtAvailability: e.target.value })}
                   placeholder="Pure Padel – Court Availability"
                   required
+                  className="h-11 rounded-lg"
                 />
                 <p className="text-xs text-muted-foreground">
                   Must match the WhatsApp group name exactly (including spaces and capitals).
@@ -149,6 +150,7 @@ export default function OnboardingStep3() {
                   onChange={(e) => setGroupNames({ ...groupNames, partialMatches: e.target.value })}
                   placeholder="Pure Padel – Matches"
                   required
+                  className="h-11 rounded-lg"
                 />
                 <p className="text-xs text-muted-foreground">
                   Must match the WhatsApp group name exactly (including spaces and capitals).
@@ -164,6 +166,7 @@ export default function OnboardingStep3() {
                   onChange={(e) => setGroupNames({ ...groupNames, competitions: e.target.value })}
                   placeholder="Pure Padel – Competitions"
                   required
+                  className="h-11 rounded-lg"
                 />
                 <p className="text-xs text-muted-foreground">
                   Must match the WhatsApp group name exactly (including spaces and capitals).
@@ -172,20 +175,21 @@ export default function OnboardingStep3() {
             </div>
           </CardContent>
 
-          <CardFooter className="space-y-2">
-            <div className="flex gap-2">
+          <CardFooter className="flex flex-col gap-3 pt-2">
+            <div className="flex gap-3 w-full">
               <Button 
                 type="button"
                 variant="outline"
                 onClick={() => navigate('/onboarding/step-2')}
-                className="flex-1"
+                className="flex-1 h-11 rounded-lg"
               >
                 Back
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1" 
+                className="flex-1 h-11 rounded-lg" 
                 disabled={loading || !botAdded}
+                variant="hero"
               >
                 {loading ? (
                   <>
@@ -201,7 +205,7 @@ export default function OnboardingStep3() {
               type="button"
               variant="ghost"
               onClick={() => navigate('/client/dashboard')}
-              className="w-full"
+              className="w-full text-muted-foreground hover:text-foreground"
             >
               Skip to Dashboard
             </Button>
