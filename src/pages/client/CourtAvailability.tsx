@@ -8,14 +8,18 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, Hash, FileText, Clock } from 'lucide-react';
-import { format, addDays, startOfDay, endOfDay } from 'date-fns';
+import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, Hash, FileText, Clock, ChevronRight } from 'lucide-react';
+import { format, addDays, startOfDay, endOfDay, endOfWeek, startOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduledSendsV2 } from '@/components/client/ScheduledSendsV2';
 import EmojiPicker from '@/components/client/EmojiPicker';
 import { generateAvailabilitySummary } from '@/utils/playtomicAdminUtils';
 import { SocialPostBuilder } from '@/components/social/SocialPostBuilder';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 export default function CourtAvailability() {
   const { organization } = useOrganizationAuth();
@@ -153,16 +157,54 @@ export default function CourtAvailability() {
     return f === t ? f : `${f} – ${t}`;
   };
 
-  const setPreset = (preset: 'today' | 'tomorrow') => {
+  const [activePreset, setActivePreset] = useState<'today' | 'tomorrow' | 'week' | null>(null);
+
+  const setPreset = (preset: 'today' | 'tomorrow' | 'week') => {
     const now = new Date();
-    const targetDate = preset === 'today' ? now : addDays(now, 1);
     const timezone = 'Europe/London';
     
-    const startOfDayLocal = formatInTimeZone(startOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
-    const endOfDayLocal = formatInTimeZone(endOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+    let targetStart: Date;
+    let targetEnd: Date;
     
-    setDateFrom(startOfDayLocal);
-    setDateTo(endOfDayLocal);
+    if (preset === 'today') {
+      targetStart = startOfDay(now);
+      targetEnd = endOfDay(now);
+    } else if (preset === 'tomorrow') {
+      targetStart = startOfDay(addDays(now, 1));
+      targetEnd = endOfDay(addDays(now, 1));
+    } else {
+      targetStart = startOfDay(now);
+      targetEnd = endOfWeek(now, { weekStartsOn: 1 });
+    }
+    
+    const startLocal = formatInTimeZone(targetStart, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+    const endLocal = formatInTimeZone(targetEnd, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+    
+    setDateFrom(startLocal);
+    setDateTo(endLocal);
+    setActivePreset(preset);
+  };
+
+  // Parse dates for calendar display
+  const fromDate = dateFrom ? new Date(dateFrom) : undefined;
+  const toDate = dateTo ? new Date(dateTo) : undefined;
+
+  const handleFromDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const timezone = 'Europe/London';
+      const startLocal = formatInTimeZone(startOfDay(date), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+      setDateFrom(startLocal);
+      setActivePreset(null);
+    }
+  };
+
+  const handleToDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const timezone = 'Europe/London';
+      const endLocal = formatInTimeZone(endOfDay(date), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+      setDateTo(endLocal);
+      setActivePreset(null);
+    }
   };
 
   useEffect(() => {
@@ -577,108 +619,151 @@ Book now — don't miss out!`);
         </div>
       </div>
 
-      {/* Section 1 – Search Availability (unified search + results) */}
+      {/* Section 1 – Compact Search Bar */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold">Search Availability</CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">Find open court slots for your selected date range</p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Quick date pills */}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreset('today')}
-              className={`rounded-full px-5 transition-all ${
-                dateFrom.includes(format(new Date(), 'yyyy-MM-dd')) 
-                  ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
-                  : 'bg-muted/40 hover:bg-muted/60 border-border/50'
-              }`}
-            >
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreset('tomorrow')}
-              className={`rounded-full px-5 transition-all ${
-                dateFrom.includes(format(addDays(new Date(), 1), 'yyyy-MM-dd'))
-                  ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
-                  : 'bg-muted/40 hover:bg-muted/60 border-border/50'
-              }`}
-            >
-              Tomorrow
-            </Button>
-          </div>
-
-          {/* Date inputs grouped */}
-          <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-4 border border-border/30">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">From</Label>
-                <Input
-                  id="dateFrom"
-                  type="datetime-local"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To</Label>
-                <Input
-                  id="dateTo"
-                  type="datetime-local"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="h-10 rounded-lg border-border/50 bg-white dark:bg-background"
-                />
-              </div>
+        <CardContent className="p-5">
+          {/* Horizontal search bar */}
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            {/* Preset pills */}
+            <div className="flex gap-2 flex-shrink-0">
+              {(['today', 'tomorrow', 'week'] as const).map((preset) => (
+                <Button
+                  key={preset}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPreset(preset)}
+                  className={cn(
+                    "rounded-full px-4 h-9 text-sm font-medium transition-all",
+                    activePreset === preset
+                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm"
+                      : "bg-background hover:bg-muted/60 border-border/50"
+                  )}
+                >
+                  {preset === 'today' && 'Today'}
+                  {preset === 'tomorrow' && 'Tomorrow'}
+                  {preset === 'week' && 'This Week'}
+                </Button>
+              ))}
             </div>
-          </div>
 
-          <Button 
-            onClick={handleSearch} 
-            disabled={loading}
-            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            Search Availability
-          </Button>
+            {/* Date range selector */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-9 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
+                      !fromDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                    {fromDate ? format(fromDate, "MMM d") : "Start"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={fromDate}
+                    onSelect={handleFromDateSelect}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-9 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
+                      !toDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                    {toDate ? format(toDate, "MMM d") : "End"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={toDate}
+                    onSelect={handleToDateSelect}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Search button */}
+            <Button
+              onClick={handleSearch}
+              disabled={loading}
+              className="h-9 px-5 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              <span className="hidden sm:inline">Search</span>
+            </Button>
+          </div>
 
           {error && (
-            <Alert variant="destructive" className="rounded-xl">
+            <Alert variant="destructive" className="rounded-xl mt-4">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          {/* Results divider */}
-          <div className="border-t border-border/40 pt-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Results</p>
-            
-            {summaryText ? (
-              <div className="border-l-2 border-primary/50 bg-muted/20 dark:bg-muted/10 rounded-r-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Calendar className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <div className="font-mono text-sm whitespace-pre-wrap">
-                    <span className="font-semibold text-foreground">{dateDisplayShort}</span>
-                    <span className="text-muted-foreground ml-2">• {countSlots} slots</span>
-                    {'\n\n'}
-                    <span className="text-foreground/90">{summaryText}</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-10 text-muted-foreground bg-muted/10 rounded-xl border border-dashed border-border/40">
-                <Search className="mx-auto h-8 w-8 opacity-30 mb-3" />
-                <p className="text-sm">Search for courts to see availability</p>
-              </div>
-            )}
-          </div>
         </CardContent>
       </Card>
+
+      {/* Section 2 – Results Display */}
+      {(summaryText || loading) ? (
+        <Card className={cardClass}>
+          <CardContent className="p-5">
+            {/* Results header with badge */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-base font-semibold text-foreground">{dateDisplayShort || 'Results'}</h3>
+                {countSlots > 0 && (
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold">
+                    {countSlots} slots
+                  </Badge>
+                )}
+              </div>
+              {countSlots > 0 && (
+                <span className="text-xs text-muted-foreground">Available courts</span>
+              )}
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="bg-muted/20 dark:bg-muted/10 rounded-xl p-4 border border-border/30">
+                <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
+                  {summaryText}
+                </pre>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className={cn(cardClass, "border-dashed")}>
+          <CardContent className="p-8">
+            <div className="text-center text-muted-foreground">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted/30 mb-3">
+                <CalendarIcon className="h-5 w-5 opacity-50" />
+              </div>
+              <p className="text-sm font-medium">No search results yet</p>
+              <p className="text-xs mt-1 opacity-70">Select a date range and search for available courts</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Section 3 – Message Builder */}
       <Card className={cardClass}>
