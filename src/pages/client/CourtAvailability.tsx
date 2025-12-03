@@ -626,7 +626,7 @@ Book now — don't miss out!`);
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">
             {/* Preset pills */}
             <div className="flex gap-2 flex-shrink-0">
-              {(['today', 'tomorrow', 'week'] as const).map((preset) => (
+              {(['today', 'tomorrow'] as const).map((preset) => (
                 <Button
                   key={preset}
                   variant="outline"
@@ -639,9 +639,7 @@ Book now — don't miss out!`);
                       : "bg-background hover:bg-muted/60 border-border/50"
                   )}
                 >
-                  {preset === 'today' && 'Today'}
-                  {preset === 'tomorrow' && 'Tomorrow'}
-                  {preset === 'week' && 'This Week'}
+                  {preset === 'today' ? 'Today' : 'Tomorrow'}
                 </Button>
               ))}
             </div>
