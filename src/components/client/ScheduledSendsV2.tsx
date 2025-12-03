@@ -784,7 +784,23 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                           <div className="space-y-3">
                             <h4 className="font-semibold">Setup Instructions</h4>
                             <ol className="list-decimal pl-4 space-y-2 text-muted-foreground">
-                              <li><strong className="text-foreground">Add the CORTEK number</strong> <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">+44 7757 658667</span> to your WhatsApp group as a participant</li>
+                              <li>
+                                <strong className="text-foreground">Add the CORTEK number</strong>{" "}
+                                <span className="inline-flex items-center gap-1">
+                                  <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">+44 7757 658667</span>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText("+44 7757 658667");
+                                      toast.success("Number copied to clipboard");
+                                    }}
+                                    className="p-1 rounded hover:bg-muted transition-colors"
+                                    title="Copy number"
+                                  >
+                                    <Copy className="h-3 w-3 text-muted-foreground" />
+                                  </button>
+                                </span>{" "}
+                                to your WhatsApp group as a participant
+                              </li>
                               <li><strong className="text-foreground">Group name must match exactly</strong> – Enter the exact same name as your WhatsApp group below (case-sensitive)</li>
                               <li><strong className="text-foreground">Send a test</strong> to verify the connection is working</li>
                             </ol>
