@@ -777,25 +777,22 @@ Book now — don't miss out!`);
           {/* Two-column layout: Editor + Preview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left side - Template editor */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
-                  <span className="text-xs text-muted-foreground">{templateContent.length} chars</span>
-                </div>
-                <Textarea
-                  ref={textareaRef}
-                  id="templateContent"
-                  value={templateContent}
-                  onChange={(e) => setTemplateContent(e.target.value)}
-                  rows={8}
-                  placeholder="Enter your message template..."
-                  className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed"
-                />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+                <span className="text-xs text-muted-foreground">{templateContent.length} chars</span>
               </div>
-
-              {/* Token chips - simplified */}
-              <div className="space-y-2">
+              <Textarea
+                ref={textareaRef}
+                id="templateContent"
+                value={templateContent}
+                onChange={(e) => setTemplateContent(e.target.value)}
+                rows={8}
+                placeholder="Enter your message template..."
+                className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed"
+              />
+              {/* Token chips */}
+              <div className="space-y-2 pt-2">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
                 <div className="flex flex-wrap gap-1.5">
                   {[
@@ -820,7 +817,10 @@ Book now — don't miss out!`);
 
             {/* Right side - Live Preview */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+                <span className="text-xs text-muted-foreground invisible">placeholder</span>
+              </div>
               <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
                 <div className="text-sm whitespace-pre-wrap text-foreground/85 leading-relaxed">
                   {summaryText ? renderTemplate(templateContent) : (
@@ -829,7 +829,7 @@ Book now — don't miss out!`);
                 </div>
               </div>
               {!summaryText && templateContent && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground pt-2">
                   Tip: Add {`{{summary}}`} to include the availability breakdown
                 </p>
               )}
