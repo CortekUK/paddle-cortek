@@ -722,19 +722,17 @@ Book now — don't miss out!`);
           {/* Right Panel - Results Display */}
           <div className="p-5">
             {/* Results header with badge */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
-                </h3>
-                {countSlots > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <h3 className="text-sm font-semibold text-foreground">
+                {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
+              </h3>
+              {countSlots > 0 && (
+                <>
                   <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold text-xs">
                     {countSlots} slots
                   </Badge>
-                )}
-              </div>
-              {countSlots > 0 && (
-                <span className="text-xs text-muted-foreground">Available courts</span>
+                  <span className="text-xs text-muted-foreground ml-auto">Available courts</span>
+                </>
               )}
             </div>
 
@@ -749,12 +747,16 @@ Book now — don't miss out!`);
                 </pre>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="p-3 rounded-full bg-muted/30 mb-3">
-                  <CalendarIcon className="h-6 w-6 text-muted-foreground/60" />
+              <div className="flex flex-col items-start py-10 px-1">
+                <div className="relative mb-4">
+                  <div className="absolute -inset-3 bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent rounded-2xl blur-sm" />
+                  <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary/10 to-purple-500/10 border border-primary/10">
+                    <CalendarIcon className="h-5 w-5 text-primary/70" />
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Select dates and search to find available courts
+                <h4 className="text-sm font-medium text-foreground mb-1">No search results yet</h4>
+                <p className="text-sm text-muted-foreground max-w-[240px]">
+                  Select your dates and search to discover available court times.
                 </p>
               </div>
             )}
