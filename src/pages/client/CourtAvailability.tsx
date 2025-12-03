@@ -638,7 +638,7 @@ Book now — don't miss out!`);
                     "rounded-full px-4 h-9 text-sm font-medium transition-all flex-1",
                     activePreset === preset
                       ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
-                      : "bg-background hover:bg-muted/60 border-border/50"
+                      : "bg-background text-foreground hover:bg-muted border-border/50"
                   )}
                 >
                   {preset === 'today' ? 'Today' : 'Tomorrow'}
@@ -724,13 +724,13 @@ Book now — don't miss out!`);
 
           {/* Right Panel - Results Display */}
           <div className="p-5 min-h-[280px]">
-            {/* Results header with badge - centered */}
-            <div className="flex flex-col items-center justify-center mb-4">
+            {/* Results header with badge inline */}
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-foreground">
                 {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
               </h3>
               {countSlots > 0 && (
-                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs mt-1">
+                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 font-semibold text-xs">
                   {countSlots} slots available
                 </Badge>
               )}
