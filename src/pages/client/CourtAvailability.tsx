@@ -619,13 +619,15 @@ Book now — don't miss out!`);
         </div>
       </div>
 
-      {/* Section 1 – Compact Search Bar */}
+      {/* Section 1 – Search & Results Side-by-Side */}
       <Card className={cardClass}>
-        <CardContent className="p-5">
-          {/* Horizontal search bar */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]">
+          {/* Left Panel - Search Controls */}
+          <div className="p-5 lg:border-r border-border/40 bg-muted/5 dark:bg-muted/10">
+            <h3 className="text-sm font-semibold text-foreground mb-4">Find Availability</h3>
+            
             {/* Preset pills */}
-            <div className="flex gap-2 flex-shrink-0">
+            <div className="flex gap-2 mb-4">
               {(['today', 'tomorrow'] as const).map((preset) => (
                 <Button
                   key={preset}
@@ -633,7 +635,7 @@ Book now — don't miss out!`);
                   size="sm"
                   onClick={() => setPreset(preset)}
                   className={cn(
-                    "rounded-full px-4 h-9 text-sm font-medium transition-all",
+                    "rounded-full px-4 h-9 text-sm font-medium transition-all flex-1",
                     activePreset === preset
                       ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm"
                       : "bg-background hover:bg-muted/60 border-border/50"
@@ -645,88 +647,88 @@ Book now — don't miss out!`);
             </div>
 
             {/* Date range selector */}
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "h-9 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
-                      !fromDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                    {fromDate ? format(fromDate, "MMM d") : "Start"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={fromDate}
-                    onSelect={handleFromDateSelect}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "h-9 flex-1 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
+                        !fromDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {fromDate ? format(fromDate, "MMM d, yyyy") : "Start date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={fromDate}
+                      onSelect={handleFromDateSelect}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
 
-              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "h-9 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
-                      !toDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                    {toDate ? format(toDate, "MMM d") : "End"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={toDate}
-                    onSelect={handleToDateSelect}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "h-9 flex-1 px-3 justify-start text-left font-normal border-border/50 bg-background hover:bg-muted/40",
+                        !toDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {toDate ? format(toDate, "MMM d, yyyy") : "End date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={toDate}
+                      onSelect={handleToDateSelect}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
 
             {/* Search button */}
             <Button
               onClick={handleSearch}
               disabled={loading}
-              className="h-9 px-5 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
+              className="w-full h-10 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              <span className="hidden sm:inline">Search</span>
+              Search Courts
             </Button>
+
+            {error && (
+              <Alert variant="destructive" className="rounded-xl mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
           </div>
 
-          {error && (
-            <Alert variant="destructive" className="rounded-xl mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Section 2 – Results Display */}
-      {(summaryText || loading) ? (
-        <Card className={cardClass}>
-          <CardContent className="p-5">
+          {/* Right Panel - Results Display */}
+          <div className="p-5">
             {/* Results header with badge */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <h3 className="text-base font-semibold text-foreground">{dateDisplayShort || 'Results'}</h3>
+                <h3 className="text-sm font-semibold text-foreground">
+                  {summaryText ? (dateDisplayShort || 'Results') : 'Results'}
+                </h3>
                 {countSlots > 0 && (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-semibold text-xs">
                     {countSlots} slots
                   </Badge>
                 )}
@@ -737,31 +739,28 @@ Book now — don't miss out!`);
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-12">
+              <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
-            ) : (
+            ) : summaryText ? (
               <div className="bg-muted/20 dark:bg-muted/10 rounded-xl p-4 border border-border/30">
                 <pre className="font-mono text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">
                   {summaryText}
                 </pre>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className={cn(cardClass, "border-dashed")}>
-          <CardContent className="p-8">
-            <div className="text-center text-muted-foreground">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted/30 mb-3">
-                <CalendarIcon className="h-5 w-5 opacity-50" />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="p-3 rounded-full bg-muted/30 mb-3">
+                  <CalendarIcon className="h-6 w-6 text-muted-foreground/60" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Select dates and search to find available courts
+                </p>
               </div>
-              <p className="text-sm font-medium">No search results yet</p>
-              <p className="text-xs mt-1 opacity-70">Select a date range and search for available courts</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            )}
+          </div>
+        </div>
+      </Card>
 
       {/* Section 3 – Message Builder */}
       <Card className={cardClass}>
