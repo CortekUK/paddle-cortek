@@ -10,8 +10,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock, MoreHorizontal, Link2, ChevronDown } from 'lucide-react';
+import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock, MoreHorizontal, Link2, ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -770,17 +771,32 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                   <div>
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
                       Test Your WhatsApp Connection
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            onClick={(e) => e.stopPropagation()} 
+                            className="p-1 rounded-full hover:bg-blue-200/50 dark:hover:bg-blue-800/30 transition-colors"
+                          >
+                            <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 text-sm" align="start">
+                          <div className="space-y-3">
+                            <h4 className="font-semibold">Setup Instructions</h4>
+                            <ol className="list-decimal pl-4 space-y-2 text-muted-foreground">
+                              <li><strong className="text-foreground">Add the CORTEK number</strong> to your WhatsApp group as a participant</li>
+                              <li><strong className="text-foreground">Group name must match exactly</strong> – Enter the exact same name as your WhatsApp group below (case-sensitive)</li>
+                              <li><strong className="text-foreground">Send a test</strong> to verify the connection is working</li>
+                            </ol>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                       {lastTestResult?.status === 'success' && (
                         <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs">
                           Connected
                         </Badge>
                       )}
                     </CardTitle>
-                    <CardDescription className="text-sm">
-                      {lastTestResult?.status === 'success' 
-                        ? 'Connection verified - click to expand' 
-                        : 'Verify your integration is working before creating schedules'}
-                    </CardDescription>
                   </div>
                 </div>
                 <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${testSectionOpen ? 'rotate-180' : ''}`} />
