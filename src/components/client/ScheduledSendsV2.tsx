@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -740,187 +741,147 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   }
   return <>
       <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-4 border-b border-border/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+        <Tabs defaultValue="schedules" className="w-full">
+          <CardHeader className="pb-0 border-b border-border/50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <CardTitle className="text-lg font-semibold">Scheduled Messages</CardTitle>
               </div>
-              <CardTitle className="text-lg font-semibold">Scheduled Messages</CardTitle>
+              <Button onClick={() => {
+                resetForm();
+                setEditingSchedule(null);
+                setModalOpen(true);
+              }} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20">
+                <Plus className="h-4 w-4 mr-1" strokeWidth={1.5} />
+                New Schedule
+              </Button>
             </div>
-            <Button onClick={() => {
-              resetForm();
-              setEditingSchedule(null);
-              setModalOpen(true);
-            }} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20">
-              <Plus className="h-4 w-4 mr-1" strokeWidth={1.5} />
-              New Schedule
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-5">
-          {schedules.length === 0 ? <div className="text-center py-8 text-muted-foreground">
-              No scheduled sends configured. Create your first schedule to get started.
-            </div> : <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Name</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Time</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Target</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Group</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Template</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Status</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Next run</TableHead>
-                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {schedules.map(schedule => <TableRow key={schedule.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {schedule.name}
-                        {getLastStatusIcon(schedule.last_status)}
-                      </div>
-                    </TableCell>
-                    <TableCell>{formatTimeInClubTz(schedule.time_local)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {schedule.target}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{schedule.whatsapp_group}</TableCell>
-                    <TableCell>{schedule.message_templates?.name}</TableCell>
-                    <TableCell>{getStatusBadge(schedule.status)}</TableCell>
-                    <TableCell>{formatNextRunInClubTz(schedule.next_run_at_utc, schedule.tz)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-0.5">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
-                          <Edit2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
-                          {schedule.status === 'ACTIVE' ? <Pause className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Play className="h-3.5 w-3.5" strokeWidth={1.5} />}
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately" disabled={schedule.status !== 'ACTIVE'} className="text-primary hover:text-primary/80 h-8 w-8 p-0">
-                          <Send className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
-                              <MoreHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <TabsList className="w-full justify-start bg-transparent p-0 h-auto border-b-0">
+              <TabsTrigger value="schedules" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4 pb-3">
+                Schedules
+              </TabsTrigger>
+              <TabsTrigger value="recent-runs" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none px-4 pb-3">
+                Recent Runs
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
+          
+          <TabsContent value="schedules" className="mt-0">
+            <CardContent className="pt-5">
+              {schedules.length === 0 ? <div className="text-center py-8 text-muted-foreground">
+                  No scheduled sends configured. Create your first schedule to get started.
+                </div> : <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Name</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Time</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Target</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Group</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Template</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Status</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Next run</TableHead>
+                      <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {schedules.map(schedule => <TableRow key={schedule.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            {schedule.name}
+                            {getLastStatusIcon(schedule.last_status)}
+                          </div>
+                        </TableCell>
+                        <TableCell>{formatTimeInClubTz(schedule.time_local)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {schedule.target}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{schedule.whatsapp_group}</TableCell>
+                        <TableCell>{schedule.message_templates?.name}</TableCell>
+                        <TableCell>{getStatusBadge(schedule.status)}</TableCell>
+                        <TableCell>{formatNextRunInClubTz(schedule.next_run_at_utc, schedule.tz)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5">
+                            <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                              <Edit2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40 bg-popover border border-border shadow-md">
-                            <DropdownMenuItem onClick={() => handleRunNow(schedule)} disabled={schedule.status !== 'ACTIVE'} className="gap-2 text-sm">
-                              <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
-                              Schedule +2min
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDuplicate(schedule)} className="gap-2 text-sm">
-                              <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setDeleteScheduleId(schedule.id)} className="gap-2 text-sm text-destructive focus:text-destructive">
-                              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>)}
-              </TableBody>
-            </Table>}
-        </CardContent>
-      </Card>
-
-      {/* Test Instructions Section */}
-      <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-4 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-              <AlertCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-            </div>
-            <CardTitle className="text-lg font-semibold">Test Instructions</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-5 space-y-4">
-          <div className="bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-400 p-4 rounded-xl">
-            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">How to Test:</h4>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-blue-700 dark:text-blue-400">
-              <li>Create a WhatsApp group named "Cortek Padel" (or your chosen test name).</li>
-              <li>Add this number to the group: +44 7757 658667.</li>
-              <li>Add [Your Name] to the same group so we can verify delivery.</li>
-              <li>Click "Send test now" to post the latest availability.</li>
-            </ol>
-          </div>
+                            <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                              {schedule.status === 'ACTIVE' ? <Pause className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Play className="h-3.5 w-3.5" strokeWidth={1.5} />}
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately" disabled={schedule.status !== 'ACTIVE'} className="text-primary hover:text-primary/80 h-8 w-8 p-0">
+                              <Send className="h-3.5 w-3.5" strokeWidth={1.5} />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40 bg-popover border border-border shadow-md">
+                                <DropdownMenuItem onClick={() => handleRunNow(schedule)} disabled={schedule.status !== 'ACTIVE'} className="gap-2 text-sm">
+                                  <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
+                                  Schedule +2min
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDuplicate(schedule)} className="gap-2 text-sm">
+                                  <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
+                                  Duplicate
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDeleteScheduleId(schedule.id)} className="gap-2 text-sm text-destructive focus:text-destructive">
+                                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>)}
+                  </TableBody>
+                </Table>}
+            </CardContent>
+          </TabsContent>
           
-          <div className="flex flex-col sm:flex-row gap-3 items-end">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="testGroup" className="text-sm font-medium">Test WhatsApp Group</Label>
-              <Input id="testGroup" value={testGroupName} onChange={e => setTestGroupName(e.target.value)} placeholder="Cloud 29 Paddle" className="h-10 rounded-lg border-border/50 bg-white dark:bg-background" />
-            </div>
-            <Button onClick={handleTestSend} disabled={testingMessage || !testGroupName.trim()} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
-              {testingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              Send test now
-            </Button>
-          </div>
-          
-          {lastTestResult && <div className={`p-3 rounded-xl ${lastTestResult.status === 'success' ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'}`}>
-              <div className="flex items-center gap-2">
-                {lastTestResult.status === 'success' ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                <span className="font-medium">
-                  {lastTestResult.status === 'success' ? 'Success!' : 'Failed'}
-                </span>
+          <TabsContent value="recent-runs" className="mt-0">
+            <CardContent className="pt-5">
+              <div className="flex justify-end mb-4">
+                <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs} className="rounded-lg border-border/50">
+                  {loadingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
+                </Button>
               </div>
-              <p className="text-sm mt-1">{lastTestResult.message}</p>
-            </div>}
-        </CardContent>
-      </Card>
-
-      {/* Run Logs Section */}
-      <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
-        <CardHeader className="pb-4 border-b border-border/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <Eye className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-              </div>
-              <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
-            </div>
-            <Button variant="outline" size="sm" onClick={loadRunLogs} disabled={loadingLogs} className="rounded-lg border-border/50">
-              {loadingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-5">
-          {loadingLogs ? <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div> : runLogs.length === 0 ? <div className="text-center py-8 text-muted-foreground">
-              No runs yet. Create a schedule and wait for it to execute.
-            </div> : <div className="space-y-2">
-              {runLogs.map(log => <div key={log.id} className="flex items-center justify-between p-4 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-xl hover:bg-muted/30 transition-colors">
-                    <div className="flex items-center gap-3">
-                    {log.status === 'OK' ? <CheckCircle className="h-4 w-4 text-emerald-600" /> : log.status === 'SKIPPED' ? <Clock className="h-4 w-4 text-amber-600" /> : <AlertCircle className="h-4 w-4 text-red-600" />}
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {log.scheduled_sends_v2?.name || 'Unknown Schedule'}
+              {loadingLogs ? <div className="text-center py-4 text-muted-foreground">Loading recent runs...</div> : runLogs.length === 0 ? <div className="text-center py-8 text-muted-foreground">
+                  No runs yet. Create a schedule and wait for it to execute.
+                </div> : <div className="space-y-2">
+                  {runLogs.map(log => <div key={log.id} className="flex items-center justify-between p-4 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-xl hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center gap-3">
+                        {log.status === 'OK' ? <CheckCircle className="h-4 w-4 text-emerald-600" /> : log.status === 'SKIPPED' ? <Clock className="h-4 w-4 text-amber-600" /> : <AlertCircle className="h-4 w-4 text-red-600" />}
+                        <div>
+                          <div className="font-medium text-foreground">
+                            {log.scheduled_sends_v2?.name || 'Unknown Schedule'}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(log.sent_at).toLocaleString()} • {log.whatsapp_group}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(log.sent_at).toLocaleString()} • {log.whatsapp_group}
+                      <div className="flex items-center gap-2">
+                        <Badge variant={log.status === 'OK' ? 'default' : log.status === 'SKIPPED' ? 'outline' : 'destructive'} className={log.status === 'OK' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' : log.status === 'SKIPPED' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800' : ''}>
+                          {log.status}
+                        </Badge>
+                        {log.message_excerpt && <div className="text-xs text-muted-foreground max-w-xs truncate">
+                            {log.message_excerpt}
+                          </div>}
+                        <Button variant="ghost" size="sm" onClick={() => handleViewLogDetails(log)} className="h-8 w-8 p-0 hover:bg-muted/50">
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={log.status === 'OK' ? 'default' : log.status === 'SKIPPED' ? 'outline' : 'destructive'} className={log.status === 'OK' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' : log.status === 'SKIPPED' ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800' : ''}>
-                      {log.status}
-                    </Badge>
-                    {log.message_excerpt && <div className="text-xs text-muted-foreground max-w-xs truncate">
-                        {log.message_excerpt}
-                      </div>}
-                    <Button variant="ghost" size="sm" onClick={() => handleViewLogDetails(log)} className="h-8 w-8 p-0 hover:bg-muted/50">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>)}
-            </div>}
-        </CardContent>
+                    </div>)}
+                </div>}
+            </CardContent>
+          </TabsContent>
+        </Tabs>
       </Card>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
