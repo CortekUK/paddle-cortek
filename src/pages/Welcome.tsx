@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Calendar, MessageSquare, Zap } from 'lucide-react';
+import { Check, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserMenu } from '@/components/layout/UserMenu';
 import cortekLogo from '@/assets/cortek-logo.svg';
@@ -10,17 +10,14 @@ export default function Welcome() {
 
   const features = [
     {
-      icon: Calendar,
       title: "Court Availability",
       description: "Automatic notifications when courts become available"
     },
     {
-      icon: MessageSquare,
       title: "Match Alerts",  
       description: "Get notified about partially filled matches to join"
     },
     {
-      icon: Zap,
       title: "Competition Updates",
       description: "Stay updated on competitions and academy sessions"
     }
@@ -53,17 +50,17 @@ export default function Welcome() {
             </CardHeader>
             
             <CardContent className="space-y-6 pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-3 text-left max-w-md mx-auto">
                 {features.map((feature, index) => (
                   <div 
                     key={index} 
-                    className="group flex flex-col items-center text-center p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    className="flex items-start gap-3 px-3 py-2.5 -mx-3 rounded-lg hover:bg-primary/5 transition-colors duration-200 cursor-default"
                   >
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-3 shadow-md shadow-primary/20 group-hover:shadow-lg group-hover:shadow-primary/25 transition-all duration-300">
-                      <feature.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-sm mb-1 text-foreground">{feature.title}</h3>
-                    <p className="text-xs text-muted-foreground/80 leading-relaxed">{feature.description}</p>
+                    <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <p className="text-sm">
+                      <span className="font-medium text-foreground">{feature.title}</span>
+                      <span className="text-muted-foreground"> — {feature.description}</span>
+                    </p>
                   </div>
                 ))}
               </div>
