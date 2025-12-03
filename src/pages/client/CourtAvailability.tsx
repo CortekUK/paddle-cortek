@@ -656,7 +656,7 @@ Book now — don't miss out!`);
               onClick={handleSearch}
               disabled={loading}
               size="sm"
-              className="h-8 gap-2 bg-gradient-to-r from-primary to-purple-500/80 hover:from-primary/90 hover:to-purple-500/70 text-white px-4 sm:ml-auto shadow-sm shadow-primary/15"
+              className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4 sm:ml-auto"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               Search Courts
