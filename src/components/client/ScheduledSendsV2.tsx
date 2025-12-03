@@ -937,7 +937,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           </DialogHeader>
           <div className="space-y-5 pt-2">
             <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm font-medium">Schedule name</Label>
+              <Label htmlFor="name" className="text-sm font-medium">Schedule Name</Label>
               <Input id="name" className="h-11 rounded-lg" value={formData.name} onChange={e => setFormData({
               ...formData,
               name: e.target.value
@@ -954,7 +954,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             
             {/* Target field - only show for AVAILABILITY and PARTIAL_MATCHES, not for COMPETITIONS_ACADEMIES */}
             {category !== 'COMPETITIONS_ACADEMIES' && <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Day to send</Label>
+                <Label className="text-sm font-medium">Day To Send</Label>
                 <RadioGroup value={formData.target} onValueChange={value => setFormData({
               ...formData,
               target: value as 'TODAY' | 'TOMORROW'
@@ -1029,7 +1029,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
 
             {category === 'COMPETITIONS_ACADEMIES' && <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm font-medium">One-off send</Label>
+                  <Label className="text-sm font-medium">One-Off Send</Label>
                   <div className="flex items-center gap-2 mt-2">
                     <Switch id="is_one_off" className="data-[state=checked]:bg-purple-600" checked={!!formData.is_one_off} onCheckedChange={checked => setFormData({
                   ...formData,
@@ -1257,7 +1257,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               ...formData,
               enabled: checked
             })} />
-              <Label htmlFor="enabled" className="text-sm font-medium">Enable schedule</Label>
+              <Label htmlFor="enabled" className="text-sm font-medium">Enable Schedule</Label>
             </div>
             
             <div className="flex gap-3 pt-4 border-t border-border/30">
