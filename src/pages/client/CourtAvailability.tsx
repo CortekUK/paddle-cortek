@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, FileText, Clock, ChevronRight, ChevronDown } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, AlertCircle, Loader2, MessageSquare, Send, Plus, Save, Star, Eye, FileText, Clock, ChevronRight, ChevronDown, Info } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format, addDays, startOfDay, endOfDay, endOfWeek, startOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -737,18 +737,15 @@ Book now — don't miss out!`);
       <Card className={cardClass}>
         <CardHeader className="pb-0">
           <div className="flex items-center gap-3 pb-4 border-b border-border/50">
-            <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
+            <div className="p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
               <Send className="h-4 w-4 text-primary" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">Send a one-time availability update.</p>
-            </div>
+            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-5 space-y-4">
+        <CardContent className="pt-5 space-y-5">
           <div className="flex flex-col sm:flex-row gap-3 items-end">
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 max-w-md space-y-2">
               <Label htmlFor="whatsappGroup" className="text-sm font-medium">WhatsApp Group</Label>
               <Input id="whatsappGroup" value={whatsappGroup} onChange={e => setWhatsappGroup(e.target.value)} placeholder="Group name" className="h-10 rounded-lg border-border/50 bg-white dark:bg-background" />
             </div>
@@ -758,7 +755,8 @@ Book now — don't miss out!`);
             </Button>
           </div>
 
-          {!orgSettings?.wa_group_availability && <div className="text-xs text-muted-foreground">
+          {!orgSettings?.wa_group_availability && <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+              <Info className="h-3.5 w-3.5 flex-shrink-0" />
               Set up WhatsApp groups in Settings to enable sending
             </div>}
 
