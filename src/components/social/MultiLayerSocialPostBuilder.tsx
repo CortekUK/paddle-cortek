@@ -639,7 +639,7 @@ export function MultiLayerSocialPostBuilder({
             <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
               Create your first social media template in the Social Media Library to start building visual posts.
             </p>
-            <Button variant="outline" className="rounded-lg border-border/50 hover:bg-primary/10" onClick={() => navigate('/client/social-media-library')}>
+            <Button className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 rounded-lg" onClick={() => navigate('/client/social-media-library')}>
               <ExternalLink className="h-4 w-4 mr-2" />
               Go to Social Media Library
             </Button>
