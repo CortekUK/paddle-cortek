@@ -147,21 +147,45 @@ export function AuthPage() {
     setShowResetForm(false);
   };
 
+  // Shared background component with floating orbs
+  const PremiumBackground = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-purple-50/40 to-blue-50/30 p-4 relative overflow-hidden">
+      {/* Floating gradient orbs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-primary/5 to-accent/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-md">
+        {children}
+      </div>
+    </div>
+  );
+
+  // Shared glassmorphism card wrapper
+  const GlassCard = ({ children }: { children: React.ReactNode }) => (
+    <div className="p-[1px] rounded-3xl bg-gradient-to-br from-primary/20 via-white to-accent/20 shadow-2xl shadow-primary/10">
+      <Card className="bg-white/95 backdrop-blur-xl rounded-3xl border-0">
+        {children}
+      </Card>
+    </div>
+  );
+
   if (showResetForm) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
-        <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
-          <CardHeader className="space-y-1 text-center pb-2">
-            <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
-            <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
-            <CardDescription>
+      <PremiumBackground>
+        <GlassCard>
+          <CardHeader className="space-y-2 text-center pb-4 pt-8 px-8">
+            <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-4" />
+            <CardTitle className="text-xl font-semibold">Reset Password</CardTitle>
+            <CardDescription className="font-medium">
               Enter your email to receive a password reset link
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleResetPassword} className="space-y-5">
+          <CardContent className="px-8 pb-8">
+            <form onSubmit={handleResetPassword} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="resetEmail">Email address</Label>
+                <Label htmlFor="resetEmail" className="font-medium text-sm">Email address</Label>
                 <Input
                   id="resetEmail"
                   type="email"
@@ -170,14 +194,14 @@ export function AuthPage() {
                   onChange={(e) => setResetEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className="h-11 rounded-lg"
+                  className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                 />
               </div>
               <div className="flex gap-3">
                 <Button 
                   type="button" 
                   variant="outline" 
-                  className="flex-1 h-11 rounded-lg"
+                  className="flex-1 h-12 rounded-xl border-muted-foreground/20 hover:bg-muted/50"
                   onClick={() => setShowResetForm(false)}
                   disabled={loading}
                 >
@@ -185,7 +209,7 @@ export function AuthPage() {
                 </Button>
                 <Button 
                   type="submit" 
-                  className="flex-1 h-11 rounded-lg" 
+                  className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
                   disabled={loading || !resetEmail}
                   variant="hero"
                 >
@@ -194,38 +218,48 @@ export function AuthPage() {
               </div>
             </form>
           </CardContent>
-        </Card>
-      </div>
+        </GlassCard>
+      </PremiumBackground>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 p-4">
-      <Card className="w-full max-w-md shadow-xl rounded-2xl border-0">
-        <CardHeader className="space-y-1 text-center pb-2">
-          <img src={cortekLogo} alt="CORTEK" className="h-10 mx-auto mb-4" />
-          <CardTitle className="text-2xl font-bold">Welcome to CORTEK</CardTitle>
-          <CardDescription>
-            Paddle Club Automation
+    <PremiumBackground>
+      <GlassCard>
+        <CardHeader className="space-y-2 text-center pb-4 pt-8 px-8">
+          <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-4" />
+          <CardTitle className="text-xl font-semibold">Welcome to CORTEK</CardTitle>
+          <CardDescription className="font-medium text-muted-foreground">
+            Padel Club Automation
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-8 pb-8">
           {error && (
-            <Alert variant="destructive" className="mb-4">
+            <Alert variant="destructive" className="mb-6 rounded-xl">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Log in</TabsTrigger>
-              <TabsTrigger value="signup">Create account</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 h-12 rounded-xl bg-muted/50 p-1">
+              <TabsTrigger 
+                value="login" 
+                className="rounded-lg h-10 font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+              >
+                Log in
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup" 
+                className="rounded-lg h-10 font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+              >
+                Create account
+              </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login" className="space-y-5 mt-0">
+            <TabsContent value="login" className="space-y-6 mt-0">
               <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="loginEmail">Email address</Label>
+                  <Label htmlFor="loginEmail" className="font-medium text-sm">Email address</Label>
                   <Input
                     id="loginEmail"
                     type="email"
@@ -234,11 +268,11 @@ export function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-11 rounded-lg"
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="loginPassword">Password</Label>
+                  <Label htmlFor="loginPassword" className="font-medium text-sm">Password</Label>
                   <div className="relative">
                     <Input
                       id="loginPassword"
@@ -248,23 +282,23 @@ export function AuthPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 rounded-lg pr-10"
+                      className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={loading}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-11 rounded-lg" 
+                  className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
                   disabled={loading || !email || !password}
                   variant="hero"
                 >
@@ -275,7 +309,7 @@ export function AuthPage() {
                 <Button 
                   type="button" 
                   variant="link" 
-                  className="text-sm text-muted-foreground hover:text-primary"
+                  className="text-sm text-primary hover:text-primary/80"
                   onClick={() => setShowResetForm(true)}
                   disabled={loading}
                 >
@@ -284,10 +318,10 @@ export function AuthPage() {
               </div>
             </TabsContent>
             
-            <TabsContent value="signup" className="space-y-5 mt-0">
+            <TabsContent value="signup" className="space-y-6 mt-0">
               <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signupEmail">Email address</Label>
+                  <Label htmlFor="signupEmail" className="font-medium text-sm">Email address</Label>
                   <Input
                     id="signupEmail"
                     type="email"
@@ -296,11 +330,11 @@ export function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-11 rounded-lg"
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signupPassword">Password</Label>
+                  <Label htmlFor="signupPassword" className="font-medium text-sm">Password</Label>
                   <div className="relative">
                     <Input
                        id="signupPassword"
@@ -311,22 +345,22 @@ export function AuthPage() {
                        required
                        minLength={8}
                        disabled={loading}
-                       className="h-11 rounded-lg pr-10"
+                       className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                      />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={loading}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm password</Label>
+                  <Label htmlFor="confirmPassword" className="font-medium text-sm">Confirm password</Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
@@ -336,17 +370,17 @@ export function AuthPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 rounded-lg pr-10"
+                      className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       disabled={loading}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
@@ -355,7 +389,7 @@ export function AuthPage() {
                 )}
                 <Button 
                    type="submit" 
-                   className="w-full h-11 rounded-lg" 
+                   className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" 
                    disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8}
                    variant="hero"
                  >
@@ -365,7 +399,7 @@ export function AuthPage() {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
-    </div>
+      </GlassCard>
+    </PremiumBackground>
   );
 }
