@@ -564,29 +564,18 @@ Book now — don't miss out!`);
   // Premium card styling
   const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden";
 
-  // Get greeting based on time
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
-
   return (
     <div className="relative space-y-8">
       {/* Page Header */}
-      <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">
-          {(organization as any)?.club_name || organization?.name || 'Your Club'} / {getGreeting()}
-        </p>
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20">
-            <Calendar className="h-6 w-6 text-primary" strokeWidth={1.5} />
+      <div className="space-y-1">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 dark:from-primary/20 dark:to-primary/10 ring-1 ring-primary/10">
+            <Calendar className="h-7 w-7 text-primary" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Court Availability</h1>
-            <p className="text-muted-foreground">
-              Search for available courts and send WhatsApp notifications.
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Court Availability</h1>
+            <p className="text-muted-foreground mt-1">
+              Find open courts and notify your members instantly.
             </p>
           </div>
         </div>
