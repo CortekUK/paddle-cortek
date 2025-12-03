@@ -9,7 +9,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock } from 'lucide-react';
+import { Plus, Edit2, Pause, Play, Copy, Trash2, CheckCircle, AlertCircle, Send, Loader2, Eye, Clock, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 
 // Supabase URL and key for direct fetch calls
@@ -795,25 +796,37 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <TableCell>{getStatusBadge(schedule.status)}</TableCell>
                     <TableCell>{formatNextRunInClubTz(schedule.next_run_at_utc, schedule.tz)}</TableCell>
                     <TableCell>
-                      <div className="flex gap-0.5">
+                      <div className="flex items-center gap-0.5">
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
                           <Edit2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
                           {schedule.status === 'ACTIVE' ? <Pause className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Play className="h-3.5 w-3.5" strokeWidth={1.5} />}
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleRunNow(schedule)} title="Schedule for 2 minutes later" disabled={schedule.status !== 'ACTIVE'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
-                          <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately (force run)" disabled={schedule.status !== 'ACTIVE'} className="text-primary hover:text-primary/80 h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately" disabled={schedule.status !== 'ACTIVE'} className="text-primary hover:text-primary/80 h-8 w-8 p-0">
                           <Send className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDuplicate(schedule)} title="Duplicate schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
-                          <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteScheduleId(schedule.id)} title="Delete schedule" className="text-muted-foreground hover:text-destructive h-8 w-8 p-0">
-                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                              <MoreHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40 bg-popover border border-border shadow-md">
+                            <DropdownMenuItem onClick={() => handleRunNow(schedule)} disabled={schedule.status !== 'ACTIVE'} className="gap-2 text-sm">
+                              <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
+                              Schedule +2min
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(schedule)} className="gap-2 text-sm">
+                              <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDeleteScheduleId(schedule.id)} className="gap-2 text-sm text-destructive focus:text-destructive">
+                              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>)}
