@@ -625,8 +625,8 @@ Book now — don't miss out!`);
         <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
-                <Search className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              <div className="p-2 rounded-lg bg-accent/10 dark:bg-accent/20">
+                <Search className="h-4 w-4 text-accent" strokeWidth={1.5} />
               </div>
               <h3 className="text-lg font-semibold text-foreground whitespace-nowrap">Find Availability</h3>
             </div>
