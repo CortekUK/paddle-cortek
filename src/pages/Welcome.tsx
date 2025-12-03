@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Zap, MessageSquare, Calendar } from 'lucide-react';
+import { CheckCircle, Calendar, MessageSquare, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserMenu } from '@/components/layout/UserMenu';
+import cortekLogo from '@/assets/cortek-logo.svg';
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -26,23 +27,19 @@ export default function Welcome() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30">
       {/* Header with user menu */}
       <div className="flex justify-end p-4">
         <UserMenu />
       </div>
       
       <div className="flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl text-center">
+        <Card className="w-full max-w-2xl text-center shadow-xl rounded-2xl border-0">
           <CardHeader>
-            <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center">
-                <Zap className="h-8 w-8 text-primary-foreground" />
-              </div>
-            </div>
-            <CardTitle className="text-3xl font-bold">Welcome to CORTEK</CardTitle>
+            <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-6" />
+            <CardTitle className="text-3xl font-bold">Paddle Club Automation</CardTitle>
             <CardDescription className="text-lg">
-              Paddle Club Automation - Start your free 14-day trial
+              Start your free 14-day trial
             </CardDescription>
           </CardHeader>
           
@@ -50,7 +47,9 @@ export default function Welcome() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               {features.map((feature, index) => (
                 <div key={index} className="flex flex-col items-center text-center p-4">
-                  <feature.icon className="h-8 w-8 text-primary mb-2" />
+                  <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+                    <feature.icon className="h-6 w-6 text-accent" />
+                  </div>
                   <h3 className="font-semibold text-sm mb-1">{feature.title}</h3>
                   <p className="text-xs text-muted-foreground">{feature.description}</p>
                 </div>
@@ -67,6 +66,7 @@ export default function Welcome() {
                 onClick={() => navigate('/auth')}
                 className="w-full"
                 size="lg"
+                variant="hero"
               >
                 Start Free Trial
               </Button>
