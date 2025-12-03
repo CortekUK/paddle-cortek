@@ -743,7 +743,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           <div className="flex items-center justify-between pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                <Clock className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </div>
               <div>
                 <CardTitle className="text-lg font-semibold">Scheduled Sends</CardTitle>
@@ -754,8 +754,8 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               resetForm();
               setEditingSchedule(null);
               setModalOpen(true);
-            }} size="sm" className="bg-primary hover:bg-primary/90">
-              <Plus className="h-4 w-4 mr-1" />
+            }} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20">
+              <Plus className="h-4 w-4 mr-1" strokeWidth={1.5} />
               New Schedule
             </Button>
           </div>
@@ -766,14 +766,14 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
             </div> : <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Time (Club TZ)</TableHead>
-                  <TableHead>Target</TableHead>
-                  <TableHead>Group</TableHead>
-                  <TableHead>Template</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Next run</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Name</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Time</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Target</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Group</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Template</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Status</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Next run</TableHead>
+                  <TableHead className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -795,24 +795,24 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                     <TableCell>{getStatusBadge(schedule.status)}</TableCell>
                     <TableCell>{formatNextRunInClubTz(schedule.next_run_at_utc, schedule.tz)}</TableCell>
                     <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule">
-                          <Edit2 className="h-4 w-4" />
+                      <div className="flex gap-0.5">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(schedule)} title="Edit schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                          <Edit2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'}>
-                          {schedule.status === 'ACTIVE' ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                        <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(schedule)} title={schedule.status === 'ACTIVE' ? 'Pause schedule' : 'Resume schedule'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                          {schedule.status === 'ACTIVE' ? <Pause className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Play className="h-3.5 w-3.5" strokeWidth={1.5} />}
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleRunNow(schedule)} title="Schedule for 2 minutes later" disabled={schedule.status !== 'ACTIVE'}>
-                          <Clock className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleRunNow(schedule)} title="Schedule for 2 minutes later" disabled={schedule.status !== 'ACTIVE'} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                          <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately (force run)" disabled={schedule.status !== 'ACTIVE'} className="text-blue-600 hover:text-blue-700">
-                          <Send className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleTriggerNow(schedule)} title="Trigger immediately (force run)" disabled={schedule.status !== 'ACTIVE'} className="text-primary hover:text-primary/80 h-8 w-8 p-0">
+                          <Send className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDuplicate(schedule)} title="Duplicate schedule">
-                          <Copy className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => handleDuplicate(schedule)} title="Duplicate schedule" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0">
+                          <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteScheduleId(schedule.id)} title="Delete schedule">
-                          <Trash2 className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteScheduleId(schedule.id)} title="Delete schedule" className="text-muted-foreground hover:text-destructive h-8 w-8 p-0">
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
                       </div>
                     </TableCell>
@@ -877,7 +877,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
           <div className="flex items-center justify-between pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                <Eye className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               </div>
               <div>
                 <CardTitle className="text-lg font-semibold">Recent Runs</CardTitle>
