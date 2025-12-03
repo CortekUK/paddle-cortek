@@ -756,16 +756,16 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
   return <>
       {/* Test Connection Section */}
       <Collapsible open={testSectionOpen} onOpenChange={setTestSectionOpen}>
-        <Card className="bg-blue-50/50 dark:bg-blue-950/20 backdrop-blur-sm rounded-2xl shadow-md border border-blue-200/50 dark:border-blue-800/30 mb-6">
+        <Card className="bg-purple-50/50 dark:bg-purple-950/20 backdrop-blur-sm rounded-2xl shadow-md border border-purple-200/50 dark:border-purple-800/30 mb-6">
           <CollapsibleTrigger asChild>
-            <CardHeader className="pb-3 cursor-pointer hover:bg-blue-100/30 dark:hover:bg-blue-900/20 transition-colors rounded-t-2xl">
+            <CardHeader className="pb-3 cursor-pointer hover:bg-purple-100/30 dark:hover:bg-purple-900/20 transition-colors rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-100/70 dark:bg-blue-900/30">
+                  <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                     {lastTestResult?.status === 'success' ? (
                       <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
                     ) : (
-                      <Link2 className="h-4 w-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
+                      <Link2 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
                     )}
                   </div>
                   <div>
@@ -775,9 +775,9 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
                         <PopoverTrigger asChild>
                           <button 
                             onClick={(e) => e.stopPropagation()} 
-                            className="p-1 rounded-full hover:bg-blue-200/50 dark:hover:bg-blue-800/30 transition-colors"
+                            className="p-1 rounded-full hover:bg-purple-200/50 dark:hover:bg-purple-800/30 transition-colors"
                           >
-                            <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                            <Info className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-96 text-sm" align="start">
