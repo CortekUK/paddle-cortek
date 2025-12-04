@@ -154,7 +154,7 @@ export default function Setup() {
       </div>
 
       {/* Form Card */}
-      <div className="max-w-2xl">
+      <div className="max-w-2xl mx-auto">
         <Card className={cardClass}>
           <CardHeader className="text-left">
             <div className="flex items-start gap-4">
