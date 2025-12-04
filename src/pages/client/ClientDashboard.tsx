@@ -80,7 +80,7 @@ export default function ClientDashboard() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
         <div className="relative text-left">
           <h1 className="text-3xl font-bold text-foreground tracking-tight">
-            Welcome back{organization?.club_name ? `, ${organization.club_name}` : ''}
+            Welcome Back{organization?.club_name ? `, ${organization.club_name}` : ''}
           </h1>
           <p className="text-muted-foreground mt-1.5">
             Overview of your automation platform
