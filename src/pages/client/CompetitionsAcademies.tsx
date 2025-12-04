@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info } from 'lucide-react';
+import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info, Save } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format, addDays, startOfDay, endOfDay, endOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -763,115 +763,116 @@ Register now - spaces are limited!`);
 
       {/* Message Builder */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-              </div>
-              <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
+            <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-5 space-y-5">
+          {/* Template Controls Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            {/* Left: Template selector */}
+            <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+              <SelectTrigger className="w-52 h-9 rounded-lg text-sm">
+                <SelectValue placeholder="Select template..." />
+              </SelectTrigger>
+              <SelectContent>
+                {templates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    <div className="flex items-center gap-2">
+                      {template.name}
+                      {template.is_default && <Star className="h-3 w-3 text-yellow-500" />}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Right: Name input + Save dropdown + New button */}
             <div className="flex items-center gap-2">
-              <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-                <SelectTrigger className="w-52 h-9 rounded-lg text-sm">
-                  <SelectValue placeholder="Select template..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      <div className="flex items-center gap-2">
-                        {template.name}
-                        {template.is_default && <Star className="h-3 w-3 text-yellow-500" />}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
                 placeholder="Template name"
                 className="w-40 h-9 rounded-lg text-sm"
               />
+              <div className="h-5 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 px-3 rounded-lg">
+                  <Button variant="ghost" size="sm" className="h-9 px-3 rounded-lg">
+                    <Save className="h-4 w-4 mr-1.5" />
                     Save <ChevronDown className="h-3 w-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleSaveTemplate}>
-                    Save
+                    <Save className="h-4 w-4 mr-2" />
+                    Update current
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSaveAsTemplate}>
-                    Save as new
+                    <Plus className="h-4 w-4 mr-2" />
+                    Save as new...
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId}>
+                    <Star className="h-4 w-4 mr-2" />
                     Set as default
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant="outline" size="sm" onClick={handleNewTemplate} className="h-9 px-3 rounded-lg">
+              <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-9 px-3 rounded-lg">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+
+          {/* Gradient Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+
           {/* Two-column layout for editor and preview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Editor Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground tracking-wide">Template Editor</Label>
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
               <Textarea
                 ref={textareaRef}
                 value={templateContent}
                 onChange={(e) => setTemplateContent(e.target.value)}
                 placeholder="Enter your message template..."
-                rows={10}
-                className="rounded-lg resize-none font-mono text-sm"
+                rows={8}
+                className="rounded-lg resize-none font-mono text-sm min-h-[180px]"
               />
               
               {/* Token Chips */}
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => insertToken('{{summary}}')}
-                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
-                >
-                  summary
-                </button>
-                <button
-                  onClick={() => insertToken('{{date_display_short}}')}
-                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
-                >
-                  date
-                </button>
-                <button
-                  onClick={() => insertToken('{{club_name}}')}
-                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
-                >
-                  club
-                </button>
-                <button
-                  onClick={() => insertToken('{{sport}}')}
-                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
-                >
-                  sport
-                </button>
-                <button
-                  onClick={() => insertToken('{{count_slots}}')}
-                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
-                >
-                  count
-                </button>
-                <EmojiPicker onEmojiSelect={insertEmoji} />
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { token: '{{summary}}', label: 'summary' },
+                    { token: '{{date_display_short}}', label: 'date' },
+                    { token: '{{club_name}}', label: 'club' },
+                    { token: '{{sport}}', label: 'sport' },
+                    { token: '{{count_slots}}', label: 'count' }
+                  ].map(({ token, label }) => (
+                    <button
+                      key={token}
+                      onClick={() => insertToken(token)}
+                      className="text-xs rounded-full px-2.5 py-1 bg-muted/50 hover:bg-primary/10 hover:text-primary transition-colors"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                  <EmojiPicker onEmojiSelect={insertEmoji} />
+                </div>
               </div>
             </div>
 
             {/* Preview Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground tracking-wide">Live Preview</Label>
-              <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[260px]">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+              <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[180px]">
                 <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
                   {renderTemplate(templateContent) || 'Preview will appear here...'}
                 </pre>
@@ -881,28 +882,17 @@ Register now - spaces are limited!`);
         </CardContent>
 
         {/* Send Message Footer */}
-        <div className="px-6 py-4 bg-muted/30 dark:bg-muted/20 border-t border-border/40">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex items-center gap-2 flex-1">
-              <Label htmlFor="whatsappGroupFooter" className="text-sm font-medium whitespace-nowrap">WhatsApp Group</Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <p className="text-xs">Enter the exact name of your WhatsApp group. Make sure CORTEK has been added to the group.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <Input
-                id="whatsappGroupFooter"
-                value={whatsappGroup}
-                onChange={(e) => setWhatsappGroup(e.target.value)}
-                placeholder="Enter group name"
-                className="flex-1 h-9 rounded-lg text-sm"
-              />
-            </div>
+        <div className="-mx-6 px-6 py-4 rounded-b-lg bg-muted/30 dark:bg-muted/20 border-t border-border/40">
+          <div className="flex items-center gap-4">
+            <Label htmlFor="whatsappGroupFooter" className="text-sm font-medium whitespace-nowrap">WhatsApp Group:</Label>
+            <Input
+              id="whatsappGroupFooter"
+              value={whatsappGroup}
+              onChange={(e) => setWhatsappGroup(e.target.value)}
+              placeholder="Enter group name"
+              className="flex-1 h-9 rounded-lg text-sm"
+            />
+            <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">Must match exactly</span>
             <Button 
               onClick={handleSendMessage} 
               disabled={sendingMessage || !summaryText}
