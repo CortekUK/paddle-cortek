@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { Settings } from 'lucide-react';
 
 const timezones = [
   'Europe/London',
@@ -25,6 +26,8 @@ interface Location {
   name: string;
   timezone: string;
 }
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 export default function Setup() {
   const { profile, updateProfile } = useAuth();
@@ -138,66 +141,81 @@ export default function Setup() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Location Setup</h1>
-        <p className="text-muted-foreground">
-          Configure your paddle club location details.
-        </p>
+    <div className="space-y-6">
+      {/* Gradient Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative">
+          <h1 className="text-3xl font-bold">Location Setup</h1>
+          <p className="text-muted-foreground mt-1">
+            Configure your paddle club location details.
+          </p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{location ? 'Update Location' : 'Create Location'}</CardTitle>
-          <CardDescription>
-            Set up your paddle club details. Advanced settings like emulator URL are configured automatically.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">Club Name *</Label>
-              <Input
-                id="name"
-                placeholder="e.g., Pure Padel Manchester"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                required
-                disabled={loading}
-              />
+      {/* Form Card */}
+      <div className="max-w-2xl">
+        <Card className={cardClass}>
+          <CardHeader className="text-left">
+            <div className="flex items-start gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Settings className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <div className="space-y-1">
+                <CardTitle>{location ? 'Update Location' : 'Create Location'}</CardTitle>
+                <CardDescription>
+                  Set up your paddle club details. Advanced settings like emulator URL are configured automatically.
+                </CardDescription>
+              </div>
             </div>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6 text-left">
+              <div className="space-y-2">
+                <Label htmlFor="name">Club Name *</Label>
+                <Input
+                  id="name"
+                  placeholder="e.g., Pure Padel Manchester"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  disabled={loading}
+                  className="h-11 rounded-lg"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
-              <Select 
-                value={formData.timezone} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, timezone: value }))}
-                disabled={loading}
+              <div className="space-y-2">
+                <Label htmlFor="timezone">Timezone</Label>
+                <Select 
+                  value={formData.timezone} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, timezone: value }))}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="h-11 rounded-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timezones.map((tz) => (
+                      <SelectItem key={tz} value={tz}>
+                        {tz}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button 
+                type="submit" 
+                disabled={loading || !formData.name.trim()}
+                variant="hero"
+                className="w-full rounded-xl"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timezones.map((tz) => (
-                    <SelectItem key={tz} value={tz}>
-                      {tz}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button 
-              type="submit" 
-              disabled={loading || !formData.name.trim()}
-              variant="hero"
-              className="w-full"
-            >
-              {loading ? 'Saving...' : (location ? 'Update Location' : 'Create Location')}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+                {loading ? 'Saving...' : (location ? 'Update Location' : 'Create Location')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
