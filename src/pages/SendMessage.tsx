@@ -119,7 +119,7 @@ export default function SendMessage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
         <div className="relative text-left">
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Send Message</h1>
-          <p className="text-muted-foreground mt-1.5">Test message delivery to WhatsApp groups in the sandbox environment.</p>
+          <p className="text-muted-foreground mt-1.5">Send a message to WhatsApp groups.</p>
         </div>
       </div>
 
