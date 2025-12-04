@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -55,9 +56,12 @@ export default function CompetitionsAcademies() {
   const [dateFrom, setDateFrom] = useState(defaultFromDate);
   const [dateTo, setDateTo] = useState(defaultToDate);
 
-  // Selected tournament/event state
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  // Selected events state (multiple selection)
+  const [selectedEventIds, setSelectedEventIds] = useState<Set<string>>(new Set());
   const [eventsList, setEventsList] = useState<any[]>([]);
+
+  // Helper to get event ID
+  const getEventId = (event: any) => event.tournament_id || event.id || event.tournamentId || '';
 
   // Use admin tournament summary with Playtomic offset
   const generateTournamentSummaryWithAdmin = (tournament: any) => {
@@ -66,30 +70,31 @@ export default function CompetitionsAcademies() {
 
   // Use admin logic for competitions & academies summary
   const generateCompetitionsSummary = (
-    tournamentsData: any[],
-    lessonsData: any[],
-    classesData: any[],
-    eventOverride: any = selectedEvent
+    allEvents: any[],
+    selectedIds?: Set<string>
   ) => {
-    // Combine all events
-    const allEvents = [
-      ...tournamentsData.map(event => ({ ...event, type: 'tournament' })),
-      ...lessonsData.map(event => ({ ...event, type: 'lesson' })),
-      ...classesData.map(event => ({ ...event, type: 'class' }))
-    ];
-
     if (allEvents.length === 0) {
       return 'No competitions or academies available';
     }
 
-    // If specific event is selected, show only that one
-    if (eventOverride) {
-      return generateTournamentSummaryWithAdmin(eventOverride);
+    // If specific events are selected, filter to only those
+    const eventsToSummarize = selectedIds && selectedIds.size > 0
+      ? allEvents.filter(event => selectedIds.has(getEventId(event)))
+      : allEvents;
+
+    if (eventsToSummarize.length === 0) {
+      return 'No events selected';
     }
 
-    // Otherwise show all events with headers
-    const eventSummaries = allEvents.map(event => generateTournamentSummaryWithAdmin(event));
+    const eventSummaries = eventsToSummarize.map(event => generateTournamentSummaryWithAdmin(event));
     return eventSummaries.join('\n\n---\n\n');
+  };
+
+  // Update summary when selection changes
+  const updateSummaryFromSelection = (newSelectedIds: Set<string>) => {
+    const newSummary = generateCompetitionsSummary(eventsList, newSelectedIds);
+    setSummaryText(newSummary);
+    setCountSlots(newSelectedIds.size > 0 ? newSelectedIds.size : eventsList.length);
   };
 
   // Generate friendly date display 
@@ -244,8 +249,9 @@ Register now - spaces are limited!`);
 
       setSearchResults(allResults);
       setEventsList(allResults);
+      setSelectedEventIds(new Set()); // Reset selection on new search
       setCountSlots(allResults.length);
-      setSummaryText(generateCompetitionsSummary(tournamentsData, lessonsData, classesData, selectedEvent));
+      setSummaryText(generateCompetitionsSummary(allResults));
 
       // Generate friendly date display
       setDateDisplayShort(toShortDate(fromDate, toDate));
@@ -307,7 +313,11 @@ Register now - spaces are limited!`);
       // Auto-load saved configuration
       if (template.linked_event_id) {
         const found = eventsList.find(e => (e.tournament_id || e.id) === template.linked_event_id);
-        if (found) setSelectedEvent(found);
+        if (found) {
+          const newIds = new Set([getEventId(found)]);
+          setSelectedEventIds(newIds);
+          updateSummaryFromSelection(newIds);
+        }
       }
       if (template.whatsapp_group) setWhatsappGroup(template.whatsapp_group);
     }
@@ -337,7 +347,7 @@ Register now - spaces are limited!`);
         content: templateContent,
         module: 'COMPETITIONS_ACADEMIES',
         summary_variant: null,
-        linked_event_id: selectedEvent ? (selectedEvent.tournament_id || selectedEvent.id || null) : null,
+        linked_event_id: selectedEventIds.size === 1 ? Array.from(selectedEventIds)[0] : null,
         whatsapp_group: whatsappGroup
       };
 
@@ -536,7 +546,7 @@ Register now - spaces are limited!`);
           content: templateContent,
           module: 'COMPETITIONS_ACADEMIES',
           summary_variant: null,
-          linked_event_id: selectedEvent ? (selectedEvent.tournament_id || selectedEvent.id || null) : null,
+          linked_event_id: selectedEventIds.size === 1 ? Array.from(selectedEventIds)[0] : null,
           whatsapp_group: whatsappGroup
         })
         .select()
@@ -668,38 +678,34 @@ Register now - spaces are limited!`);
                       const name = event.tournament_name || event.name || event.title || 'Untitled';
                       const dateTime = formatTournamentDateTime(event, 60);
                       const capacity = getPlayerCapacity(event);
-                      const isSelected = selectedEvent === event;
+                      const eventId = getEventId(event);
+                      const isSelected = selectedEventIds.has(eventId);
                       
                       return (
                         <div
                           key={index}
-                          className={`p-2 cursor-pointer rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
-                          onClick={() => {
-                            const willBeSelected = selectedEvent !== event;
-                            const newSelectedEvent = willBeSelected ? event : null;
-                            setSelectedEvent(newSelectedEvent);
-                            
-                            if (newSelectedEvent) {
-                              const newSummary = generateTournamentSummaryWithAdmin(newSelectedEvent);
-                              setSummaryText(newSummary);
-                              setCountSlots(1);
-                            } else {
-                              const newSummary = generateCompetitionsSummary(
-                                eventsList.filter(e => e.type === 'tournament'),
-                                eventsList.filter(e => e.type === 'lesson'),
-                                eventsList.filter(e => e.type === 'class'),
-                                null
-                              );
-                              setSummaryText(newSummary);
-                              setCountSlots(eventsList.length);
-                            }
-                          }}
+                          className={`p-2 rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              id={`event-${index}`}
+                              checked={isSelected}
+                              onCheckedChange={(checked) => {
+                                const newSelectedIds = new Set(selectedEventIds);
+                                if (checked) {
+                                  newSelectedIds.add(eventId);
+                                } else {
+                                  newSelectedIds.delete(eventId);
+                                }
+                                setSelectedEventIds(newSelectedIds);
+                                updateSummaryFromSelection(newSelectedIds);
+                              }}
+                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            />
+                            <label htmlFor={`event-${index}`} className="flex-1 cursor-pointer">
                               <div className="text-sm font-medium">{name}</div>
                               <div className="text-xs text-muted-foreground">{dateTime.date} at {dateTime.time}</div>
-                            </div>
+                            </label>
                             {capacity.display && (
                               <Badge 
                                 variant={capacity.full ? "default" : "secondary"}
@@ -934,12 +940,8 @@ Register now - spaces are limited!`);
         source="COMPETITIONS"
         pageData={{
           category: 'COMPETITIONS',
-          data: selectedEvent
-            ? (searchResults || []).filter(event => {
-                const eventId = event.tournament_id || event.id || event.tournamentId;
-                const selectedId = selectedEvent.tournament_id || selectedEvent.id || selectedEvent.tournamentId;
-                return eventId === selectedId || String(eventId) === String(selectedId);
-              })
+          data: selectedEventIds.size > 0
+            ? (searchResults || []).filter(event => selectedEventIds.has(getEventId(event)))
             : (searchResults || []),
           variant: 'basic',
           target: 'TODAY',
@@ -948,8 +950,8 @@ Register now - spaces are limited!`);
           clubName: (organization as any)?.club_name || organization?.name || 'Club',
           dateDisplayShort: dateDisplayShort || '',
           sport: 'Padel',
-          countSlots: selectedEvent ? 1 : countSlots, // Use 1 if event is selected, otherwise total count
-          eventId: selectedEvent ? (selectedEvent.tournament_id || selectedEvent.id || null) : null,
+          countSlots: selectedEventIds.size > 0 ? selectedEventIds.size : countSlots,
+          eventId: selectedEventIds.size === 1 ? Array.from(selectedEventIds)[0] : null,
           selectedVariant: 'basic'
         }}
         summaryVariants={['basic']}
