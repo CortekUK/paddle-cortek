@@ -190,7 +190,7 @@ export function AuthPage() {
           <CardContent className="px-8 pb-8">
             <form onSubmit={handleResetPassword} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="resetEmail" className="font-medium text-sm">Email address</Label>
+                <Label htmlFor="resetEmail" className="font-medium text-sm">Email Address</Label>
                 <Input id="resetEmail" type="email" placeholder="your@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
               </div>
               <div className="flex gap-3">
@@ -229,7 +229,7 @@ export function AuthPage() {
             <TabsContent value="login" className="space-y-6 mt-0">
               <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="loginEmail" className="font-medium text-sm">Email address</Label>
+                  <Label htmlFor="loginEmail" className="font-medium text-sm">Email Address</Label>
                   <Input id="loginEmail" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
                 </div>
                 <div className="space-y-2">
@@ -255,7 +255,7 @@ export function AuthPage() {
             <TabsContent value="signup" className="space-y-6 mt-0">
               <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signupEmail" className="font-medium text-sm">Email address</Label>
+                  <Label htmlFor="signupEmail" className="font-medium text-sm">Email Address</Label>
                   <Input id="signupEmail" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} className="h-12 rounded-xl border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
                 </div>
                 <div className="space-y-2">
@@ -268,7 +268,7 @@ export function AuthPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="font-medium text-sm">Confirm password</Label>
+                  <Label htmlFor="confirmPassword" className="font-medium text-sm">Confirm Password</Label>
                   <div className="relative">
                     <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={loading} className="h-12 rounded-xl pr-10 border-muted-foreground/20 focus:border-primary placeholder:text-muted-foreground/60" />
                     <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={loading}>
