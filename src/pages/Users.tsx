@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -22,12 +22,12 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { UserPlus, Mail } from 'lucide-react';
+import { UserPlus, Mail, Users } from 'lucide-react';
 import type { AppRole } from '@/hooks/useUserRole';
 
 interface UserWithRole {
   id: string;
-  user_id: string; // Add this property
+  user_id: string;
   email: string;
   full_name?: string;
   location_id?: string;
@@ -35,7 +35,9 @@ interface UserWithRole {
   roles: AppRole[];
 }
 
-export default function Users() {
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
+
+export default function UsersPage() {
   const { user } = useAuth();
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,14 +88,12 @@ export default function Users() {
 
     setInviting(true);
     try {
-      // Use Supabase auth to invite user
       const { error } = await supabase.auth.admin.inviteUserByEmail(inviteEmail, {
         redirectTo: `${window.location.origin}/dashboard`
       });
 
       if (error) throw error;
 
-      // Log the admin action
       await supabase.from('admin_action_logs').insert({
         actor_user_id: user!.id,
         action: 'invite_user',
@@ -106,7 +106,6 @@ export default function Users() {
       });
 
       setInviteEmail('');
-      // Refresh users list after a short delay
       setTimeout(fetchUsers, 1000);
     } catch (error: any) {
       toast({
@@ -123,14 +122,12 @@ export default function Users() {
     try {
       if (currentRoles.includes(newRole)) return;
 
-      // Add the new role
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
 
       if (error) throw error;
 
-      // Log the admin action
       await supabase.from('admin_action_logs').insert({
         actor_user_id: user!.id,
         action: 'promote_user',
@@ -163,7 +160,6 @@ export default function Users() {
 
       if (error) throw error;
 
-      // Log the admin action
       await supabase.from('admin_action_logs').insert({
         actor_user_id: user!.id,
         action: 'demote_user',
@@ -198,120 +194,126 @@ export default function Users() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <p className="text-muted-foreground">
-          Manage user roles and permissions.
-        </p>
+    <div className="space-y-8">
+      {/* Gradient Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold">User Management</h1>
+          <p className="text-muted-foreground mt-1">Manage user roles and permissions.</p>
+        </div>
       </div>
 
-      {/* Invite User Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Invite New User
-          </CardTitle>
-          <CardDescription>
-            Send a magic link invitation to a new user.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleInviteUser} className="flex gap-4">
-            <div className="flex-1">
-              <Input
-                type="email"
-                placeholder="user@example.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                disabled={inviting}
-              />
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Invite User Card */}
+        <Card className={cardClass}>
+          <CardHeader className="text-left">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <UserPlus className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <CardTitle>Invite New User</CardTitle>
             </div>
-            <Button type="submit" disabled={inviting || !inviteEmail.trim()}>
-              <Mail className="h-4 w-4 mr-2" />
-              {inviting ? 'Sending...' : 'Send Invitation'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleInviteUser} className="flex gap-4">
+              <div className="flex-1">
+                <Input
+                  type="email"
+                  placeholder="user@example.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  disabled={inviting}
+                  className="h-11 rounded-lg"
+                />
+              </div>
+              <Button type="submit" disabled={inviting || !inviteEmail.trim()} className="rounded-xl">
+                <Mail className="h-4 w-4 mr-2" />
+                {inviting ? 'Sending...' : 'Send Invitation'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Users ({users.length})</CardTitle>
-          <CardDescription>
-            Manage existing users and their roles.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Current Roles</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead>Joined</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((userData) => (
-                <TableRow key={userData.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{userData.full_name || 'Unknown'}</p>
-                      <p className="text-sm text-muted-foreground">{userData.email}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {userData.roles.length > 0 ? userData.roles.map(role => (
-                        <Badge 
-                          key={role} 
-                          variant={role === 'admin' ? 'destructive' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {role}
-                          {role !== 'viewer' && (
-                            <button
-                              onClick={() => handleRemoveRole(userData.user_id, role)}
-                              className="ml-1 text-xs opacity-70 hover:opacity-100"
-                            >
-                              ×
-                            </button>
-                          )}
-                        </Badge>
-                      )) : (
-                        <Badge variant="outline">No roles</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select 
-                      onValueChange={(role: AppRole) => 
-                        handleRoleChange(userData.user_id, role, userData.roles)
-                      }
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Add role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                        <SelectItem value="editor">Editor</SelectItem>
-                        <SelectItem value="location_admin">Location Admin</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(userData.created_at).toLocaleDateString()}
-                  </TableCell>
+        {/* Users Table */}
+        <Card className={cardClass}>
+          <CardHeader className="text-left">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <CardTitle>Users ({users.length})</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Current Roles</TableHead>
+                  <TableHead>Actions</TableHead>
+                  <TableHead>Joined</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {users.map((userData) => (
+                  <TableRow key={userData.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{userData.full_name || 'Unknown'}</p>
+                        <p className="text-sm text-muted-foreground">{userData.email}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 flex-wrap">
+                        {userData.roles.length > 0 ? userData.roles.map(role => (
+                          <Badge 
+                            key={role} 
+                            variant={role === 'admin' ? 'destructive' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {role}
+                            {role !== 'viewer' && (
+                              <button
+                                onClick={() => handleRemoveRole(userData.user_id, role)}
+                                className="ml-1 text-xs opacity-70 hover:opacity-100"
+                              >
+                                ×
+                              </button>
+                            )}
+                          </Badge>
+                        )) : (
+                          <Badge variant="outline">No roles</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Select 
+                        onValueChange={(role: AppRole) => 
+                          handleRoleChange(userData.user_id, role, userData.roles)
+                        }
+                      >
+                        <SelectTrigger className="w-32 h-11 rounded-lg">
+                          <SelectValue placeholder="Add role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="viewer">Viewer</SelectItem>
+                          <SelectItem value="editor">Editor</SelectItem>
+                          <SelectItem value="location_admin">Location Admin</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(userData.created_at).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
