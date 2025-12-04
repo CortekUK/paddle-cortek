@@ -12,7 +12,6 @@ import {
   Users,
   CreditCard,
   TestTube,
-  ArrowLeft,
   X,
   ChevronLeft,
   ChevronRight
@@ -208,32 +207,6 @@ export function Sidebar({ collapsed, setCollapsed, sidebarOpen, setSidebarOpen }
           </Button>
         </div>
 
-        {/* Footer */}
-        <div className={cn("p-2 border-t border-border", collapsed && "px-1")}>
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to="/dashboard"
-                  className="flex items-center justify-center py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="font-medium">
-                Back to Client Portal
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-              Back to Client Portal
-            </Link>
-          )}
-        </div>
       </aside>
     </TooltipProvider>
   );
