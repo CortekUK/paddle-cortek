@@ -125,16 +125,13 @@ export default function SendMessage() {
 
       <div className="max-w-2xl mx-auto">
         <Card className={cardClass}>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+          <CardHeader className="text-left">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <MessageSquare className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
-              <CardTitle className="text-lg">Compose Message</CardTitle>
+              <CardTitle>Compose Message</CardTitle>
             </div>
-            <CardDescription className="ml-11">
-              Write your message and select which WhatsApp groups to send it to.
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSend} className="space-y-5">
