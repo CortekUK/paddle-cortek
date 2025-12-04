@@ -4,24 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { 
   Save, 
   Type, 
   Image as ImageIcon, 
   Square, 
-  QrCode, 
-  Layers,
-  Move,
-  RotateCcw,
-  Undo,
-  Redo,
-  Upload,
-  Eye,
-  Lock,
-  Unlock
+  Upload
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
@@ -483,185 +472,157 @@ const TemplateDesigner: React.FC<TemplateDesignerProps> = ({ template, onSave, o
             </div>
           </div>
 
-          <Tabs defaultValue="layers" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="layers">Layers</TabsTrigger>
-              <TabsTrigger value="properties">Properties</TabsTrigger>
-            </TabsList>
+          {/* Add Layer Buttons */}
+          <div className="p-4 border-b">
+            <Label className="text-sm font-medium">Add Layer</Label>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => addLayer('text')}
+                className="flex items-center gap-1"
+              >
+                <Type className="h-3 w-3" />
+                Text
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => addLayer('image')}
+                className="flex items-center gap-1"
+              >
+                <ImageIcon className="h-3 w-3" />
+                Image
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => addLayer('shape')}
+                className="flex items-center gap-1"
+              >
+                <Square className="h-3 w-3" />
+                Shape
+              </Button>
+            </div>
+          </div>
 
-            <TabsContent value="layers" className="p-4 space-y-4">
-              <div>
-                <Label className="text-sm font-medium">Add Layer</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => addLayer('text')}
-                    className="flex items-center gap-1"
-                  >
-                    <Type className="h-3 w-3" />
-                    Text
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => addLayer('image')}
-                    className="flex items-center gap-1"
-                  >
-                    <ImageIcon className="h-3 w-3" />
-                    Image
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => addLayer('shape')}
-                    className="flex items-center gap-1"
-                  >
-                    <Square className="h-3 w-3" />
-                    Shape
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => addLayer('qr')}
-                    className="flex items-center gap-1"
-                  >
-                    <QrCode className="h-3 w-3" />
-                    QR Code
-                  </Button>
+          {/* Layers List */}
+          <div className="p-4 border-b flex-1 overflow-y-auto">
+            <Label className="text-sm font-medium">Layers</Label>
+            <div className="space-y-1 mt-2">
+              {fabricLayers.length === 0 && (
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  No layers yet. Add a layer above.
                 </div>
+              )}
+              {fabricLayers.map((layer) => (
+                <div 
+                  key={layer.id}
+                  className={`p-2 rounded border cursor-pointer ${
+                    selectedLayerId === layer.id ? 'border-primary bg-primary/5' : 'border-border'
+                  }`}
+                  onClick={() => setSelectedLayerId(layer.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">{layer.name}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteLayer(layer.id);
+                      }}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Properties Panel - shown when layer selected */}
+          {selectedLayer && selectedLayer.type === 'text' && (
+            <div className="p-4 space-y-4 border-t bg-muted/30">
+              <Label className="text-sm font-medium">Layer Properties</Label>
+              
+              <div>
+                <Label className="text-xs">Text Binding</Label>
+                <Select 
+                  value={selectedLayer.binding || ''} 
+                  onValueChange={(value) => updateLayer(selectedLayerId!, { binding: value })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="message_content">Message Content</SelectItem>
+                    <SelectItem value="club_name">Club Name</SelectItem>
+                    <SelectItem value="date_display_short">Date</SelectItem>
+                    <SelectItem value="summary">Summary</SelectItem>
+                    <SelectItem value="count_slots">Count</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <Label className="text-sm font-medium">Layers</Label>
-                <div className="space-y-1 mt-2">
-                  {fabricLayers.map((layer) => (
-                    <div 
-                      key={layer.id}
-                      className={`p-2 rounded border cursor-pointer ${
-                        selectedLayerId === layer.id ? 'border-primary bg-primary/5' : 'border-border'
-                      }`}
-                      onClick={() => setSelectedLayerId(layer.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">{layer.name}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteLayer(layer.id);
-                          }}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <Label className="text-xs">Font Size: {selectedLayer.style.fontSize || 24}px</Label>
+                <Slider
+                  value={[selectedLayer.style.fontSize || 24]}
+                  onValueChange={(value) => 
+                    updateLayer(selectedLayerId!, {
+                      style: { ...selectedLayer.style, fontSize: value[0] }
+                    })
+                  }
+                  max={72}
+                  min={8}
+                  step={1}
+                  className="mt-2"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Label className="text-xs">Color</Label>
+                  <Input 
+                    type="color"
+                    value={selectedLayer.style.fill || '#000000'}
+                    onChange={(e) =>
+                      updateLayer(selectedLayerId!, {
+                        style: { ...selectedLayer.style, fill: e.target.value }
+                      })
+                    }
+                    className="mt-1 h-8"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Label className="text-xs">Alignment</Label>
+                  <Select 
+                    value={selectedLayer.style.textAlign || 'left'}
+                    onValueChange={(value) => 
+                      updateLayer(selectedLayerId!, {
+                        style: { ...selectedLayer.style, textAlign: value }
+                      })
+                    }
+                  >
+                    <SelectTrigger className="mt-1 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="properties" className="p-4 space-y-4">
-              {selectedLayer && selectedLayer.type === 'text' && (
-                <div className="space-y-4">
-                  <div>
-                    <Label>Text Binding</Label>
-                    <Select 
-                      value={selectedLayer.binding || ''} 
-                      onValueChange={(value) => updateLayer(selectedLayerId!, { binding: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="message_content">Message Content</SelectItem>
-                        <SelectItem value="club_name">Club Name</SelectItem>
-                        <SelectItem value="date_display_short">Date</SelectItem>
-                        <SelectItem value="summary">Summary</SelectItem>
-                        <SelectItem value="count_slots">Count</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Font Size</Label>
-                    <Slider
-                      value={[selectedLayer.style.fontSize || 24]}
-                      onValueChange={(value) => 
-                        updateLayer(selectedLayerId!, {
-                          style: { ...selectedLayer.style, fontSize: value[0] }
-                        })
-                      }
-                      max={72}
-                      min={8}
-                      step={1}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Text Color</Label>
-                    <Input 
-                      type="color"
-                      value={selectedLayer.style.fill || '#000000'}
-                      onChange={(e) =>
-                        updateLayer(selectedLayerId!, {
-                          style: { ...selectedLayer.style, fill: e.target.value }
-                        })
-                      }
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Text Alignment</Label>
-                    <Select 
-                      value={selectedLayer.style.textAlign || 'left'}
-                      onValueChange={(value) => 
-                        updateLayer(selectedLayerId!, {
-                          style: { ...selectedLayer.style, textAlign: value }
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="left">Left</SelectItem>
-                        <SelectItem value="center">Center</SelectItem>
-                        <SelectItem value="right">Right</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
-
-              {!selectedLayer && (
-                <div className="text-center text-muted-foreground">
-                  Select a layer to edit its properties
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
         </div>
 
         {/* Center - Canvas */}
         <div className="flex-1 bg-muted/20 overflow-auto">
           <div className="p-4">
-            <div className="flex items-center gap-4 mb-4">
-              <Select value={previewSource} onValueChange={(value: any) => setPreviewSource(value)}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sample">Sample Data</SelectItem>
-                  <SelectItem value="current">Current Page</SelectItem>
-                  <SelectItem value="saved">Saved Context</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Canvas Preview with Konva */}
             <div className="flex justify-center items-center p-4">
               <div 
@@ -926,7 +887,7 @@ const TemplateDesigner: React.FC<TemplateDesignerProps> = ({ template, onSave, o
           <div className="space-y-4">
             <div>
               <Label>Canvas Size</Label>
-              <div className="space-y-2 mt-2">
+              <div className="mt-2">
                 <Select value={canvasPreset} onValueChange={(value: CanvasPreset) => handleCanvasPresetChange(value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -939,54 +900,12 @@ const TemplateDesigner: React.FC<TemplateDesignerProps> = ({ template, onSave, o
                     ))}
                   </SelectContent>
                 </Select>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  <Input 
-                    type="number"
-                    placeholder="Width"
-                    value={canvasSize.w}
-                    onChange={(e) => {
-                      const newSize = { ...canvasSize, w: parseInt(e.target.value) || 1080 };
-                      setCanvasSize(newSize);
-                      setCanvasPreset('custom');
-                    }}
-                  />
-                  <Input 
-                    type="number"
-                    placeholder="Height"
-                    value={canvasSize.h}
-                    onChange={(e) => {
-                      const newSize = { ...canvasSize, h: parseInt(e.target.value) || 1080 };
-                      setCanvasSize(newSize);
-                      setCanvasPreset('custom');
-                    }}
-                  />
-                </div>
               </div>
             </div>
 
             <div>
               <Label>Background Image</Label>
               <div className="space-y-2 mt-2">
-                <Input 
-                  placeholder="Image URL (optional)"
-                  value={bgUrl}
-                  onChange={(e) => setBgUrl(e.target.value)}
-                  onBlur={(e) => {
-                    const url = e.target.value.trim();
-                    if (url && url !== bgUrl) {
-                      handleBgUrlChange(url);
-                    }
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const url = (e.target as HTMLInputElement).value.trim();
-                      if (url) {
-                        handleBgUrlChange(url);
-                      }
-                    }
-                  }}
-                />
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -998,40 +917,22 @@ const TemplateDesigner: React.FC<TemplateDesignerProps> = ({ template, onSave, o
                   {isUploading ? 'Uploading...' : bgStatus === 'loading' ? 'Loading...' : 'Upload PNG/JPG'}
                 </Button>
                 
-                {/* Status and debug info */}
-                {bgStatus === 'loading' && (
-                  <div className="text-xs text-muted-foreground">Loading image...</div>
-                )}
                 {bgStatus === 'error' && (
                   <div className="text-xs text-destructive">Failed to load image</div>
                 )}
-                {bgUrl && bgStatus === 'ready' && (
-                  <div className="text-xs text-muted-foreground">
-                    Image loaded: {bgNaturalW}×{bgNaturalH}
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => window.open(bgUrl, '_blank')}
-                      className="ml-2 h-6 px-2 text-xs"
-                    >
-                      View
-                    </Button>
-                  </div>
-                )}
+                
                 {bgUrl && (
-                  <div>
-                    <Label className="text-xs">Background Fit</Label>
-                    <Select value={bgFit} onValueChange={(value: 'cover' | 'contain') => setBgFit(value)}>
-                      <SelectTrigger className="w-full mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cover">Cover (fill canvas)</SelectItem>
-                        <SelectItem value="contain">Contain (fit inside)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Select value={bgFit} onValueChange={(value: 'cover' | 'contain') => setBgFit(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cover">Cover (fill canvas)</SelectItem>
+                      <SelectItem value="contain">Contain (fit inside)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
+                
                 <input
                   ref={fileInputRef}
                   type="file"
