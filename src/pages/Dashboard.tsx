@@ -217,13 +217,13 @@ export default function Dashboard() {
 
         {/* Quick Access Section */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Quick Access</h2>
+            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Quick Access</h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickAccessItems.map((item) => (
               <Card
                 key={item.href}
@@ -234,9 +234,11 @@ export default function Dashboard() {
                 onClick={() => navigate(item.href)}
               >
                 <CardContent className="p-5 flex flex-col items-center text-center gap-3">
-                  <item.icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
+                  <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-primary/10 transition-colors">
+                    <item.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                  </div>
                   <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
-                  <Badge variant="outline" className="text-[10px] text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30">
+                  <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px]">
                     Active
                   </Badge>
                 </CardContent>
