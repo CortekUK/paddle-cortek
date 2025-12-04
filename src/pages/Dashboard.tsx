@@ -186,8 +186,8 @@ export default function Dashboard() {
           <Card className={cardClass}>
             <CardContent className="p-6">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Location</p>
-              <p className="text-xl font-bold tracking-tight mt-2 truncate">
-                {stats.locationName || 'Not Set'}
+              <p className="text-2xl font-bold tracking-tight mt-2 truncate">
+                {stats.locationName?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') || 'Not Set'}
               </p>
               <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                 <Clock className="h-3 w-3" />
@@ -226,8 +226,8 @@ export default function Dashboard() {
                 onClick={() => navigate(item.href)}
               >
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-primary/10 transition-colors">
-                    <item.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                  <div className="p-3 rounded-xl bg-purple-100/50 dark:bg-purple-900/20 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
+                    <item.icon className="h-5 w-5 text-purple-600 dark:text-purple-400 transition-colors" strokeWidth={1.5} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
