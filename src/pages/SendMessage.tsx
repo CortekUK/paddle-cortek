@@ -159,7 +159,7 @@ export default function SendMessage() {
                 </p>
               </div>
 
-              <Button type="submit" disabled={sending || sendSuccess || !message.trim() || !groups.trim()} className={cn("w-full transition-all duration-300", sendSuccess && "bg-emerald-500 hover:bg-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-600")} size="lg">
+              <Button type="submit" disabled={sending || sendSuccess || !message.trim() || !groups.trim()} className={cn("w-full transition-all duration-300 rounded-xl bg-primary/80 hover:bg-primary/90 text-primary-foreground", sendSuccess && "bg-emerald-500 hover:bg-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-600")} size="lg">
                 {sendSuccess ? <>
                     <Check className="h-4 w-4 mr-2 animate-scale-in" />
                     <span className="animate-fade-in">Message Sent!</span>
