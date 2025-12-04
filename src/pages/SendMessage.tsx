@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Send, Clock, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
+import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare } from 'lucide-react';
 
 interface RecentSend {
   id: string;
@@ -18,6 +18,8 @@ interface RecentSend {
   status_code?: number;
   payload?: any;
 }
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 export default function SendMessage() {
   const { user } = useAuth();
@@ -112,7 +114,7 @@ export default function SendMessage() {
 
   const getStatusIcon = (statusCode?: number) => {
     if (!statusCode) return <Clock className="h-4 w-4 text-yellow-500" />;
-    if (statusCode >= 200 && statusCode < 300) return <CheckCircle className="h-4 w-4 text-green-500" />;
+    if (statusCode >= 200 && statusCode < 300) return <CheckCircle className="h-4 w-4 text-emerald-500" />;
     return <XCircle className="h-4 w-4 text-red-500" />;
   };
 
@@ -120,26 +122,33 @@ export default function SendMessage() {
   const isLongMessage = characterCount > 1800;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Send Message</h1>
-        <p className="text-muted-foreground">
-          Send a message to your paddle groups via the emulator.
-        </p>
+    <div className="space-y-6">
+      {/* Premium Gradient Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Send Message</h1>
+          <p className="text-muted-foreground mt-1.5">Send a message to your paddle groups via the emulator.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Send Form */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Compose Message</CardTitle>
-              <CardDescription>
+          <Card className={cardClass}>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <CardTitle className="text-lg">Compose Message</CardTitle>
+              </div>
+              <CardDescription className="ml-11">
                 Enter your message and target groups.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSend} className="space-y-6">
+              <form onSubmit={handleSend} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="message">Message *</Label>
                   <Textarea
@@ -149,7 +158,7 @@ export default function SendMessage() {
                     onChange={(e) => setMessage(e.target.value)}
                     required
                     disabled={sending}
-                    className="min-h-32"
+                    className="min-h-32 rounded-lg"
                   />
                   <div className="flex items-center justify-between text-xs">
                     <span className={`${isLongMessage ? 'text-orange-600' : 'text-muted-foreground'}`}>
@@ -172,6 +181,7 @@ export default function SendMessage() {
                     onChange={(e) => setGroups(e.target.value)}
                     required
                     disabled={sending}
+                    className="h-11 rounded-lg"
                   />
                   <p className="text-xs text-muted-foreground">
                     Separate multiple groups with commas
@@ -194,10 +204,15 @@ export default function SendMessage() {
 
         {/* Recent Sends */}
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Recent Sends</CardTitle>
-              <CardDescription>
+          <Card className={cardClass}>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <CardTitle className="text-lg">Recent Sends</CardTitle>
+              </div>
+              <CardDescription className="ml-11">
                 Your latest message attempts
               </CardDescription>
             </CardHeader>
@@ -208,7 +223,7 @@ export default function SendMessage() {
                     <Link
                       key={send.id}
                       to={`/admin/logs?highlight=${send.id}`}
-                      className="block p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="block p-3 border border-border/60 rounded-xl hover:bg-muted/40 transition-colors"
                     >
                       <div className="flex items-center justify-between mb-2">
                         {getStatusIcon(send.status_code)}
@@ -235,9 +250,11 @@ export default function SendMessage() {
                   </Link>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No recent sends found.
-                </p>
+                <div className="text-center py-8 border border-dashed border-border/60 rounded-xl">
+                  <p className="text-sm text-muted-foreground">
+                    No recent sends found.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
