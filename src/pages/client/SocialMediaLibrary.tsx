@@ -335,7 +335,7 @@ const SocialMediaLibrary = () => {
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">Design reusable post layouts</p>
             <Button 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20"
               onClick={() => {
                 setEditingTemplate(null);
                 setShowDesigner(true);
