@@ -7,10 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare } from 'lucide-react';
+import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface RecentSend {
   id: string;
@@ -27,6 +29,7 @@ export default function SendMessage() {
   const [groups, setGroups] = useState('');
   const [sending, setSending] = useState(false);
   const [recentSends, setRecentSends] = useState<RecentSend[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const fetchRecentSends = async () => {
     try {
@@ -66,7 +69,6 @@ export default function SendMessage() {
 
       if (error) throw error;
 
-      // Show detailed results
       if (data?.results) {
         const successCount = data.results.filter((r: any) => r.success).length;
         const totalCount = data.results.length;
@@ -99,7 +101,6 @@ export default function SendMessage() {
       setMessage('');
       setGroups('');
       
-      // Refresh recent sends
       setTimeout(fetchRecentSends, 1000);
     } catch (error: any) {
       toast({
@@ -132,133 +133,129 @@ export default function SendMessage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Send Form */}
-        <div className="lg:col-span-2">
-          <Card className={cardClass}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                  <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-                </div>
-                <CardTitle className="text-lg">Compose Message</CardTitle>
+      <div className="max-w-2xl mx-auto">
+        <Card className={cardClass}>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
-              <CardDescription className="ml-11">
-                Enter your message and target groups.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSend} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message *</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Enter your message here..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    required
-                    disabled={sending}
-                    className="min-h-32 rounded-lg"
-                  />
-                  <div className="flex items-center justify-between text-xs">
-                    <span className={`${isLongMessage ? 'text-orange-600' : 'text-muted-foreground'}`}>
-                      {characterCount} characters
+              <CardTitle className="text-lg">Compose Message</CardTitle>
+            </div>
+            <CardDescription className="ml-11">
+              Enter your message and target groups.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSend} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="message">Message *</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Enter your message here..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  disabled={sending}
+                  className="min-h-32 rounded-lg"
+                />
+                <div className="flex items-center justify-between text-xs">
+                  <span className={`${isLongMessage ? 'text-orange-600' : 'text-muted-foreground'}`}>
+                    {characterCount} characters
+                  </span>
+                  {isLongMessage && (
+                    <span className="text-orange-600">
+                      Long message will be split into multiple parts
                     </span>
-                    {isLongMessage && (
-                      <span className="text-orange-600">
-                        Long message will be split into multiple parts
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="groups">Target Groups *</Label>
-                  <Input
-                    id="groups"
-                    placeholder="group1, group2, group3"
-                    value={groups}
-                    onChange={(e) => setGroups(e.target.value)}
-                    required
-                    disabled={sending}
-                    className="h-11 rounded-lg"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Separate multiple groups with commas
-                  </p>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  disabled={sending || !message.trim() || !groups.trim()}
-                  className="w-full"
-                  size="lg"
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  {sending ? 'Sending...' : 'Send Message'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Sends */}
-        <div>
-          <Card className={cardClass}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                  <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-                </div>
-                <CardTitle className="text-lg">Recent Sends</CardTitle>
               </div>
-              <CardDescription className="ml-11">
-                Your latest message attempts
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {recentSends.length > 0 ? (
-                <div className="space-y-3">
-                  {recentSends.map((send) => (
+
+              <div className="space-y-2">
+                <Label htmlFor="groups">Target Groups *</Label>
+                <Input
+                  id="groups"
+                  placeholder="group1, group2, group3"
+                  value={groups}
+                  onChange={(e) => setGroups(e.target.value)}
+                  required
+                  disabled={sending}
+                  className="h-11 rounded-lg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Separate multiple groups with commas
+                </p>
+              </div>
+
+              <Button 
+                type="submit" 
+                disabled={sending || !message.trim() || !groups.trim()}
+                className="w-full"
+                size="lg"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {sending ? 'Sending...' : 'Send Message'}
+              </Button>
+            </form>
+
+            {/* Collapsible Recent Sends */}
+            <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
+              <CollapsibleTrigger className="flex items-center justify-between w-full py-3 border-t border-border/60 hover:bg-muted/30 transition-colors -mx-6 px-6">
+                <span className="flex items-center gap-2 text-sm font-medium">
+                  <Clock className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                  Recent Sends
+                  {recentSends.length > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {recentSends.length}
+                    </Badge>
+                  )}
+                </span>
+                <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", historyOpen && "rotate-180")} />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="-mx-6 px-6 pt-3">
+                {recentSends.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentSends.map((send) => (
+                      <Link
+                        key={send.id}
+                        to={`/admin/logs?highlight=${send.id}`}
+                        className="block p-3 border border-border/60 rounded-xl hover:bg-muted/40 transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          {getStatusIcon(send.status_code)}
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(send.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium truncate">
+                          {send.payload?.message || 'Message'}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">
+                            {send.payload?.groups?.join(', ') || 'Unknown groups'}
+                          </Badge>
+                          <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                        </div>
+                      </Link>
+                    ))}
                     <Link
-                      key={send.id}
-                      to={`/admin/logs?highlight=${send.id}`}
-                      className="block p-3 border border-border/60 rounded-xl hover:bg-muted/40 transition-colors"
+                      to="/admin/logs"
+                      className="block text-center text-sm text-primary hover:underline py-2"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        {getStatusIcon(send.status_code)}
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(send.created_at).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium truncate">
-                        {send.payload?.message || 'Message'}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {send.payload?.groups?.join(', ') || 'Unknown groups'}
-                        </Badge>
-                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                      </div>
+                      View all logs →
                     </Link>
-                  ))}
-                  <Link
-                    to="/admin/logs"
-                    className="block text-center text-sm text-primary hover:underline py-2"
-                  >
-                    View all logs →
-                  </Link>
-                </div>
-              ) : (
-                <div className="text-center py-8 border border-dashed border-border/60 rounded-xl">
-                  <p className="text-sm text-muted-foreground">
-                    No recent sends found.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-6 border border-dashed border-border/60 rounded-xl">
+                    <p className="text-sm text-muted-foreground">
+                      No recent sends found.
+                    </p>
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
