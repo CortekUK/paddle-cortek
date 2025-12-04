@@ -208,7 +208,7 @@ export function AuthPage() {
   }
   return <PremiumBackground>
       <GlassCard>
-        <CardHeader className="text-center pb-4 pt-8 px-8">
+        <CardHeader className="text-center pb-6 pt-10 px-8">
           <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto" />
         </CardHeader>
         <CardContent className="px-8 pb-8">
