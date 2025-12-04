@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Image, Calendar, Download, ExternalLink, Edit, Trash2, Play, Copy, PauseCircle, PlayCircle, XCircle, ListChecks } from 'lucide-react';
+import { Plus, Image, Calendar, Download, ExternalLink, Edit, Trash2, Play, Copy, PauseCircle, PlayCircle, XCircle, Images } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { toast } from 'sonner';
@@ -322,11 +322,11 @@ const SocialMediaLibrary = () => {
             Templates
           </TabsTrigger>
           <TabsTrigger value="renders" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Renders
+            <Images className="h-4 w-4" />
+            Posts
           </TabsTrigger>
           <TabsTrigger value="schedules" className="flex items-center gap-2">
-            <ListChecks className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             Schedules
           </TabsTrigger>
         </TabsList>
