@@ -2,6 +2,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useUserRole } from '@/hooks/useUserRole';
+import cortekLogo from '@/assets/cortek-logo-mark.svg';
 import {
   LayoutDashboard,
   Send,
@@ -9,7 +10,8 @@ import {
   FileText,
   Users,
   CreditCard,
-  TestTube
+  TestTube,
+  ArrowLeft
 } from 'lucide-react';
 
 interface NavItem {
@@ -73,7 +75,7 @@ export function Sidebar() {
 
   if (loading) {
     return (
-      <div className="w-64 bg-card border-r border-border p-4">
+      <div className="w-64 bg-card border-r border-border shadow-sm p-4">
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-10 bg-muted animate-pulse rounded-md" />
@@ -91,26 +93,21 @@ export function Sidebar() {
   });
 
   return (
-    <div className="w-64 bg-card border-r border-border">
-      <div className="p-6">
-        <div className="flex items-center justify-between">
+    <div className="w-64 bg-card border-r border-border shadow-sm flex flex-col">
+      {/* Header */}
+      <div className="p-5 border-b border-border">
+        <div className="flex items-center gap-3">
+          <img src={cortekLogo} alt="CORTEK" className="h-7 w-7" />
           <div>
-            <h2 className="text-lg font-semibold text-foreground">CORTEK Admin</h2>
-            <p className="text-sm text-muted-foreground">Admin Console</p>
+            <h2 className="text-sm font-semibold text-foreground">CORTEK</h2>
+            <p className="text-xs text-muted-foreground">Admin Console</p>
           </div>
-        </div>
-        <div className="mt-4 pt-4 border-t">
-          <Link
-            to="/dashboard"
-            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-          >
-            ← Back to Site
-          </Link>
         </div>
       </div>
       
-      <nav className="px-4 pb-4">
-        <ul className="space-y-2">
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4">
+        <ul className="space-y-1">
           {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
@@ -120,10 +117,10 @@ export function Sidebar() {
                 <Link
                   to={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
+                    'flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm transition-colors border-l-2',
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'bg-muted/60 dark:bg-muted/40 text-foreground font-medium border-l-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/40 border-l-transparent'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -134,6 +131,17 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Footer */}
+      <div className="p-3 border-t border-border">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-2 py-2 px-3 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to Client Portal
+        </Link>
+      </div>
     </div>
   );
 }
