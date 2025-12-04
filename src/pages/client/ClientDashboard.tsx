@@ -2,6 +2,7 @@ import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Calendar, 
   Users, 
@@ -9,17 +10,19 @@ import {
   Send, 
   Clock,
   ArrowRight,
-  ArrowUpRight,
   TrendingUp,
   BarChart3,
-  Activity
+  Activity,
+  Image
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
-  const { organization } = useOrganizationAuth();
+  const { organization, loading } = useOrganizationAuth();
+
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
   const secondaryAutomations = [
     {
@@ -37,15 +40,69 @@ export default function ClientDashboard() {
       icon: Flag, 
       href: '/client/competitions-academies',
       accentColor: 'border-l-accent/50'
+    },
+    {
+      title: 'Social Media',
+      description: 'Create and schedule social posts',
+      status: 'Active',
+      icon: Image,
+      href: '/client/social-media-library',
+      accentColor: 'border-l-purple-500/50'
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="relative space-y-8">
+        {/* Header Skeleton */}
+        <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+          <div className="relative">
+            <Skeleton className="h-9 w-48 mb-2" />
+            <Skeleton className="h-5 w-72" />
+          </div>
+        </div>
+        
+        {/* Stats Row Skeleton */}
+        <div className="grid gap-5 grid-cols-1 md:grid-cols-4">
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="md:col-span-2 h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+        </div>
+        
+        {/* Features Skeleton */}
+        <div>
+          <Skeleton className="h-5 w-40 mb-4" />
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-3">
+            <Skeleton className="md:col-span-2 md:row-span-2 h-80 rounded-3xl" />
+            <Skeleton className="h-36 rounded-2xl" />
+            <Skeleton className="h-36 rounded-2xl" />
+            <Skeleton className="h-36 rounded-2xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative space-y-8">
+      {/* Premium Gradient Page Header */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            Welcome back{organization?.club_name ? `, ${organization.club_name}` : ''}
+          </h1>
+          <p className="text-muted-foreground mt-1.5">
+            Overview of your automation platform
+          </p>
+        </div>
+      </div>
+
       {/* Bento Grid - Stats Row */}
       <div className="grid gap-5 grid-cols-1 md:grid-cols-4">
         {/* Trial Days - Compact */}
-        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <Card className={cn(cardClass, "group hover:shadow-xl transition-all duration-300")}>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Trial</span>
@@ -75,7 +132,7 @@ export default function ClientDashboard() {
         </Card>
 
         {/* Combined Stats Card - Wide (spans 2 columns) */}
-        <Card className="md:col-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden">
+        <Card className={cn(cardClass, "md:col-span-2")}>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Performance</span>
@@ -113,7 +170,7 @@ export default function ClientDashboard() {
         </Card>
 
         {/* Club Status - Compact */}
-        <Card className="bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <Card className={cn(cardClass, "group hover:shadow-xl transition-all duration-300")}>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</span>
@@ -134,20 +191,19 @@ export default function ClientDashboard() {
 
       {/* Bento Grid - Features */}
       <div>
-        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">Your Automations</h2>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+            <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+          </div>
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Your Automations</h2>
+        </div>
         <div className="grid gap-5 grid-cols-1 md:grid-cols-3 auto-rows-fr">
           {/* Hero Card - Court Availability */}
           <Card 
-            className="md:col-span-2 md:row-span-2 bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-3xl shadow-xl border border-border/40 dark:border-white/[0.08] overflow-hidden group cursor-pointer hover:shadow-2xl transition-all duration-300 relative"
+            className={cn(cardClass, "md:col-span-2 md:row-span-2 rounded-3xl shadow-xl group cursor-pointer hover:shadow-2xl transition-all duration-300")}
             onClick={() => navigate('/client/court-availability')}
           >
-            {/* Decorative background pattern */}
-            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500 to-green-400 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-primary to-blue-400 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
-            </div>
-            
-            <CardContent className="p-8 h-full flex flex-col relative">
+            <CardContent className="p-8 h-full flex flex-col">
               <div className="flex items-start justify-between mb-6">
                 <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-muted/70 transition-colors duration-300">
                   <Calendar className="h-6 w-6 text-foreground" strokeWidth={1.5} />
@@ -186,7 +242,8 @@ export default function ClientDashboard() {
             <Card 
               key={card.title}
               className={cn(
-                "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/40 dark:border-white/[0.08] border-l-4 overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300",
+                cardClass,
+                "border-l-4 group cursor-pointer hover:shadow-xl transition-all duration-300",
                 card.accentColor
               )}
               onClick={() => navigate(card.href)}
@@ -214,31 +271,6 @@ export default function ClientDashboard() {
             </Card>
           ))}
         </div>
-      </div>
-
-      {/* Coming Soon - Slim Accent Strip */}
-      <div className="p-[1px] rounded-xl bg-gradient-to-r from-border via-border/50 to-border">
-        <Card className="bg-white/80 dark:bg-card/80 backdrop-blur-sm rounded-xl border-0">
-          <CardContent className="py-4 px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30">
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-foreground">
-                    New Features in Development
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Advanced analytics & custom automation rules</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-lg text-xs">
-                Learn more
-                <ArrowRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
