@@ -573,7 +573,7 @@ Register now - spaces are limited!`);
         </div>
       </div>
 
-      {/* Search Section */}
+      {/* Find Events & Results */}
       <Card className={cardClass}>
         <CardHeader className="pb-4 border-b border-border/40">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -581,7 +581,12 @@ Register now - spaces are limited!`);
               <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                 <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <CardTitle className="text-lg font-semibold">Find Events</CardTitle>
+              <CardTitle className="text-lg font-semibold">
+                Find Events
+                {searchResults.length > 0 && (
+                  <span className="ml-2 text-muted-foreground font-normal">({countSlots} results)</span>
+                )}
+              </CardTitle>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -651,107 +656,104 @@ Register now - spaces are limited!`);
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Results Summary */}
-      {searchResults.length > 0 && (
-        <Card className={cardClass}>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <Hash className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <CardTitle className="text-lg font-semibold">Summary ({countSlots} events)</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Events List</Label>
-              <div className="max-h-32 overflow-y-auto border border-border/40 rounded-lg bg-muted/20">
-                <div className="p-2">
-                  {eventsList.map((event, index) => {
-                    const name = event.tournament_name || event.name || event.title || 'Untitled';
-                    const dateTime = formatTournamentDateTime(event, 60);
-                    const capacity = getPlayerCapacity(event);
-                    const isSelected = selectedEvent === event;
-                    
-                    return (
-                      <div
-                        key={index}
-                        className={`p-2 cursor-pointer rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
-                        onClick={() => {
-                          const willBeSelected = selectedEvent !== event;
-                          const newSelectedEvent = willBeSelected ? event : null;
-                          setSelectedEvent(newSelectedEvent);
-                          
-                          if (newSelectedEvent) {
-                            const newSummary = generateTournamentSummaryWithAdmin(newSelectedEvent);
-                            setSummaryText(newSummary);
-                            setCountSlots(1);
-                          } else {
-                            const newSummary = generateCompetitionsSummary(
-                              eventsList.filter(e => e.type === 'tournament'),
-                              eventsList.filter(e => e.type === 'lesson'),
-                              eventsList.filter(e => e.type === 'class'),
-                              null
-                            );
-                            setSummaryText(newSummary);
-                            setCountSlots(eventsList.length);
-                          }
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-sm font-medium">{name}</div>
-                            <div className="text-xs text-muted-foreground">{dateTime.date} at {dateTime.time}</div>
+          {/* Results Section */}
+          {searchResults.length > 0 && (
+            <>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Events List</Label>
+                <div className="max-h-32 overflow-y-auto border border-border/40 rounded-lg bg-muted/20">
+                  <div className="p-2">
+                    {eventsList.map((event, index) => {
+                      const name = event.tournament_name || event.name || event.title || 'Untitled';
+                      const dateTime = formatTournamentDateTime(event, 60);
+                      const capacity = getPlayerCapacity(event);
+                      const isSelected = selectedEvent === event;
+                      
+                      return (
+                        <div
+                          key={index}
+                          className={`p-2 cursor-pointer rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
+                          onClick={() => {
+                            const willBeSelected = selectedEvent !== event;
+                            const newSelectedEvent = willBeSelected ? event : null;
+                            setSelectedEvent(newSelectedEvent);
+                            
+                            if (newSelectedEvent) {
+                              const newSummary = generateTournamentSummaryWithAdmin(newSelectedEvent);
+                              setSummaryText(newSummary);
+                              setCountSlots(1);
+                            } else {
+                              const newSummary = generateCompetitionsSummary(
+                                eventsList.filter(e => e.type === 'tournament'),
+                                eventsList.filter(e => e.type === 'lesson'),
+                                eventsList.filter(e => e.type === 'class'),
+                                null
+                              );
+                              setSummaryText(newSummary);
+                              setCountSlots(eventsList.length);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium">{name}</div>
+                              <div className="text-xs text-muted-foreground">{dateTime.date} at {dateTime.time}</div>
+                            </div>
+                            {capacity.display && (
+                              <Badge 
+                                variant={capacity.full ? "default" : "secondary"}
+                                className={`ml-2 ${capacity.full ? "bg-green-600 hover:bg-green-700" : ""}`}
+                              >
+                                {capacity.display}
+                              </Badge>
+                            )}
                           </div>
-                          {capacity.display && (
-                            <Badge 
-                              variant={capacity.full ? "default" : "secondary"}
-                              className={`ml-2 ${capacity.full ? "bg-green-600 hover:bg-green-700" : ""}`}
-                            >
-                              {capacity.display}
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Raw Summary</Label>
-              <div className="p-4 bg-muted/30 rounded-lg border border-border/40">
-                <pre className="whitespace-pre-wrap text-sm font-mono text-foreground/80">
-                  {summaryText || 'No summary available'}
-                </pre>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Raw Summary</Label>
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/40">
+                  <pre className="whitespace-pre-wrap text-sm font-mono text-foreground/80">
+                    {summaryText || 'No summary available'}
+                  </pre>
+                </div>
               </div>
-            </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (summaryText) {
-                  navigator.clipboard.writeText(summaryText);
-                  toast({
-                    title: "Copied to clipboard",
-                    description: "Summary copied successfully",
-                  });
-                }
-              }}
-              disabled={!summaryText}
-              className="h-8 rounded-lg"
-            >
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Summary
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (summaryText) {
+                    navigator.clipboard.writeText(summaryText);
+                    toast({
+                      title: "Copied to clipboard",
+                      description: "Summary copied successfully",
+                    });
+                  }
+                }}
+                disabled={!summaryText}
+                className="h-8 rounded-lg"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Summary
+              </Button>
+            </>
+          )}
+
+          {/* Empty State */}
+          {searchResults.length === 0 && !loading && !error && (
+            <div className="text-center py-8 text-muted-foreground border border-dashed border-border/60 rounded-lg">
+              <p className="text-sm">Search for events to see results</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Message Builder */}
       <Card className={cardClass}>
