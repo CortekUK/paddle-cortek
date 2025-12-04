@@ -819,7 +819,7 @@ export const ScheduledSendsV2: React.FC<ScheduledSendsV2Props> = ({
               </div>
             </CardHeader>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
+          <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden">
             <CardContent className="pt-0">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Input
