@@ -845,29 +845,6 @@ Register now - spaces are limited!`);
                 rows={8}
                 className="rounded-lg resize-none font-mono text-sm min-h-[180px]"
               />
-              
-              {/* Token Chips */}
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block text-left">Insert</Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { token: '{{summary}}', label: 'summary' },
-                    { token: '{{date_display_short}}', label: 'date' },
-                    { token: '{{club_name}}', label: 'club' },
-                    { token: '{{sport}}', label: 'sport' },
-                    { token: '{{count_slots}}', label: 'count' }
-                  ].map(({ token, label }) => (
-                    <button
-                      key={token}
-                      onClick={() => insertToken(token)}
-                      className="text-xs rounded-full px-2.5 py-1 bg-muted/50 hover:bg-primary/10 hover:text-primary transition-colors"
-                    >
-                      {label}
-                    </button>
-                  ))}
-                  <EmojiPicker onEmojiSelect={insertEmoji} />
-                </div>
-              </div>
             </div>
 
             {/* Preview Column */}
@@ -878,6 +855,29 @@ Register now - spaces are limited!`);
                   {searchResults.length > 0 ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Token Chips - Centered */}
+          <div className="space-y-2 text-center">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
+            <div className="flex flex-wrap gap-1.5 justify-center">
+              {[
+                { token: '{{summary}}', label: 'summary' },
+                { token: '{{date_display_short}}', label: 'date' },
+                { token: '{{club_name}}', label: 'club' },
+                { token: '{{sport}}', label: 'sport' },
+                { token: '{{count_slots}}', label: 'count' }
+              ].map(({ token, label }) => (
+                <button
+                  key={token}
+                  onClick={() => insertToken(token)}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
+              <EmojiPicker onEmojiSelect={insertEmoji} />
             </div>
           </div>
 
