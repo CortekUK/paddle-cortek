@@ -12,8 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Copy, Save, Calendar, Clock } from 'lucide-react';
+import { ChevronDown, Copy, Save, Calendar, Clock, Search, Play, BarChart3 } from 'lucide-react';
 import { format, startOfDay, endOfDay, addDays, parseISO, addMinutes } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -88,6 +89,12 @@ export default function PlaytomicAPI() {
   // Location data
   const [location, setLocation] = useState<any>(null);
   const [prefillMode, setPrefillMode] = useState<boolean>(true);
+  
+  // Active preset state for UI
+  const [activePreset, setActivePreset] = useState<'today' | 'tomorrow' | null>(null);
+  
+  // Premium card styling
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
   // Load location data
   useEffect(() => {
@@ -146,7 +153,7 @@ export default function PlaytomicAPI() {
   };
 
   // Preset functions
-  const setPreset = (preset: 'today' | 'tomorrow') => {
+  const handlePreset = (preset: 'today' | 'tomorrow') => {
     const now = new Date();
     const targetDate = preset === 'today' ? now : addDays(now, 1);
     const timezone = location?.timezone || 'Europe/London';
@@ -156,6 +163,7 @@ export default function PlaytomicAPI() {
     
     setStartMin(startOfDayLocal);
     setStartMax(endOfDayLocal);
+    setActivePreset(preset);
   };
 
   // Playtomic offset configuration
@@ -1838,25 +1846,39 @@ ${matchUrl}`;
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Playtomic API Test Lab</h1>
-        <Badge variant="outline">Admin Only</Badge>
+    <div className="space-y-6">
+      {/* Premium Gradient Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Playtomic API Test Lab</h1>
+            <p className="text-muted-foreground mt-1">Test and debug Playtomic API endpoints</p>
+          </div>
+          <Badge variant="outline" className="bg-background/50 backdrop-blur-sm">Admin Only</Badge>
+        </div>
       </div>
 
       <Tabs defaultValue="discovery" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="discovery">Tenant Discovery</TabsTrigger>
-          <TabsTrigger value="fetch">API Fetch Runner</TabsTrigger>
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="discovery" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Tenant Discovery</TabsTrigger>
+          <TabsTrigger value="fetch" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">API Fetch Runner</TabsTrigger>
         </TabsList>
         
         <TabsContent value="discovery">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tenant Discovery</CardTitle>
-              <CardDescription>
-                Discover Playtomic tenant information from a club URL
-              </CardDescription>
+          <Card className={cardClass}>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <Search className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <CardTitle>Tenant Discovery</CardTitle>
+                  <CardDescription>
+                    Discover Playtomic tenant information from a club URL
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -1868,11 +1890,13 @@ ${matchUrl}`;
                     value={clubUrl}
                     onChange={(e) => setClubUrl(e.target.value)}
                     disabled={prefillMode && location?.playtomic_url}
+                    className="h-11 rounded-lg"
                   />
                   {prefillMode && location?.playtomic_url && (
                     <Button 
                       variant="outline" 
                       onClick={() => setPrefillMode(false)}
+                      className="rounded-lg"
                     >
                       Replace
                     </Button>
@@ -1883,22 +1907,23 @@ ${matchUrl}`;
               <Button 
                 onClick={discoverTenant}
                 disabled={isDiscovering || !clubUrl.trim()}
+                className="rounded-xl"
               >
                 {isDiscovering ? 'Discovering...' : 'Discover Tenant'}
               </Button>
 
               {tenantInfo && (
-                <Card className="bg-muted/50">
+                <Card className="bg-muted/30 border-border/40">
                   <CardContent className="pt-4 space-y-2">
                     <div><strong>Tenant ID:</strong> {tenantInfo.tenant_id}</div>
                     <div><strong>Sport ID:</strong> {tenantInfo.sport_id}</div>
                     <div><strong>Evidence:</strong> Seen on {tenantInfo.evidence.seen_on}</div>
                     
                     <div className="flex gap-2 pt-2">
-                      <Button onClick={useForSession} variant="outline">
+                      <Button onClick={useForSession} variant="outline" className="rounded-lg">
                         Use for This Session
                       </Button>
-                      <Button onClick={saveToLocation}>
+                      <Button onClick={saveToLocation} className="rounded-xl">
                         Save to Location
                       </Button>
                     </div>
@@ -1910,19 +1935,26 @@ ${matchUrl}`;
         </TabsContent>
 
         <TabsContent value="fetch">
-          <Card>
-            <CardHeader>
-              <CardTitle>API Fetch Runner</CardTitle>
-              <CardDescription>
-                Test Playtomic API endpoints with various parameters
-              </CardDescription>
+          <Card className={cardClass}>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <Play className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <CardTitle>API Fetch Runner</CardTitle>
+                  <CardDescription>
+                    Test Playtomic API endpoints with various parameters
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Endpoint</Label>
                   <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                       <SelectContent>
@@ -1938,7 +1970,7 @@ ${matchUrl}`;
                 <div className="space-y-2">
                   <Label>Sport ID</Label>
                   <Select value={selectedSportId} onValueChange={setSelectedSportId}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1955,14 +1987,26 @@ ${matchUrl}`;
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPreset('today')}
+                    onClick={() => handlePreset('today')}
+                    className={cn(
+                      "rounded-lg transition-colors",
+                      activePreset === 'today' 
+                        ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                        : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                    )}
                   >
                     Today
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPreset('tomorrow')}
+                    onClick={() => handlePreset('tomorrow')}
+                    className={cn(
+                      "rounded-lg transition-colors",
+                      activePreset === 'tomorrow' 
+                        ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                        : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                    )}
                   >
                     Tomorrow
                   </Button>
@@ -1973,7 +2017,7 @@ ${matchUrl}`;
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div className="space-y-2">
                        <Label htmlFor="start-min" className="flex items-center gap-2">
-                         <Calendar className="h-4 w-4" />
+                         <Calendar className="h-4 w-4 text-muted-foreground" />
                          Start Min
                        </Label>
                        <Input
@@ -1982,11 +2026,12 @@ ${matchUrl}`;
                          value={startMin}
                          onChange={(e) => setStartMin(e.target.value)}
                          step="60"
+                         className="h-11 rounded-lg"
                        />
                      </div>
                      <div className="space-y-2">
                        <Label htmlFor="start-max" className="flex items-center gap-2">
-                         <Clock className="h-4 w-4" />
+                         <Clock className="h-4 w-4 text-muted-foreground" />
                          Start Max
                        </Label>
                        <Input
@@ -1995,6 +2040,7 @@ ${matchUrl}`;
                          value={startMax}
                          onChange={(e) => setStartMax(e.target.value)}
                          step="60"
+                         className="h-11 rounded-lg"
                        />
                      </div>
                    </div>
@@ -2044,11 +2090,12 @@ ${matchUrl}`;
                   <Button 
                     onClick={fetchData} 
                     disabled={isLoading}
+                    className="rounded-xl"
                   >
                     {isLoading ? 'Fetching...' : 'Fetch Now'}
                   </Button>
                  {currentTenantId && (
-                   <Badge variant="outline">
+                   <Badge variant="outline" className="bg-muted/50">
                      Tenant: {currentTenantId.substring(0, 8)}...
                    </Badge>
                  )}
@@ -2057,10 +2104,15 @@ ${matchUrl}`;
           </Card>
 
           {lastResult && (
-            <Card>
-              <CardHeader>
+            <Card className={cardClass}>
+              <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Results</CardTitle>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                      <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                    </div>
+                    <CardTitle>Results</CardTitle>
+                  </div>
                   {getStatusBadge(lastResult.status)}
                 </div>
               </CardHeader>
@@ -2068,12 +2120,13 @@ ${matchUrl}`;
                 <div className="space-y-2">
                   <Label>Final URL</Label>
                   <div className="flex gap-2">
-                    <Input value={lastResult.url} readOnly className="font-mono text-xs" />
+                    <Input value={lastResult.url} readOnly className="font-mono text-xs h-11 rounded-lg bg-muted/30" />
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={copyUrl}
+                        className="rounded-lg"
                       >
                         <Copy className="h-4 w-4 mr-2" />
                         Copy
@@ -2082,6 +2135,7 @@ ${matchUrl}`;
                         variant="outline"
                         size="sm"
                         onClick={copyCurl}
+                        className="rounded-lg"
                       >
                         <Copy className="h-4 w-4 mr-2" />
                         Copy cURL
@@ -2092,7 +2146,7 @@ ${matchUrl}`;
 
                   <div className="space-y-2">
                     <Label>Summary</Label>
-                    <div className="p-3 bg-muted rounded-md text-sm">
+                    <div className="p-3 bg-muted/50 rounded-lg text-sm border border-border/40">
                       {getSummary(lastResult)}
                     </div>
                   </div>
@@ -2113,13 +2167,13 @@ ${matchUrl}`;
                       </div>
                       <Collapsible open={showDebugTable} onOpenChange={setShowDebugTable}>
                         <CollapsibleTrigger asChild>
-                          <Button variant="ghost" className="flex items-center gap-2 p-0">
-                            <ChevronDown className={`h-4 w-4 transition-transform ${showDebugTable ? 'rotate-180' : ''}`} />
-                            {showDebugTable ? 'Hide' : 'Show'} Normalized Slots Table
+                          <Button variant="ghost" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50">
+                            <ChevronDown className={cn("h-4 w-4 transition-transform text-muted-foreground", showDebugTable && "rotate-180")} />
+                            <span className="text-sm">{showDebugTable ? 'Hide' : 'Show'} Normalized Slots Table</span>
                           </Button>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                          <div className="mt-2 border rounded-md overflow-auto max-h-96">
+                          <div className="mt-2 border border-border/40 rounded-lg overflow-auto max-h-96">
                             <Table>
                               <TableHeader>
                                 <TableRow>
@@ -2177,7 +2231,7 @@ ${matchUrl}`;
                     <div className="space-y-2">
                       <Label>Summary Variant</Label>
                       <Select value={selectedSummaryVariant} onValueChange={setSelectedSummaryVariant}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11 rounded-lg">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2188,7 +2242,7 @@ ${matchUrl}`;
 
                     <div className="space-y-2">
                       <Label>Enhanced Summary</Label>
-                      <div className="p-3 bg-muted rounded-md text-sm whitespace-pre-line">
+                      <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line border border-border/40">
                         {currentSummary}
                       </div>
                       <div className="flex gap-2">
@@ -2197,6 +2251,7 @@ ${matchUrl}`;
                           size="sm"
                           onClick={copySummary}
                           disabled={!currentSummary}
+                          className="rounded-lg"
                         >
                           <Copy className="h-4 w-4 mr-2" />
                           Copy Summary
@@ -2206,6 +2261,7 @@ ${matchUrl}`;
                           size="sm"
                           onClick={saveDynamicField}
                           disabled={!currentSummary}
+                          className="rounded-lg"
                         >
                           <Save className="h-4 w-4 mr-2" />
                           Save as Dynamic Field
@@ -2218,8 +2274,8 @@ ${matchUrl}`;
                  {lastResult.endpoint === 'tournaments' && Array.isArray(lastResult.raw) && lastResult.raw.length > 0 && (
                    <div className="space-y-4">
                      <div className="space-y-2">
-                       <Label>Competitions / Academy</Label>
-                       <div className="border rounded-md">
+                       <Label className="text-base font-medium">Competitions / Academy</Label>
+                       <div className="border border-border/40 rounded-lg overflow-hidden">
                          <Table>
                             <TableHeader>
                               <TableRow>
@@ -2387,7 +2443,7 @@ ${matchUrl}`;
                       <div className="space-y-2">
                         <Label>Summary Variant</Label>
                         <Select value={selectedMatchesVariant} onValueChange={setSelectedMatchesVariant}>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-11 rounded-lg">
                             <SelectValue />
                           </SelectTrigger>
                             <SelectContent>
@@ -2401,7 +2457,7 @@ ${matchUrl}`;
 
                       <div className="space-y-2">
                         <Label>Enhanced Summary</Label>
-                        <div className="p-4 bg-muted rounded-md border">
+                        <div className="p-4 bg-muted/50 rounded-lg border border-border/40">
                           <pre className="whitespace-pre-wrap text-sm font-mono">
                             {currentMatchesSummary}
                           </pre>
@@ -2414,6 +2470,7 @@ ${matchUrl}`;
                           size="sm"
                           onClick={copyMatchesSummary}
                           disabled={!currentMatchesSummary}
+                          className="rounded-lg"
                         >
                           <Copy className="h-4 w-4 mr-2" />
                           Copy Summary
@@ -2423,6 +2480,7 @@ ${matchUrl}`;
                           size="sm"
                           onClick={saveMatchesDynamicField}
                           disabled={!currentMatchesSummary}
+                          className="rounded-lg"
                         >
                           <Save className="h-4 w-4 mr-2" />
                           Save as Dynamic Field
