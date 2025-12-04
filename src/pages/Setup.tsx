@@ -145,7 +145,7 @@ export default function Setup() {
       {/* Gradient Header Banner */}
       <div className="relative -mx-8 -mt-8 px-8 py-10 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
-        <div className="relative">
+        <div className="relative text-left">
           <h1 className="text-3xl font-bold">Location Setup</h1>
           <p className="text-muted-foreground mt-1">
             Configure your paddle club location details.
