@@ -180,17 +180,12 @@ export default function Logs() {
 
       {/* Logs Table */}
       <Card className={cardClass}>
-        <CardHeader>
-          <div className="flex items-center gap-3">
+        <CardHeader className="text-left">
+          <div className="flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <History className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle>Send History ({filteredLogs.length})</CardTitle>
-              <CardDescription>
-                Click on a row to view full request and response details.
-              </CardDescription>
-            </div>
+            <CardTitle>Send History ({filteredLogs.length})</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
