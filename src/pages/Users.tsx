@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { UserPlus, Mail, Users } from 'lucide-react';
+import { UserPlus, Mail, Users, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { AppRole } from '@/hooks/useUserRole';
 
 interface UserWithRole {
@@ -36,6 +36,7 @@ interface UserWithRole {
 }
 
 const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
+const USERS_PER_PAGE = 10;
 
 export default function UsersPage() {
   const { user } = useAuth();
@@ -43,6 +44,8 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchUsers = async () => {
     try {
@@ -81,6 +84,28 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Filter users based on search query
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
+    const query = searchQuery.toLowerCase();
+    return users.filter(u => 
+      u.email?.toLowerCase().includes(query) || 
+      u.full_name?.toLowerCase().includes(query)
+    );
+  }, [users, searchQuery]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * USERS_PER_PAGE;
+    return filteredUsers.slice(start, start + USERS_PER_PAGE);
+  }, [filteredUsers, currentPage]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleInviteUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,11 +263,23 @@ export default function UsersPage() {
         {/* Users Table */}
         <Card className={cardClass}>
           <CardHeader className="text-left">
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                  <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+                </div>
+                <CardTitle>Users ({filteredUsers.length})</CardTitle>
               </div>
-              <CardTitle>Users ({users.length})</CardTitle>
+              {/* Search Input */}
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-11 rounded-lg pl-9"
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -256,7 +293,7 @@ export default function UsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((userData) => (
+                {paginatedUsers.length > 0 ? paginatedUsers.map((userData) => (
                   <TableRow key={userData.id}>
                     <TableCell>
                       <div>
@@ -308,9 +345,59 @@ export default function UsersPage() {
                       {new Date(userData.created_at).toLocaleDateString()}
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                      {searchQuery ? 'No users found matching your search.' : 'No users found.'}
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                <p className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * USERS_PER_PAGE) + 1}-{Math.min(currentPage * USERS_PER_PAGE, filteredUsers.length)} of {filteredUsers.length} users
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="h-9 rounded-lg"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <Button
+                        key={page}
+                        variant={page === currentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="h-9 w-9 rounded-lg p-0"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="h-9 rounded-lg"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
