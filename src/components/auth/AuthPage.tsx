@@ -208,10 +208,8 @@ export function AuthPage() {
   }
   return <PremiumBackground>
       <GlassCard>
-        <CardHeader className="space-y-2 text-center pb-4 pt-8 px-8">
-          <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto mb-4" />
-          <CardTitle className="text-xl font-semibold">Welcome to CORTEK</CardTitle>
-          
+        <CardHeader className="text-center pb-4 pt-8 px-8">
+          <img src={cortekLogo} alt="CORTEK" className="h-12 mx-auto" />
         </CardHeader>
         <CardContent className="px-8 pb-8">
           {error && <Alert variant="destructive" className="mb-6 rounded-xl">
