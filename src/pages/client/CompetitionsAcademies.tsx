@@ -19,6 +19,7 @@ import { ScheduledSendsV2 } from '@/components/client/ScheduledSendsV2';
 import EmojiPicker from '@/components/client/EmojiPicker';
 import { generateTournamentSummary, formatTournamentDateTime, getPlayerCapacity } from '@/utils/playtomicAdminUtils';
 import { SocialPostBuilder } from '@/components/social/SocialPostBuilder';
+import { cn } from '@/lib/utils';
 
 export default function CompetitionsAcademies() {
   const { organization } = useOrganizationAuth();
@@ -602,11 +603,12 @@ Register now - spaces are limited!`);
                 variant="outline"
                 size="sm"
                 onClick={() => setPreset('today')}
-                className={`h-8 px-3 rounded-full text-xs font-medium transition-colors ${
+                className={cn(
+                  "rounded-full px-4 h-8 text-sm font-medium transition-all",
                   activePreset === 'today'
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
-                    : 'hover:bg-muted/50'
-                }`}
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                    : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                )}
               >
                 Today
               </Button>
@@ -614,11 +616,12 @@ Register now - spaces are limited!`);
                 variant="outline"
                 size="sm"
                 onClick={() => setPreset('tomorrow')}
-                className={`h-8 px-3 rounded-full text-xs font-medium transition-colors ${
+                className={cn(
+                  "rounded-full px-4 h-8 text-sm font-medium transition-all",
                   activePreset === 'tomorrow'
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
-                    : 'hover:bg-muted/50'
-                }`}
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                    : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                )}
               >
                 Tomorrow
               </Button>
@@ -626,9 +629,9 @@ Register now - spaces are limited!`);
                 onClick={handleSearch} 
                 disabled={loading}
                 size="sm"
-                className="h-8 px-4 rounded-lg bg-primary/10 border border-primary text-primary hover:bg-primary/20"
+                className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4"
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-1.5" />}
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 {loading ? 'Searching...' : 'Search'}
               </Button>
             </div>
