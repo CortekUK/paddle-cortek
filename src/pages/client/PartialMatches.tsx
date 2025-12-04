@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Save, Star, Hash, ChevronDown, Info } from 'lucide-react';
+import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Save, Star, Hash, ChevronDown, Info, Users } from 'lucide-react';
 import { format, addDays, startOfDay, endOfDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -689,6 +689,12 @@ Join these matches - let's play!`);
       <Card className={cardClass}>
         <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground whitespace-nowrap">Find Matches</h3>
+            </div>
             
             <div className="flex items-center gap-2 flex-1">
               {(['today', 'tomorrow'] as const).map(preset => (
