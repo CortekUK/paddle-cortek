@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { supabase } from '@/integrations/supabase/client';
 import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format, addDays, startOfDay, endOfDay } from 'date-fns';
+import { format, addDays, startOfDay, endOfDay, endOfWeek } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduledSendsV2 } from '@/components/client/ScheduledSendsV2';
@@ -104,17 +104,28 @@ export default function CompetitionsAcademies() {
     return f === t ? f : `${f} – ${t}`;
   };
 
-  // Preset functions for Today/Tomorrow buttons
-  const setPreset = (preset: 'today' | 'tomorrow') => {
+  // Preset functions for Today/Tomorrow/Week buttons
+  const setPreset = (preset: 'today' | 'tomorrow' | 'week') => {
     const now = new Date();
-    const targetDate = preset === 'today' ? now : addDays(now, 1);
-    const timezone = 'Europe/London'; // Default timezone, could be made configurable
+    const timezone = 'Europe/London';
     
-    const startOfDayLocal = formatInTimeZone(startOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
-    const endOfDayLocal = formatInTimeZone(endOfDay(targetDate), timezone, 'yyyy-MM-dd\'T\'HH:mm:ss');
+    let targetStart: Date;
+    let targetEnd: Date;
     
-    setDateFrom(startOfDayLocal);
-    setDateTo(endOfDayLocal);
+    if (preset === 'today') {
+      targetStart = startOfDay(now);
+      targetEnd = endOfDay(now);
+    } else if (preset === 'tomorrow') {
+      targetStart = startOfDay(addDays(now, 1));
+      targetEnd = endOfDay(addDays(now, 1));
+    } else {
+      // This Week - from now until end of week (Monday start)
+      targetStart = startOfDay(now);
+      targetEnd = endOfWeek(now, { weekStartsOn: 1 });
+    }
+    
+    setDateFrom(formatInTimeZone(targetStart, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss'));
+    setDateTo(formatInTimeZone(targetEnd, timezone, 'yyyy-MM-dd\'T\'HH:mm:ss'));
   };
 
   // Load templates and settings on component mount
@@ -518,9 +529,12 @@ Register now - spaces are limited!`);
     const todayEnd = format(endOfDay(now), "yyyy-MM-dd'T'HH:mm:ss");
     const tomorrowStart = format(startOfDay(addDays(now, 1)), "yyyy-MM-dd'T'HH:mm:ss");
     const tomorrowEnd = format(endOfDay(addDays(now, 1)), "yyyy-MM-dd'T'HH:mm:ss");
+    const weekStart = format(startOfDay(now), "yyyy-MM-dd'T'HH:mm:ss");
+    const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd'T'HH:mm:ss");
     
     if (dateFrom === todayStart && dateTo === todayEnd) return 'today';
     if (dateFrom === tomorrowStart && dateTo === tomorrowEnd) return 'tomorrow';
+    if (dateFrom === weekStart && dateTo === weekEnd) return 'week';
     return null;
   };
 
@@ -585,20 +599,20 @@ Register now - spaces are limited!`);
 
       {/* Find Events & Results */}
       <Card className={cardClass}>
-        <CardHeader className="pb-4 border-b border-border/40">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="p-4 border-b border-border/50 bg-muted/5 dark:bg-muted/10">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                 <Trophy className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
-              <CardTitle className="text-lg font-semibold">
-                Find Events
-                {searchResults.length > 0 && (
-                  <span className="ml-2 text-muted-foreground font-normal">({countSlots} results)</span>
-                )}
-              </CardTitle>
+              <h3 className="text-lg font-semibold">Find Events</h3>
+              {searchResults.length > 0 && (
+                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
+                  {countSlots} Events Available
+                </Badge>
+              )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:ml-auto">
               <Button
                 variant="outline"
                 size="sm"
@@ -625,6 +639,19 @@ Register now - spaces are limited!`);
               >
                 Tomorrow
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreset('week')}
+                className={cn(
+                  "rounded-full px-4 h-8 text-sm font-medium transition-all",
+                  activePreset === 'week'
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                    : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                )}
+              >
+                This Week
+              </Button>
               <Button 
                 onClick={handleSearch} 
                 disabled={loading}
@@ -632,36 +659,12 @@ Register now - spaces are limited!`);
                 className="h-8 gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20 px-4"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                {loading ? 'Searching...' : 'Search'}
+                Search
               </Button>
             </div>
           </div>
-        </CardHeader>
+        </div>
         <CardContent className="pt-4 space-y-4">
-          {/* Date Range Inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground tracking-wide">From Date & Time</Label>
-              <Input
-                id="dateFrom"
-                type="datetime-local"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="h-9 rounded-lg text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground tracking-wide">To Date & Time</Label>
-              <Input
-                id="dateTo"
-                type="datetime-local"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="h-9 rounded-lg text-sm"
-              />
-            </div>
-          </div>
-
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -673,7 +676,7 @@ Register now - spaces are limited!`);
           {searchResults.length > 0 && (
             <>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground tracking-wide">Events List</Label>
+                <Label className="text-xs font-medium text-muted-foreground tracking-wide">Results</Label>
                 <div className="max-h-32 overflow-y-auto border border-border/40 rounded-lg bg-muted/20">
                   <div className="p-2">
                     {eventsList.map((event, index) => {
