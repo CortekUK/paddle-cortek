@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare, ChevronDown, Check } from 'lucide-react';
+import { Send, Clock, MessageSquare, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 interface RecentSend {
   id: string;
@@ -106,10 +106,10 @@ export default function SendMessage() {
       setSending(false);
     }
   };
-  const getStatusIcon = (statusCode?: number) => {
-    if (!statusCode) return <Clock className="h-4 w-4 text-yellow-500" />;
-    if (statusCode >= 200 && statusCode < 300) return <CheckCircle className="h-4 w-4 text-emerald-500" />;
-    return <XCircle className="h-4 w-4 text-red-500" />;
+  const getStatusDot = (statusCode?: number) => {
+    if (!statusCode) return <div className="w-2 h-2 rounded-full bg-yellow-500 shrink-0" />;
+    if (statusCode >= 200 && statusCode < 300) return <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />;
+    return <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />;
   };
   const characterCount = message.length;
   const isLongMessage = characterCount > 1800;
@@ -186,23 +186,18 @@ export default function SendMessage() {
                 <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", historyOpen && "rotate-180")} />
               </CollapsibleTrigger>
               <CollapsibleContent className="-mx-6 px-6 pt-3">
-                {recentSends.length > 0 ? <div className="space-y-3">
-                    {recentSends.map(send => <Link key={send.id} to={`/admin/logs?highlight=${send.id}`} className="block p-3 border border-border/60 rounded-xl hover:bg-muted/40 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                          {getStatusIcon(send.status_code)}
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(send.created_at).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="text-sm font-medium truncate">
+                {recentSends.length > 0 ? <div className="space-y-1">
+                    {recentSends.map(send => <Link key={send.id} to={`/admin/logs?highlight=${send.id}`} className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-muted/40 transition-colors">
+                        {getStatusDot(send.status_code)}
+                        <span className="text-sm truncate flex-1 min-w-0">
                           {send.payload?.message || 'Message'}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">
-                            {send.payload?.groups?.join(', ') || 'Unknown groups'}
-                          </Badge>
-                          <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                        </div>
+                        </span>
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {send.payload?.group || send.payload?.groups?.join(', ') || 'Unknown'}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {new Date(send.created_at).toLocaleDateString()}
+                        </span>
                       </Link>)}
                     <Link to="/admin/logs" className="block text-center text-sm text-primary hover:underline py-2">
                       View all logs →
