@@ -893,7 +893,6 @@ Register now - spaces are limited!`);
               placeholder="Enter group name"
               className="flex-1 h-9 rounded-lg text-sm"
             />
-            <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">Must match exactly</span>
             <Button 
               onClick={handleSendMessage} 
               disabled={sendingMessage || !summaryText}
