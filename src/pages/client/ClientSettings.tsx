@@ -174,12 +174,7 @@ export default function ClientSettings() {
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle>WhatsApp Group Names</CardTitle>
-              <CardDescription>
-                Configure the names of your WhatsApp groups for different automation categories
-              </CardDescription>
-            </div>
+            <CardTitle>WhatsApp Group Names</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -286,12 +281,7 @@ export default function ClientSettings() {
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle>Club Information</CardTitle>
-              <CardDescription>
-                Configure your club details and connection settings
-              </CardDescription>
-            </div>
+            <CardTitle>Club Information</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -353,12 +343,7 @@ export default function ClientSettings() {
             <div className="p-2 rounded-lg bg-destructive/10">
               <AlertTriangle className="h-4 w-4 text-destructive" strokeWidth={1.5} />
             </div>
-            <div>
-              <CardTitle>Trial Management</CardTitle>
-              <CardDescription>
-                Manage your trial subscription
-              </CardDescription>
-            </div>
+            <CardTitle>Trial Management</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
