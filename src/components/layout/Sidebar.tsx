@@ -126,7 +126,7 @@ export function Sidebar({ collapsed, setCollapsed, sidebarOpen, setSidebarOpen }
             <img src={cortekLogo} alt="CORTEK" className="h-7 w-7 flex-shrink-0" />
             {!collapsed && (
               <div className="animate-fade-in">
-                <h2 className="text-sm font-semibold text-foreground">CORTEK</h2>
+                <h2 className="font-semibold text-foreground tracking-tight">CORTEK</h2>
                 <p className="text-xs text-muted-foreground">Admin Console</p>
               </div>
             )}
