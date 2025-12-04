@@ -1,20 +1,8 @@
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Calendar, 
-  Users, 
-  Flag, 
-  Send, 
-  Clock,
-  ArrowRight,
-  TrendingUp,
-  BarChart3,
-  Activity,
-  Image
-} from 'lucide-react';
+import { Calendar, Users, Flag, Image, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -64,10 +52,11 @@ export default function ClientDashboard() {
         </div>
         
         {/* Stats Row Skeleton */}
-        <div className="grid gap-5 grid-cols-1 md:grid-cols-4">
-          <Skeleton className="h-32 rounded-2xl" />
-          <Skeleton className="md:col-span-2 h-32 rounded-2xl" />
-          <Skeleton className="h-32 rounded-2xl" />
+        <div className="grid gap-5 grid-cols-2 md:grid-cols-4">
+          <Skeleton className="h-28 rounded-2xl" />
+          <Skeleton className="h-28 rounded-2xl" />
+          <Skeleton className="h-28 rounded-2xl" />
+          <Skeleton className="h-28 rounded-2xl" />
         </div>
         
         {/* Quick Access Skeleton */}
@@ -99,92 +88,41 @@ export default function ClientDashboard() {
         </div>
       </div>
 
-      {/* Bento Grid - Stats Row */}
-      <div className="grid gap-5 grid-cols-1 md:grid-cols-4">
-        {/* Trial Days - Compact */}
-        <Card className={cn(cardClass, "group hover:shadow-xl transition-all duration-300")}>
+      {/* Ultra-Minimal Stats Row */}
+      <div className="grid gap-5 grid-cols-2 md:grid-cols-4">
+        {/* Trial Days */}
+        <Card className={cn(cardClass)}>
           <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Trial</span>
-              <Clock className="h-4 w-4 text-muted-foreground/60" />
-            </div>
-            <div className="flex items-center gap-4">
-              {/* Mini progress ring */}
-              <div className="relative">
-                <svg className="w-12 h-12 -rotate-90">
-                  <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="none" className="text-muted/20" />
-                  <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="none" 
-                    className="text-primary" 
-                    strokeDasharray={`${(12/14) * 126} 126`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-bold text-primary">12</span>
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">12 days</div>
-                <p className="text-xs text-muted-foreground">remaining</p>
-              </div>
-            </div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Trial</p>
+            <div className="text-3xl font-bold text-foreground">12</div>
+            <p className="text-sm text-muted-foreground">days left</p>
           </CardContent>
         </Card>
 
-        {/* Combined Stats Card - Wide (spans 2 columns) */}
-        <Card className={cn(cardClass, "md:col-span-2")}>
+        {/* Automations */}
+        <Card className={cn(cardClass)}>
           <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Performance</span>
-              <Activity className="h-4 w-4 text-muted-foreground/60" />
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              {/* Automations */}
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-foreground">3</div>
-                  <p className="text-xs text-muted-foreground">Active automations</p>
-                </div>
-              </div>
-              {/* Messages */}
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
-                  <Send className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-foreground">247</span>
-                    <Badge className="bg-emerald-500/10 text-emerald-600 border-0 text-[10px] font-medium px-1.5 py-0">
-                      <TrendingUp className="h-2.5 w-2.5 mr-0.5" />
-                      +23%
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Messages this month</p>
-                </div>
-              </div>
-            </div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Automations</p>
+            <div className="text-3xl font-bold text-foreground">3</div>
+            <p className="text-sm text-muted-foreground">active</p>
           </CardContent>
         </Card>
 
-        {/* Club Status - Compact */}
-        <Card className={cn(cardClass, "group hover:shadow-xl transition-all duration-300")}>
+        {/* Messages */}
+        <Card className={cn(cardClass)}>
           <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</span>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-            </div>
-            <div className="text-lg font-bold text-foreground truncate mb-1">
-              {organization?.name || 'Your Club'}
-            </div>
-            <Badge className="bg-emerald-500/10 text-emerald-600 border-0 text-xs font-medium">
-              All systems active
-            </Badge>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Messages</p>
+            <div className="text-3xl font-bold text-foreground">247</div>
+            <p className="text-sm text-muted-foreground">this month</p>
+          </CardContent>
+        </Card>
+
+        {/* Status */}
+        <Card className={cn(cardClass)}>
+          <CardContent className="p-5">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Status</p>
+            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">Active</div>
+            <p className="text-sm text-muted-foreground truncate">{organization?.name || 'All systems'}</p>
           </CardContent>
         </Card>
       </div>
