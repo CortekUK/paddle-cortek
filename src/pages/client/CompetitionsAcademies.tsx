@@ -873,10 +873,10 @@ Register now - spaces are limited!`);
             {/* Preview Column */}
             <div className="space-y-3">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block text-left">Preview</Label>
-              <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[180px]">
-                <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
-                  {renderTemplate(templateContent) || 'Preview will appear here...'}
-                </pre>
+              <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
+                <div className="whitespace-pre-wrap text-sm text-foreground/85 leading-relaxed">
+                  {searchResults.length > 0 ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
+                </div>
               </div>
             </div>
           </div>
