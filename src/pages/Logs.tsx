@@ -237,7 +237,7 @@ export default function Logs() {
                     <CollapsibleContent asChild>
                       <TableRow className="border-border/40">
                         <TableCell colSpan={5} className="bg-muted/20 p-6">
-                          <div className="space-y-4">
+                          <div className="space-y-4 text-left">
                             <div className="bg-background rounded-lg border border-border/60 p-4">
                               <h4 className="font-semibold mb-3 text-sm">Request Details</h4>
                               <div className="space-y-2">
