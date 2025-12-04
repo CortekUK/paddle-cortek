@@ -194,17 +194,18 @@ export default function EmulatorTest() {
               <CardTitle>About This Test</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground space-y-2 text-left">
-            <p>This test sends a canned message with the following properties:</p>
+          <CardContent className="text-sm text-muted-foreground space-y-3 text-left">
+            <p>This test verifies your WhatsApp connection is working correctly by:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Message: "Test message from CORTEK Admin Panel"</li>
-              <li>Groups: ["test_group"]</li>
-              <li>Uses your location's configured emulator URL</li>
-              <li>Includes proper RFC 3986 URL encoding</li>
-              <li>Times out after 10 seconds</li>
+              <li>Sending a test message to a group called "test_group"</li>
+              <li>Using your location's configured emulator endpoint</li>
+              <li>Checking for a response within 10 seconds</li>
             </ul>
-            <p className="mt-3">
-              This helps diagnose connectivity issues without affecting your main Send Message flow.
+            <p className="font-medium text-foreground">
+              Note: Make sure you have a WhatsApp group named exactly "test_group" for this test to work.
+            </p>
+            <p>
+              This test won't affect your regular automated messages.
             </p>
           </CardContent>
         </Card>
