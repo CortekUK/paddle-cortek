@@ -152,7 +152,7 @@ export default function Dashboard() {
         <div className="relative text-left">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Welcome back — your paddle club automation hub.
+            Welcome Back — your padel club automation hub.
           </p>
         </div>
       </div>
