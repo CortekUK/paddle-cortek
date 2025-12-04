@@ -158,11 +158,11 @@ export default function Dashboard() {
       </div>
 
       <div className="px-8 py-8 space-y-8">
-        {/* Stats Cards - Ultra Minimal */}
+        {/* Stats Cards - Centered */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Today's Sends */}
           <Card className={cardClass}>
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Today's Sends</p>
               <p className="text-4xl font-bold tracking-tight mt-2">{stats.todaysSends}</p>
               <p className="text-sm text-muted-foreground mt-1">messages sent</p>
@@ -171,7 +171,7 @@ export default function Dashboard() {
 
           {/* Last Send Status */}
           <Card className={cardClass}>
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Last Send</p>
               <p className={cn("text-4xl font-bold tracking-tight mt-2", getStatusColor(stats.lastSendStatus))}>
                 {getStatusText(stats.lastSendStatus)}
@@ -184,12 +184,12 @@ export default function Dashboard() {
 
           {/* Current Location */}
           <Card className={cardClass}>
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Location</p>
               <p className="text-2xl font-bold tracking-tight mt-2 truncate">
                 {stats.locationName?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') || 'Not Set'}
               </p>
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mt-1 flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3" />
                 {stats.locationTimezone || 'Unknown'}
               </p>
@@ -198,9 +198,9 @@ export default function Dashboard() {
 
           {/* Status */}
           <Card className={cardClass}>
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</p>
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex items-center justify-center gap-2 mt-3">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -214,7 +214,7 @@ export default function Dashboard() {
 
         {/* Quick Access Section */}
         <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4 text-center">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {quickAccessItems.map((item) => (
               <Card
@@ -229,7 +229,7 @@ export default function Dashboard() {
                   <div className="p-3 rounded-xl bg-purple-100/50 dark:bg-purple-900/20 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
                     <item.icon className="h-5 w-5 text-purple-600 dark:text-purple-400 transition-colors" strokeWidth={1.5} />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 text-center">
                     <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
                     <p className="text-xs text-muted-foreground">{item.description}</p>
                   </div>
