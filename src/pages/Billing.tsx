@@ -39,11 +39,11 @@ export default function Billing() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-            <div>
+            <div className="text-center">
               <p className="text-sm font-medium">Trial Days Remaining</p>
               <p className="text-2xl font-bold text-primary">14</p>
             </div>
-            <div>
+            <div className="text-center">
               <p className="text-sm font-medium">Messages This Month</p>
               <p className="text-2xl font-bold">0 / ∞</p>
             </div>
