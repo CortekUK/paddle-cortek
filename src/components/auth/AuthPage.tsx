@@ -219,10 +219,10 @@ export function AuthPage() {
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8 h-12 rounded-xl bg-muted/50 p-1">
               <TabsTrigger value="login" className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-                Log in
+                Log In
               </TabsTrigger>
               <TabsTrigger value="signup" className="rounded-lg h-10 font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-                Create account
+                Create Account
               </TabsTrigger>
             </TabsList>
             
@@ -242,12 +242,12 @@ export function AuthPage() {
                   </div>
                 </div>
                 <Button type="submit" className="w-full h-12 rounded-xl bg-primary/10 border border-primary text-primary hover:bg-primary/20 transition-all duration-300" disabled={loading || !email || !password}>
-                  {loading ? 'Signing in...' : 'Log in'}
+                  {loading ? 'Signing in...' : 'Log In'}
                 </Button>
               </form>
               <div className="text-center">
                 <Button type="button" variant="link" className="text-sm text-primary hover:text-primary/80" onClick={() => setShowResetForm(true)} disabled={loading}>
-                  Forgot password?
+                  Forgot Password?
                 </Button>
               </div>
             </TabsContent>
@@ -278,7 +278,7 @@ export function AuthPage() {
                 </div>
                 {password && confirmPassword && password !== confirmPassword && <p className="text-sm text-destructive">Passwords do not match</p>}
                 <Button type="submit" className="w-full h-12 rounded-xl bg-primary/10 border border-primary text-primary hover:bg-primary/20 transition-all duration-300" disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8}>
-                   {loading ? 'Creating account...' : 'Create account'}
+                   {loading ? 'Creating Account...' : 'Create Account'}
                  </Button>
               </form>
             </TabsContent>
