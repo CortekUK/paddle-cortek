@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Save, AlertTriangle, Info } from 'lucide-react';
+import { Copy, Save, AlertTriangle, Info, MessageSquare, Building2 } from 'lucide-react';
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 export default function ClientSettings() {
   const { organization, membership, updateClubName, canManageOrg } = useOrganizationAuth();
@@ -154,27 +155,38 @@ export default function ClientSettings() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Configure your automation settings and preferences
-        </p>
+    <div className="relative space-y-8">
+      {/* Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight text-left">Settings</h1>
+          <p className="text-muted-foreground mt-1.5 text-left">
+            Configure your automation settings and preferences
+          </p>
+        </div>
       </div>
 
       {/* WhatsApp Group Names */}
-      <Card>
+      <Card className={cardClass}>
         <CardHeader>
-          <CardTitle>WhatsApp Group Names</CardTitle>
-          <CardDescription>
-            Configure the names of your WhatsApp groups for different automation categories
-          </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle>WhatsApp Group Names</CardTitle>
+              <CardDescription>
+                Configure the names of your WhatsApp groups for different automation categories
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Please add <strong>07757 658667</strong> to each WhatsApp group. Messages can't be sent until the bot is added to each group.
+          <Alert className="bg-muted/50 border-border/60">
+            <Info className="h-4 w-4 text-muted-foreground" />
+            <AlertDescription className="text-muted-foreground">
+              Please add <strong className="text-foreground">07757 658667</strong> to each WhatsApp group. Messages can't be sent until the bot is added to each group.
             </AlertDescription>
           </Alert>
 
@@ -267,15 +279,20 @@ export default function ClientSettings() {
         </CardContent>
       </Card>
 
-      <Separator />
-
       {/* Club Information */}
-      <Card>
+      <Card className={cardClass}>
         <CardHeader>
-          <CardTitle>Club Information</CardTitle>
-          <CardDescription>
-            Configure your club details and connection settings
-          </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle>Club Information</CardTitle>
+              <CardDescription>
+                Configure your club details and connection settings
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -329,18 +346,20 @@ export default function ClientSettings() {
         </CardContent>
       </Card>
 
-      <Separator />
-
       {/* Trial Management */}
-      <Card className="border-destructive/20">
+      <Card className={`${cardClass} border-destructive/20`}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            Trial Management
-          </CardTitle>
-          <CardDescription>
-            Manage your trial subscription
-          </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-destructive/10">
+              <AlertTriangle className="h-4 w-4 text-destructive" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle>Trial Management</CardTitle>
+              <CardDescription>
+                Manage your trial subscription
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive" className="mb-4">
