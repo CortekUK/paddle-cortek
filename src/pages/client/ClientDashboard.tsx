@@ -145,14 +145,12 @@ export default function ClientDashboard() {
               )}
               onClick={() => navigate(item.href)}
             >
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30 group-hover:bg-primary/10 transition-colors">
-                  <item.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
+              <CardContent className="p-5 flex flex-col items-center text-center gap-3">
+                <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-primary/10 transition-colors">
+                  <item.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-foreground truncate">{item.title}</h3>
-                </div>
-                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px] shrink-0">
+                <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
+                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px]">
                   {item.status}
                 </Badge>
               </CardContent>
