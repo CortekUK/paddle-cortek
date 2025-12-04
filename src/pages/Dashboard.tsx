@@ -145,11 +145,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F7F5FF] via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background">
+    <div className="min-h-full bg-gradient-to-b from-[#F7F5FF] via-purple-50/30 to-background dark:from-background dark:via-background dark:to-background -m-6">
       {/* Premium Gradient Header Banner */}
       <div className="relative bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15 px-8 py-8">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-1">
             Welcome back — your paddle club automation hub.
@@ -157,7 +157,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-8 py-8 space-y-8">
+      <div className="px-8 py-8 space-y-8">
         {/* Stats Cards - Ultra Minimal */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Today's Sends */}
