@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,8 +8,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Calendar, AlertCircle, Clock, Loader2, Copy, MessageSquare, Send, Settings, Plus, Save, Star, Eye, Hash } from 'lucide-react';
+import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format, addDays, startOfDay, endOfDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
@@ -497,76 +499,128 @@ Register now - spaces are limited!`);
     }
   };
 
+  const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
+
+  // Determine active preset
+  const getActivePreset = () => {
+    const now = new Date();
+    const todayStart = format(startOfDay(now), "yyyy-MM-dd'T'HH:mm:ss");
+    const todayEnd = format(endOfDay(now), "yyyy-MM-dd'T'HH:mm:ss");
+    const tomorrowStart = format(startOfDay(addDays(now, 1)), "yyyy-MM-dd'T'HH:mm:ss");
+    const tomorrowEnd = format(endOfDay(addDays(now, 1)), "yyyy-MM-dd'T'HH:mm:ss");
+    
+    if (dateFrom === todayStart && dateTo === todayEnd) return 'today';
+    if (dateFrom === tomorrowStart && dateTo === tomorrowEnd) return 'tomorrow';
+    return null;
+  };
+
+  const activePreset = getActivePreset();
+
+  const handleSaveAsTemplate = async () => {
+    if (!templateContent.trim()) {
+      toast({
+        title: "Error",
+        description: "Template content cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('message_templates')
+        .insert({
+          org_id: organization!.id,
+          category: 'COMPETITIONS_ACADEMIES',
+          name: templateName || `Template ${new Date().toLocaleDateString()}`,
+          content: templateContent,
+          module: 'COMPETITIONS_ACADEMIES',
+          summary_variant: null,
+          linked_event_id: selectedEvent ? (selectedEvent.tournament_id || selectedEvent.id || null) : null,
+          whatsapp_group: whatsappGroup
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setSelectedTemplateId(data.id);
+      await loadTemplatesAndSettings();
+
+      toast({
+        title: "Success",
+        description: "Template saved as new",
+      });
+    } catch (err: any) {
+      console.error('Error saving template:', err);
+      toast({
+        title: "Error",
+        description: "Failed to save template",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Competitions & Academies</h1>
-        <p className="text-muted-foreground mt-1">
-          Find and share tournaments, lessons, and training programs
-        </p>
+      {/* Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight text-left">Competitions & Academies</h1>
+          <p className="text-muted-foreground mt-1.5 text-left">
+            Find and share tournaments, lessons, and training programs
+          </p>
+        </div>
       </div>
 
       {/* Search Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Search Competitions & Academies
-          </CardTitle>
-          <CardDescription>
-            Find tournaments, lessons, and classes
-          </CardDescription>
+      <Card className={cardClass}>
+        <CardHeader className="pb-4 border-b border-border/40">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <CardTitle className="text-lg font-semibold">Find Events</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreset('today')}
+                className={`h-8 px-3 rounded-full text-xs font-medium transition-colors ${
+                  activePreset === 'today'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                    : 'hover:bg-muted/50'
+                }`}
+              >
+                Today
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreset('tomorrow')}
+                className={`h-8 px-3 rounded-full text-xs font-medium transition-colors ${
+                  activePreset === 'tomorrow'
+                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                    : 'hover:bg-muted/50'
+                }`}
+              >
+                Tomorrow
+              </Button>
+              <Button 
+                onClick={handleSearch} 
+                disabled={loading}
+                size="sm"
+                className="h-8 px-4 rounded-lg bg-primary/10 border border-primary text-primary hover:bg-primary/20"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-1.5" />}
+                {loading ? 'Searching...' : 'Search'}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Quick Picks */}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreset('today')}
-              className="gap-2"
-            >
-              <Calendar className="h-4 w-4" />
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreset('tomorrow')}
-              className="gap-2"
-            >
-              <Calendar className="h-4 w-4" />
-              Tomorrow
-            </Button>
-          </div>
-
-          {/* Date Range */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dateFrom">From Date & Time</Label>
-              <Input
-                id="dateFrom"
-                type="datetime-local"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateTo">To Date & Time</Label>
-              <Input
-                id="dateTo"
-                type="datetime-local"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <Button onClick={handleSearch} disabled={loading} className="w-full gap-2">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            {loading ? 'Searching...' : 'Search Competitions & Academies'}
-          </Button>
-
+        <CardContent className="pt-4">
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -578,41 +632,40 @@ Register now - spaces are limited!`);
 
       {/* Results Summary */}
       {searchResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Hash className="h-5 w-5" />
-              Summary ({countSlots} events)
-            </CardTitle>
+        <Card className={cardClass}>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Hash className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <CardTitle className="text-lg font-semibold">Summary ({countSlots} events)</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Events List</Label>
-              <div className="max-h-32 overflow-y-auto border rounded-md">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Events List</Label>
+              <div className="max-h-32 overflow-y-auto border border-border/40 rounded-lg bg-muted/20">
                 <div className="p-2">
                   {eventsList.map((event, index) => {
                     const name = event.tournament_name || event.name || event.title || 'Untitled';
-                    const dateTime = formatTournamentDateTime(event, 60); // Use 60min offset
+                    const dateTime = formatTournamentDateTime(event, 60);
                     const capacity = getPlayerCapacity(event);
                     const isSelected = selectedEvent === event;
                     
                     return (
                       <div
                         key={index}
-                        className={`p-2 cursor-pointer rounded hover:bg-muted/50 ${isSelected ? 'bg-muted' : ''}`}
+                        className={`p-2 cursor-pointer rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
                         onClick={() => {
                           const willBeSelected = selectedEvent !== event;
                           const newSelectedEvent = willBeSelected ? event : null;
                           setSelectedEvent(newSelectedEvent);
                           
-                          // Update summary and count based on selection
                           if (newSelectedEvent) {
-                            // Event selected - show only that event
                             const newSummary = generateTournamentSummaryWithAdmin(newSelectedEvent);
                             setSummaryText(newSummary);
-                            setCountSlots(1); // Only one event selected
+                            setCountSlots(1);
                           } else {
-                            // Event deselected - show all events
                             const newSummary = generateCompetitionsSummary(
                               eventsList.filter(e => e.type === 'tournament'),
                               eventsList.filter(e => e.type === 'lesson'),
@@ -620,7 +673,7 @@ Register now - spaces are limited!`);
                               null
                             );
                             setSummaryText(newSummary);
-                            setCountSlots(eventsList.length); // All events
+                            setCountSlots(eventsList.length);
                           }
                         }}
                       >
@@ -646,212 +699,199 @@ Register now - spaces are limited!`);
             </div>
 
             <div className="space-y-2">
-              <Label>Message Preview</Label>
-              <div className="p-4 bg-muted rounded-md border">
-                <pre className="whitespace-pre-wrap text-sm font-mono">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Raw Summary</Label>
+              <div className="p-4 bg-muted/30 rounded-lg border border-border/40">
+                <pre className="whitespace-pre-wrap text-sm font-mono text-foreground/80">
                   {summaryText || 'No summary available'}
                 </pre>
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  if (summaryText) {
-                    navigator.clipboard.writeText(summaryText);
-                    toast({
-                      title: "Copied to clipboard",
-                      description: "Summary copied successfully",
-                    });
-                  }
-                }}
-                disabled={!summaryText}
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Summary
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowPreview(!showPreview)}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                {showPreview ? 'Hide' : 'Show'} Preview
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (summaryText) {
+                  navigator.clipboard.writeText(summaryText);
+                  toast({
+                    title: "Copied to clipboard",
+                    description: "Summary copied successfully",
+                  });
+                }
+              }}
+              disabled={!summaryText}
+              className="h-8 rounded-lg"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Summary
+            </Button>
           </CardContent>
         </Card>
       )}
 
       {/* Message Builder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            Message Builder
-          </CardTitle>
-          <CardDescription>
-            Create and customize your competitions & academies message
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Template Selection */}
-          <div className="flex gap-2">
-            <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select template..." />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    <div className="flex items-center gap-2">
-                      {template.name}
-                      {template.is_default && <Star className="h-3 w-3 text-yellow-500" />}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="sm" onClick={handleNewTemplate}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Template Name */}
-          <div className="space-y-2">
-            <Label htmlFor="templateName">Template Name</Label>
-            <Input
-              id="templateName"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Enter template name"
-            />
-          </div>
-
-          {/* Template Content */}
-          <div className="space-y-2">
-            <Label htmlFor="templateContent">Message Content</Label>
-            <Textarea
-              ref={textareaRef}
-              id="templateContent"
-              value={templateContent}
-              onChange={(e) => setTemplateContent(e.target.value)}
-              placeholder="Enter your message template..."
-              rows={8}
-            />
-          </div>
-
-          {/* Token Insertion */}
-          <div className="space-y-2">
-            <Label>Insert Tokens</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{summary}}')}>
-                <Hash className="h-3 w-3 mr-1" />summary
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{date_display_short}}')}>
-                <Hash className="h-3 w-3 mr-1" />date
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{club_name}}')}>
-                <Hash className="h-3 w-3 mr-1" />club
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{sport}}')}>
-                <Hash className="h-3 w-3 mr-1" />sport
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{count_slots}}')}>
-                <Hash className="h-3 w-3 mr-1" />count
+      <Card className={cardClass}>
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <MessageSquare className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+                <SelectTrigger className="w-52 h-9 rounded-lg text-sm">
+                  <SelectValue placeholder="Select template..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      <div className="flex items-center gap-2">
+                        {template.name}
+                        {template.is_default && <Star className="h-3 w-3 text-yellow-500" />}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Template name"
+                className="w-40 h-9 rounded-lg text-sm"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9 px-3 rounded-lg">
+                    Save <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleSaveTemplate}>
+                    Save
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSaveAsTemplate}>
+                    Save as new
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId}>
+                    Set as default
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="outline" size="sm" onClick={handleNewTemplate} className="h-9 px-3 rounded-lg">
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
-
-          {/* Emoji Picker */}
-          <EmojiPicker onEmojiSelect={insertEmoji} />
-
-          {/* Template Actions */}
-          <div className="flex gap-2">
-            <Button onClick={handleSaveTemplate} variant="outline" className="gap-2">
-              <Save className="h-4 w-4" />
-              Save Template
-            </Button>
-            {selectedTemplateId && (
-              <Button onClick={handleSetDefault} variant="outline" className="gap-2">
-                <Star className="h-4 w-4" />
-                Set Default
-              </Button>
-            )}
-            <Button
-              onClick={() => setShowPreview(!showPreview)}
-              variant="outline"
-              className="gap-2"
-            >
-              <Eye className="h-4 w-4" />
-              {showPreview ? 'Hide' : 'Show'} Preview
-            </Button>
-          </div>
-
-          {/* Live Preview */}
-          {showPreview && (
-            <div className="space-y-2">
-              <Label>Preview</Label>
-              <div className="bg-muted p-4 rounded-md whitespace-pre-wrap font-mono text-sm">
-                {renderTemplate(templateContent)}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Two-column layout for editor and preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Editor Column */}
+            <div className="space-y-3">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Template Editor</Label>
+              <Textarea
+                ref={textareaRef}
+                value={templateContent}
+                onChange={(e) => setTemplateContent(e.target.value)}
+                placeholder="Enter your message template..."
+                rows={10}
+                className="rounded-lg resize-none font-mono text-sm"
+              />
+              
+              {/* Token Chips */}
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => insertToken('{{summary}}')}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
+                >
+                  summary
+                </button>
+                <button
+                  onClick={() => insertToken('{{date_display_short}}')}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
+                >
+                  date
+                </button>
+                <button
+                  onClick={() => insertToken('{{club_name}}')}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
+                >
+                  club
+                </button>
+                <button
+                  onClick={() => insertToken('{{sport}}')}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
+                >
+                  sport
+                </button>
+                <button
+                  onClick={() => insertToken('{{count_slots}}')}
+                  className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 transition-colors"
+                >
+                  count
+                </button>
+                <EmojiPicker onEmojiSelect={insertEmoji} />
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Instant Send */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
-            Send Message
-          </CardTitle>
-          <CardDescription>
-            Send your message instantly to WhatsApp
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="whatsappGroup">WhatsApp Group</Label>
-            <Input
-              id="whatsappGroup"
-              value={whatsappGroup}
-              onChange={(e) => setWhatsappGroup(e.target.value)}
-              placeholder="Enter WhatsApp group name"
-            />
-            {!whatsappGroup && (
-              <p className="text-xs text-muted-foreground">
-                Configure the default group in{' '}
-                <Button variant="link" className="p-0 h-auto text-xs" onClick={() => window.location.href = '/client/settings'}>
-                  Settings
-                </Button>
-              </p>
-            )}
+            {/* Preview Column */}
+            <div className="space-y-3">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Live Preview</Label>
+              <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[260px]">
+                <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
+                  {renderTemplate(templateContent) || 'Preview will appear here...'}
+                </pre>
+              </div>
+            </div>
           </div>
+        </CardContent>
 
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={sendingMessage || !summaryText}
-            className="w-full gap-2"
-          >
-            {sendingMessage ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            {sendingMessage ? 'Sending...' : 'Send Message'}
-          </Button>
-
+        {/* Send Message Footer */}
+        <div className="px-6 py-4 bg-muted/30 dark:bg-muted/20 border-t border-border/40">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <Label htmlFor="whatsappGroupFooter" className="text-sm font-medium whitespace-nowrap">WhatsApp Group</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p className="text-xs">Enter the exact name of your WhatsApp group. Make sure CORTEK has been added to the group.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <Input
+                id="whatsappGroupFooter"
+                value={whatsappGroup}
+                onChange={(e) => setWhatsappGroup(e.target.value)}
+                placeholder="Enter group name"
+                className="flex-1 h-9 rounded-lg text-sm"
+              />
+            </div>
+            <Button 
+              onClick={handleSendMessage} 
+              disabled={sendingMessage || !summaryText}
+              size="sm"
+              className="h-9 px-4 rounded-lg bg-primary/10 border border-primary text-primary hover:bg-primary/20"
+            >
+              {sendingMessage ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+              ) : (
+                <Send className="h-4 w-4 mr-1.5" />
+              )}
+              {sendingMessage ? 'Sending...' : 'Send Now'}
+            </Button>
+          </div>
           {sendResult && (
-            <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'}>
+            <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className="mt-3">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{sendResult.message}</AlertDescription>
             </Alert>
           )}
-        </CardContent>
+        </div>
       </Card>
 
       {/* Scheduled Sends */}
