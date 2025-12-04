@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Save, Star, Eye, Hash } from 'lucide-react';
+import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Save, Star, Hash, ChevronDown, Info } from 'lucide-react';
 import { format, addDays, startOfDay, endOfDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduledSendsV2 } from '@/components/client/ScheduledSendsV2';
 import EmojiPicker from '@/components/client/EmojiPicker';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { formatMatchWhatsAppBlock, generateCompetitiveOpenMatchesSummary } from '@/utils/playtomicAdminUtils';
 import { SocialPostBuilder } from '@/components/social/SocialPostBuilder';
 
@@ -39,7 +40,6 @@ export default function PartialMatches() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   const [templateName, setTemplateName] = useState('');
   const [templateContent, setTemplateContent] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
   
   // Send state  
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -554,6 +554,43 @@ Join these matches - let's play!`);
     }
   };
 
+  const handleSaveAsTemplate = async () => {
+    const newName = templateName ? `${templateName} (copy)` : 'New Template';
+    const templateData = {
+      org_id: organization!.id,
+      category: 'PARTIAL_MATCHES',
+      name: newName,
+      content: templateContent,
+      module: 'PARTIAL_MATCHES',
+      summary_variant: selectedSummaryVariant,
+      linked_event_id: null,
+      whatsapp_group: whatsappGroup
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('message_templates')
+        .insert(templateData)
+        .select()
+        .single();
+      if (error) throw error;
+      setSelectedTemplateId(data.id);
+      setTemplateName(newName);
+      await loadTemplatesAndSettings();
+      toast({
+        title: "Success",
+        description: "Template created",
+      });
+    } catch (err: any) {
+      console.error('Error saving template:', err);
+      toast({
+        title: "Error",
+        description: "Failed to save template",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!whatsappGroup.trim()) {
       toast({
@@ -773,14 +810,6 @@ Join these matches - let's play!`);
                 <Copy className="h-4 w-4 mr-2" />
                 Copy Summary
               </Button>
-              <Button
-                size="sm"
-                className="bg-primary/10 border border-primary text-primary hover:bg-primary/20"
-                onClick={() => setShowPreview(!showPreview)}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                {showPreview ? 'Hide' : 'Show'} Preview
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -796,160 +825,161 @@ Join these matches - let's play!`);
             <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4 pt-5">
-          {/* Template Selection */}
-          <div className="flex gap-2">
+        <CardContent className="pt-5 space-y-5">
+          {/* Template controls row - streamlined */}
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            {/* Left: Template selector */}
             <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select template..." />
+              <SelectTrigger className="w-52 h-9 rounded-lg border-border/50 bg-background text-sm transition-colors hover:border-border">
+                <SelectValue placeholder="Select template" />
               </SelectTrigger>
               <SelectContent>
-                {templates.map((template) => (
+                {templates.map(template => (
                   <SelectItem key={template.id} value={template.id}>
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       {template.name}
-                      {template.is_default && <Star className="h-3 w-3 text-yellow-500" />}
-                    </div>
+                      {template.is_default && <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20" onClick={handleNewTemplate}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Template Name */}
-          <div className="space-y-2">
-            <Label htmlFor="templateName">Template Name</Label>
-            <Input
-              id="templateName"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Enter template name"
-            />
-          </div>
-
-          {/* Template Content */}
-          <div className="space-y-2">
-            <Label htmlFor="templateContent">Message Content</Label>
-            <Textarea
-              ref={textareaRef}
-              id="templateContent"
-              value={templateContent}
-              onChange={(e) => setTemplateContent(e.target.value)}
-              placeholder="Enter your message template..."
-              rows={8}
-            />
-          </div>
-
-          {/* Token Insertion */}
-          <div className="space-y-2">
-            <Label>Insert Tokens</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{summary}}')}>
-                <Hash className="h-3 w-3 mr-1" />summary
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{date_display_short}}')}>
-                <Hash className="h-3 w-3 mr-1" />date
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{club_name}}')}>
-                <Hash className="h-3 w-3 mr-1" />club
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{sport}}')}>
-                <Hash className="h-3 w-3 mr-1" />sport
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => insertToken('{{count_slots}}')}>
-                <Hash className="h-3 w-3 mr-1" />count
+            
+            {/* Right: Name + Actions grouped */}
+            <div className="flex items-center gap-1.5">
+              <Input
+                value={templateName}
+                onChange={e => setTemplateName(e.target.value)}
+                placeholder="Template name"
+                className="w-40 h-9 rounded-lg border-border/50 bg-background text-sm transition-colors hover:border-border focus:border-primary"
+              />
+              
+              <div className="h-6 w-px bg-border/50 mx-1.5" />
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-9 px-3 text-xs font-medium rounded-lg transition-all hover:bg-muted/60 active:scale-[0.98]">
+                    <Save className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
+                    Save
+                    <ChevronDown className="h-3.5 w-3.5 ml-1.5 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-popover min-w-[160px]">
+                  <DropdownMenuItem onClick={handleSaveTemplate} disabled={!selectedTemplateId} className="text-sm">
+                    <Save className="h-4 w-4 mr-2" strokeWidth={1.5} />
+                    Update current
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSaveAsTemplate} className="text-sm">
+                    <Plus className="h-4 w-4 mr-2" strokeWidth={1.5} />
+                    Save as new...
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSetDefault} disabled={!selectedTemplateId} className="text-sm">
+                    <Star className={`h-4 w-4 mr-2 ${templates.find(t => t.id === selectedTemplateId)?.is_default ? 'text-amber-500 fill-amber-500' : ''}`} strokeWidth={1.5} />
+                    Set as default
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-9 px-3 text-xs font-medium rounded-lg transition-all hover:bg-muted/60 active:scale-[0.98]">
+                <Plus className="h-4 w-4 mr-1.5" strokeWidth={1.5} />
+                New
               </Button>
             </div>
           </div>
 
-          {/* Emoji Picker */}
-          <EmojiPicker onEmojiSelect={insertEmoji} />
+          {/* Subtle divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
 
-          {/* Template Actions */}
-          <div className="flex gap-2">
-            <Button onClick={handleSaveTemplate} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2">
-              <Save className="h-4 w-4" />
-              Save Template
-            </Button>
-            {selectedTemplateId && (
-              <Button onClick={handleSetDefault} size="sm" className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2">
-                <Star className="h-4 w-4" />
-                Set Default
-              </Button>
-            )}
-            <Button
-              onClick={() => setShowPreview(!showPreview)}
-              size="sm"
-              className="bg-primary/10 border border-primary text-primary hover:bg-primary/20 gap-2"
-            >
-              <Eye className="h-4 w-4" />
-              {showPreview ? 'Hide' : 'Show'} Preview
-            </Button>
-          </div>
-
-          {/* Live Preview */}
-          {showPreview && (
+          {/* Two-column layout: Editor + Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left side - Template editor */}
             <div className="space-y-2">
-              <Label>Preview</Label>
-              <div className="bg-purple-50/40 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-200/30 dark:border-purple-800/20 whitespace-pre-wrap font-mono text-sm text-foreground/90">
-                {renderTemplate(templateContent)}
+              <div className="flex items-center justify-between">
+                <Label htmlFor="templateContent" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+              </div>
+              <Textarea
+                ref={textareaRef}
+                id="templateContent"
+                value={templateContent}
+                onChange={e => setTemplateContent(e.target.value)}
+                rows={8}
+                placeholder="Enter your message template..."
+                className="rounded-lg border-border/40 bg-background min-h-[180px] resize-none text-sm leading-relaxed"
+              />
+              {/* Token chips */}
+              <div className="space-y-2 pt-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { token: '{{club_name}}', label: 'club_name' },
+                    { token: '{{date_display_short}}', label: 'date' },
+                    { token: '{{summary}}', label: 'summary' },
+                    { token: '{{count_slots}}', label: 'count' },
+                    { token: '{{sport}}', label: 'sport' }
+                  ].map(({ token, label }) => (
+                    <button
+                      key={token}
+                      onClick={() => insertToken(token)}
+                      className="text-xs rounded-full px-2.5 py-1 bg-muted/40 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                  <EmojiPicker onEmojiSelect={insertEmoji} />
+                </div>
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Instant Send */}
-      <Card className={cardClass}>
-        <CardHeader className="pb-0">
-          <div className="flex items-center gap-3 pb-4 border-b border-border/50">
-            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-              <Send className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            {/* Right side - Live Preview */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+                <span className="text-xs text-muted-foreground invisible">placeholder</span>
+              </div>
+              <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-lg min-h-[180px]">
+                <div className="text-sm whitespace-pre-wrap text-foreground/85 leading-relaxed">
+                  {summaryText ? renderTemplate(templateContent) : <span className="text-muted-foreground/50 italic">Run a search to preview with real data</span>}
+                </div>
+              </div>
             </div>
-            <CardTitle className="text-lg font-semibold">Send Message</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-5">
-          <div className="space-y-2">
-            <Label htmlFor="whatsappGroup">WhatsApp Group</Label>
-            <Input
-              id="whatsappGroup"
-              value={whatsappGroup}
-              onChange={(e) => setWhatsappGroup(e.target.value)}
-              placeholder="Enter WhatsApp group name"
-            />
-            {!whatsappGroup && (
-              <p className="text-xs text-muted-foreground">
-                Configure the default group in{' '}
-                <Button variant="link" className="p-0 h-auto text-xs" onClick={() => window.location.href = '/client/settings'}>
-                  Settings
-                </Button>
-              </p>
-            )}
           </div>
 
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={sendingMessage || !enhancedSummary}
-            className="w-full gap-2"
-          >
-            {sendingMessage ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            {sendingMessage ? 'Sending...' : 'Send Message'}
-          </Button>
+          {/* Send Message Footer */}
+          <div className="space-y-3 bg-muted/30 dark:bg-muted/20 -mx-6 px-6 py-4 rounded-b-lg">
+            <div className="flex items-center gap-4">
+              <Label htmlFor="whatsappGroup" className="text-sm font-medium text-muted-foreground whitespace-nowrap">WhatsApp Group:</Label>
+              <Input
+                id="whatsappGroup"
+                value={whatsappGroup}
+                onChange={e => setWhatsappGroup(e.target.value)}
+                placeholder="Group name"
+                className="flex-1 h-9 rounded-lg border-border/50 bg-background text-sm"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={sendingMessage || !whatsappGroup.trim() || !templateContent.trim()}
+                className="gap-2 h-9 bg-primary/10 border border-primary text-primary hover:bg-primary/20 whitespace-nowrap px-4"
+              >
+                {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Send Now
+              </Button>
+            </div>
 
-          {sendResult && (
-            <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'}>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{sendResult.message}</AlertDescription>
-            </Alert>
-          )}
+            {!orgSettings?.wa_group_matches && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5 flex-shrink-0" />
+                Set up WhatsApp groups in Settings to enable sending
+              </div>
+            )}
+
+            {sendResult && (
+              <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className={`rounded-xl ${sendResult.status === 'success' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/30' : ''}`}>
+                <AlertDescription className="flex items-center gap-2">
+                  {sendResult.status === 'success' ? '✅' : '❌'} {sendResult.message}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
         </CardContent>
       </Card>
 
