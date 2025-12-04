@@ -836,7 +836,7 @@ Register now - spaces are limited!`);
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Editor Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</Label>
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block text-left">Content</Label>
               <Textarea
                 ref={textareaRef}
                 value={templateContent}
@@ -848,7 +848,7 @@ Register now - spaces are limited!`);
               
               {/* Token Chips */}
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Insert</Label>
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block text-left">Insert</Label>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { token: '{{summary}}', label: 'summary' },
@@ -872,7 +872,7 @@ Register now - spaces are limited!`);
 
             {/* Preview Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</Label>
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block text-left">Preview</Label>
               <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[180px]">
                 <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
                   {renderTemplate(templateContent) || 'Preview will appear here...'}
