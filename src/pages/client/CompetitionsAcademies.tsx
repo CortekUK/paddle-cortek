@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, AlertCircle, Loader2, Copy, MessageSquare, Send, Plus, Star, Hash, ChevronDown, Trophy, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -684,28 +683,23 @@ Register now - spaces are limited!`);
                       return (
                         <div
                           key={index}
-                          className={`p-2 rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
+                          className={`p-2 cursor-pointer rounded-lg transition-colors hover:bg-muted/50 ${isSelected ? 'bg-primary/10 border border-primary/30' : ''}`}
+                          onClick={() => {
+                            const newSelectedIds = new Set(selectedEventIds);
+                            if (isSelected) {
+                              newSelectedIds.delete(eventId);
+                            } else {
+                              newSelectedIds.add(eventId);
+                            }
+                            setSelectedEventIds(newSelectedIds);
+                            updateSummaryFromSelection(newSelectedIds);
+                          }}
                         >
-                          <div className="flex items-center gap-3">
-                            <Checkbox
-                              id={`event-${index}`}
-                              checked={isSelected}
-                              onCheckedChange={(checked) => {
-                                const newSelectedIds = new Set(selectedEventIds);
-                                if (checked) {
-                                  newSelectedIds.add(eventId);
-                                } else {
-                                  newSelectedIds.delete(eventId);
-                                }
-                                setSelectedEventIds(newSelectedIds);
-                                updateSummaryFromSelection(newSelectedIds);
-                              }}
-                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                            />
-                            <label htmlFor={`event-${index}`} className="flex-1 cursor-pointer">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
                               <div className="text-sm font-medium">{name}</div>
                               <div className="text-xs text-muted-foreground">{dateTime.date} at {dateTime.time}</div>
-                            </label>
+                            </div>
                             {capacity.display && (
                               <Badge 
                                 variant={capacity.full ? "default" : "secondary"}
