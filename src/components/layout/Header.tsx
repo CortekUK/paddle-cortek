@@ -18,22 +18,22 @@ export function Header() {
   const { highestRole, loading } = useUserRole();
 
   return (
-    <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
-      <div className="flex-1" />
-      
+    <header className="h-14 border-b border-border bg-background/95 backdrop-blur-sm px-6 flex items-center justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <User className="h-4 w-4" />
-            <span className="hidden md:inline">{profile?.email}</span>
+          <Button variant="ghost" size="sm" className="gap-2 h-9">
+            <div className="p-1.5 rounded-full bg-muted">
+              <User className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            <span className="hidden md:inline text-sm">{profile?.email}</span>
             {!loading && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-[10px] font-medium uppercase tracking-wide px-1.5 py-0">
                 {highestRole()}
               </Badge>
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-56 bg-popover border border-border shadow-lg">
           <DropdownMenuLabel>
             <div>
               <p className="text-sm font-medium">{profile?.full_name || 'User'}</p>
@@ -41,7 +41,7 @@ export function Header() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={signOut} className="gap-2">
+          <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer">
             <LogOut className="h-4 w-4" />
             Sign out
           </DropdownMenuItem>
