@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Wallet, Info, ExternalLink } from 'lucide-react';
+import { Crown, Rocket, ExternalLink } from 'lucide-react';
 
 const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
@@ -51,42 +51,21 @@ export default function Billing() {
         </CardContent>
       </Card>
 
-      {/* Billing Portal */}
+      {/* Coming Soon */}
       <Card className={cardClass}>
         <CardHeader className="text-left">
           <div className="flex items-center gap-4">
             <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-              <Wallet className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              <Rocket className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
             </div>
-            <CardTitle>Billing Management</CardTitle>
+            <CardTitle>Coming Soon</CardTitle>
           </div>
         </CardHeader>
-        <CardContent>
-          <Button disabled variant="outline" className="w-full rounded-xl">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Open Customer Portal (Coming Soon)
-          </Button>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Stripe billing portal will be available in the next release.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Upcoming Features */}
-      <Card className={cardClass}>
-        <CardHeader className="text-left">
-          <div className="flex items-center gap-4">
-            <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-              <Info className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
-            </div>
-            <CardTitle>Coming in Phase 2</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <ul className="space-y-2 text-sm text-left">
             <li className="flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full" />
-              Stripe payment processing
+              Stripe payment processing & customer portal
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full" />
@@ -96,11 +75,17 @@ export default function Billing() {
               <div className="w-2 h-2 bg-purple-500 rounded-full" />
               Usage-based billing
             </li>
-            <li className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full" />
-              Automatic billing management
-            </li>
           </ul>
+
+          <div className="pt-4 border-t">
+            <Button disabled variant="outline" className="w-full rounded-xl">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Customer Portal
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Available in the next release
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
