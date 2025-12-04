@@ -620,7 +620,31 @@ Register now - spaces are limited!`);
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="pt-4 space-y-4">
+          {/* Date Range Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">From Date & Time</Label>
+              <Input
+                id="dateFrom"
+                type="datetime-local"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-9 rounded-lg text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To Date & Time</Label>
+              <Input
+                id="dateTo"
+                type="datetime-local"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-9 rounded-lg text-sm"
+              />
+            </div>
+          </div>
+
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
