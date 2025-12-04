@@ -119,7 +119,7 @@ export default function SendMessage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
         <div className="relative text-left">
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Send Message</h1>
-          <p className="text-muted-foreground mt-1.5">Send a message to your padel groups via the emulator.</p>
+          <p className="text-muted-foreground mt-1.5">Test message delivery to WhatsApp groups in the sandbox environment.</p>
         </div>
       </div>
 
@@ -133,7 +133,7 @@ export default function SendMessage() {
               <CardTitle className="text-lg">Compose Message</CardTitle>
             </div>
             <CardDescription className="ml-11">
-              Enter your message and target groups.
+              Write your message and select which WhatsApp groups to send it to.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -152,10 +152,10 @@ export default function SendMessage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="groups">Target Groups *</Label>
-                <Input id="groups" placeholder="group1, group2, group3" value={groups} onChange={e => setGroups(e.target.value)} required disabled={sending} className="h-11 rounded-lg" />
+                <Label htmlFor="groups">WhatsApp Groups *</Label>
+                <Input id="groups" placeholder="Padel Club Madrid, Weekend Players" value={groups} onChange={e => setGroups(e.target.value)} required disabled={sending} className="h-11 rounded-lg" />
                 <p className="text-xs text-muted-foreground">
-                  Separate multiple groups with commas
+                  Enter exact group names, separated by commas
                 </p>
               </div>
 
