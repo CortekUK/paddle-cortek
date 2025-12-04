@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,9 @@ export default function PartialMatches() {
   // Summary variant state
   const [selectedSummaryVariant, setSelectedSummaryVariant] = useState<string>('competitive-open');
   const [enhancedSummary, setEnhancedSummary] = useState<string>('');
+  
+  // Active preset state for Today/Tomorrow buttons
+  const [activePreset, setActivePreset] = useState<'today' | 'tomorrow' | null>(null);
   
   // Template state
   const [templates, setTemplates] = useState<any[]>([]);
@@ -233,6 +237,7 @@ export default function PartialMatches() {
     
     setDateFrom(startOfDayLocal);
     setDateTo(endOfDayLocal);
+    setActivePreset(preset);
   };
 
   // Load templates and settings on component mount
@@ -703,7 +708,12 @@ Join these matches - let's play!`);
                   variant="outline"
                   size="sm"
                   onClick={() => setPreset(preset)}
-                  className="rounded-full px-4 h-8 text-sm font-medium transition-all bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                  className={cn(
+                    "rounded-full px-4 h-8 text-sm font-medium transition-all",
+                    activePreset === preset
+                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700 shadow-sm"
+                      : "bg-background text-foreground hover:bg-muted hover:text-foreground border-border/50 hover:border-border"
+                  )}
                 >
                   {preset === 'today' ? 'Today' : 'Tomorrow'}
                 </Button>
