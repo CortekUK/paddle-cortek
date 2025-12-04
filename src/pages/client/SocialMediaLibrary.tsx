@@ -332,9 +332,8 @@ const SocialMediaLibrary = () => {
         </TabsList>
 
         <TabsContent value="templates" className="space-y-6 mt-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Design reusable post layouts</p>
-            <Button 
+          <div className="flex justify-end items-center">
+            <Button
               className="flex items-center gap-2 bg-primary/10 border border-primary text-primary hover:bg-primary/20"
               onClick={() => {
                 setEditingTemplate(null);
