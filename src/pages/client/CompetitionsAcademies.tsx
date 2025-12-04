@@ -638,7 +638,7 @@ Register now - spaces are limited!`);
           {/* Date Range Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">From Date & Time</Label>
+              <Label htmlFor="dateFrom" className="text-xs font-medium text-muted-foreground tracking-wide">From Date & Time</Label>
               <Input
                 id="dateFrom"
                 type="datetime-local"
@@ -648,7 +648,7 @@ Register now - spaces are limited!`);
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">To Date & Time</Label>
+              <Label htmlFor="dateTo" className="text-xs font-medium text-muted-foreground tracking-wide">To Date & Time</Label>
               <Input
                 id="dateTo"
                 type="datetime-local"
@@ -670,7 +670,7 @@ Register now - spaces are limited!`);
           {searchResults.length > 0 && (
             <>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Events List</Label>
+                <Label className="text-xs font-medium text-muted-foreground tracking-wide">Events List</Label>
                 <div className="max-h-32 overflow-y-auto border border-border/40 rounded-lg bg-muted/20">
                   <div className="p-2">
                     {eventsList.map((event, index) => {
@@ -717,7 +717,7 @@ Register now - spaces are limited!`);
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Raw Summary</Label>
+                <Label className="text-xs font-medium text-muted-foreground tracking-wide">Raw Summary</Label>
                 <div className="p-4 bg-muted/30 rounded-lg border border-border/40">
                   <pre className="whitespace-pre-wrap text-sm font-mono text-foreground/80">
                     {summaryText || 'No summary available'}
@@ -816,7 +816,7 @@ Register now - spaces are limited!`);
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Editor Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Template Editor</Label>
+              <Label className="text-xs font-medium text-muted-foreground tracking-wide">Template Editor</Label>
               <Textarea
                 ref={textareaRef}
                 value={templateContent}
@@ -864,7 +864,7 @@ Register now - spaces are limited!`);
 
             {/* Preview Column */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Live Preview</Label>
+              <Label className="text-xs font-medium text-muted-foreground tracking-wide">Live Preview</Label>
               <div className="bg-muted/30 p-4 rounded-lg border border-border/40 min-h-[260px]">
                 <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
                   {renderTemplate(templateContent) || 'Preview will appear here...'}
