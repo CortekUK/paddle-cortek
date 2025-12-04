@@ -24,30 +24,30 @@ export default function ClientDashboard() {
 
   const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
-  const secondaryAutomations = [
+  const quickAccessItems = [
+    {
+      title: 'Court Availability',
+      status: 'Active', 
+      icon: Calendar,
+      href: '/client/court-availability',
+    },
     {
       title: 'Partial Matches',
-      description: 'Auto-find players for incomplete bookings',
       status: 'Active', 
       icon: Users,
       href: '/client/partial-matches',
-      accentColor: 'border-l-primary/50'
     },
     {
       title: 'Competitions',
-      description: 'Tournament & academy updates',
       status: 'Active',
       icon: Flag, 
       href: '/client/competitions-academies',
-      accentColor: 'border-l-accent/50'
     },
     {
       title: 'Social Media',
-      description: 'Create and schedule social posts',
       status: 'Active',
       icon: Image,
       href: '/client/social-media-library',
-      accentColor: 'border-l-purple-500/50'
     }
   ];
 
@@ -70,14 +70,14 @@ export default function ClientDashboard() {
           <Skeleton className="h-32 rounded-2xl" />
         </div>
         
-        {/* Features Skeleton */}
+        {/* Quick Access Skeleton */}
         <div>
           <Skeleton className="h-5 w-40 mb-4" />
-          <div className="grid gap-5 grid-cols-1 md:grid-cols-3">
-            <Skeleton className="md:col-span-2 md:row-span-2 h-80 rounded-3xl" />
-            <Skeleton className="h-36 rounded-2xl" />
-            <Skeleton className="h-36 rounded-2xl" />
-            <Skeleton className="h-36 rounded-2xl" />
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            <Skeleton className="h-20 rounded-xl" />
+            <Skeleton className="h-20 rounded-xl" />
+            <Skeleton className="h-20 rounded-xl" />
+            <Skeleton className="h-20 rounded-xl" />
           </div>
         </div>
       </div>
@@ -189,84 +189,34 @@ export default function ClientDashboard() {
         </Card>
       </div>
 
-      {/* Bento Grid - Features */}
+      {/* Quick Access Strip */}
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
             <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
           </div>
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Your Automations</h2>
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Quick Access</h2>
         </div>
-        <div className="grid gap-5 grid-cols-1 md:grid-cols-3 auto-rows-fr">
-          {/* Hero Card - Court Availability */}
-          <Card 
-            className={cn(cardClass, "md:col-span-2 md:row-span-2 rounded-3xl shadow-xl group cursor-pointer hover:shadow-2xl transition-all duration-300")}
-            onClick={() => navigate('/client/court-availability')}
-          >
-            <CardContent className="p-8 h-full flex flex-col">
-              <div className="flex items-start justify-between mb-6">
-                <div className="p-3 rounded-xl bg-muted/50 dark:bg-muted/30 group-hover:bg-muted/70 transition-colors duration-300">
-                  <Calendar className="h-6 w-6 text-foreground" strokeWidth={1.5} />
-                </div>
-                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 animate-pulse-soft">
-                  Active
-                </Badge>
-              </div>
-              
-              <div className="flex-1">
-                <CardTitle className="text-2xl font-bold text-foreground mb-3">Court Availability</CardTitle>
-                <CardDescription className="text-base text-muted-foreground leading-relaxed max-w-md">
-                  Automated availability notifications sent directly to your members when courts become free. Never miss a booking opportunity.
-                </CardDescription>
-              </div>
-
-              <div className="flex items-center justify-between mt-6 pt-6 border-t border-border/40">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>Last sent 2 hours ago</span>
-                </div>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="rounded-xl"
-                >
-                  Manage
-                  <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Secondary Cards - Stacked */}
-          {secondaryAutomations.map((card, index) => (
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          {quickAccessItems.map((item) => (
             <Card 
-              key={card.title}
+              key={item.title}
               className={cn(
                 cardClass,
-                "border-l-4 group cursor-pointer hover:shadow-xl transition-all duration-300",
-                card.accentColor
+                "group cursor-pointer hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
               )}
-              onClick={() => navigate(card.href)}
-              style={{ animationDelay: `${index * 100}ms` }}
+              onClick={() => navigate(item.href)}
             >
-              <CardContent className="p-5 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2.5 rounded-lg bg-muted/50 dark:bg-muted/30">
-                    <card.icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                  </div>
-                  <Badge variant="outline" className="border-border text-muted-foreground bg-muted/30 text-[10px]">
-                    {card.status}
-                  </Badge>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted/50 dark:bg-muted/30 group-hover:bg-primary/10 transition-colors">
+                  <item.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.5} />
                 </div>
-                
-                <div className="flex-1">
-                  <CardTitle className="text-base font-semibold text-foreground mb-1">{card.title}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground line-clamp-2">{card.description}</CardDescription>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium text-foreground truncate">{item.title}</h3>
                 </div>
-
-                <div className="flex items-center justify-end mt-4">
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
+                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px] shrink-0">
+                  {item.status}
+                </Badge>
               </CardContent>
             </Card>
           ))}
