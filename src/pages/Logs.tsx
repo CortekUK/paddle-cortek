@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { ChevronDown, ChevronRight, Search, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, RefreshCw, History } from 'lucide-react';
 
 interface SendLog {
   id: string;
@@ -33,6 +33,8 @@ interface SendLog {
   user_id: string;
   location_id: string;
 }
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 export default function Logs() {
   const [searchParams] = useSearchParams();
@@ -86,16 +88,36 @@ export default function Logs() {
   };
 
   const getStatusBadge = (statusCode?: number) => {
-    if (!statusCode) return <Badge variant="secondary">No Response</Badge>;
+    if (!statusCode) return (
+      <Badge variant="secondary" className="bg-muted text-muted-foreground border-0">
+        No Response
+      </Badge>
+    );
     
     if (statusCode >= 200 && statusCode < 300) {
-      return <Badge variant="default" className="bg-green-500">Success ({statusCode})</Badge>;
+      return (
+        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
+          Success ({statusCode})
+        </Badge>
+      );
     } else if (statusCode >= 400 && statusCode < 500) {
-      return <Badge variant="destructive">Client Error ({statusCode})</Badge>;
+      return (
+        <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0">
+          Client Error ({statusCode})
+        </Badge>
+      );
     } else if (statusCode >= 500) {
-      return <Badge variant="destructive">Server Error ({statusCode})</Badge>;
+      return (
+        <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0">
+          Server Error ({statusCode})
+        </Badge>
+      );
     } else {
-      return <Badge variant="secondary">{statusCode}</Badge>;
+      return (
+        <Badge variant="secondary" className="bg-muted text-muted-foreground border-0">
+          {statusCode}
+        </Badge>
+      );
     }
   };
 
@@ -119,30 +141,37 @@ export default function Logs() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Send Logs</h1>
-          <p className="text-muted-foreground">
-            View message sending history and debug information.
-          </p>
+      {/* Premium Gradient Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-8 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Send Logs</h1>
+            <p className="text-muted-foreground mt-1">
+              View message sending history and debug information.
+            </p>
+          </div>
+          <Button onClick={fetchLogs} variant="outline" className="rounded-lg">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
-        <Button onClick={fetchLogs} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
+      {/* Search Card */}
+      <Card className={cardClass}>
         <CardContent className="pt-6">
           <div className="flex gap-4 items-center">
+            <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <Search className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by URL, channel, or response..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-11 rounded-lg"
               />
             </div>
           </div>
@@ -150,17 +179,24 @@ export default function Logs() {
       </Card>
 
       {/* Logs Table */}
-      <Card>
+      <Card className={cardClass}>
         <CardHeader>
-          <CardTitle>Send History ({filteredLogs.length})</CardTitle>
-          <CardDescription>
-            Click on a row to view full request and response details.
-          </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <History className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <div>
+              <CardTitle>Send History ({filteredLogs.length})</CardTitle>
+              <CardDescription>
+                Click on a row to view full request and response details.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-border/40">
                 <TableHead className="w-10"></TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Channel</TableHead>
@@ -174,23 +210,23 @@ export default function Logs() {
                   <>
                     <CollapsibleTrigger asChild>
                       <TableRow 
-                        className={`cursor-pointer hover:bg-muted/50 ${
+                        className={`cursor-pointer hover:bg-muted/50 border-border/40 ${
                           highlightLogId === log.id ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''
                         }`}
                         onClick={() => toggleRowExpansion(log.id)}
                       >
                         <TableCell>
                           {expandedRows.has(log.id) ? (
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
                           ) : (
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           )}
                         </TableCell>
                         <TableCell className="font-mono text-sm">
                           {new Date(log.created_at).toLocaleString()}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">{log.channel}</Badge>
+                          <Badge variant="outline" className="rounded-md">{log.channel}</Badge>
                         </TableCell>
                         <TableCell>{getStatusBadge(log.status_code)}</TableCell>
                         <TableCell className="font-mono text-sm max-w-md truncate">
@@ -199,18 +235,18 @@ export default function Logs() {
                       </TableRow>
                     </CollapsibleTrigger>
                     <CollapsibleContent asChild>
-                      <TableRow>
-                        <TableCell colSpan={5} className="bg-muted/30 p-6">
+                      <TableRow className="border-border/40">
+                        <TableCell colSpan={5} className="bg-muted/20 p-6">
                           <div className="space-y-4">
-                            <div>
-                              <h4 className="font-semibold mb-2">Request Details</h4>
-                              <div className="bg-background p-3 rounded border">
-                                <p className="text-sm"><strong>URL:</strong> {log.request_url}</p>
-                                <p className="text-sm"><strong>Channel:</strong> {log.channel}</p>
+                            <div className="bg-background rounded-lg border border-border/60 p-4">
+                              <h4 className="font-semibold mb-3 text-sm">Request Details</h4>
+                              <div className="space-y-2">
+                                <p className="text-sm"><span className="text-muted-foreground">URL:</span> {log.request_url}</p>
+                                <p className="text-sm"><span className="text-muted-foreground">Channel:</span> {log.channel}</p>
                                 {log.payload && (
-                                  <div className="mt-2">
-                                    <strong className="text-sm">Payload:</strong>
-                                    <pre className="text-xs mt-1 p-2 bg-muted rounded overflow-x-auto">
+                                  <div className="mt-3">
+                                    <span className="text-sm text-muted-foreground">Payload:</span>
+                                    <pre className="text-xs mt-2 p-3 bg-muted/50 rounded-lg overflow-x-auto font-mono">
                                       {JSON.stringify(log.payload, null, 2)}
                                     </pre>
                                   </div>
@@ -218,16 +254,16 @@ export default function Logs() {
                               </div>
                             </div>
                             
-                            <div>
-                              <h4 className="font-semibold mb-2">Response Details</h4>
-                              <div className="bg-background p-3 rounded border">
+                            <div className="bg-background rounded-lg border border-border/60 p-4">
+                              <h4 className="font-semibold mb-3 text-sm">Response Details</h4>
+                              <div className="space-y-2">
                                 <p className="text-sm">
-                                  <strong>Status Code:</strong> {log.status_code || 'N/A'}
+                                  <span className="text-muted-foreground">Status Code:</span> {log.status_code || 'N/A'}
                                 </p>
                                 {log.response_body && (
-                                  <div className="mt-2">
-                                    <strong className="text-sm">Response Body:</strong>
-                                    <pre className="text-xs mt-1 p-2 bg-muted rounded overflow-x-auto max-h-48 overflow-y-auto">
+                                  <div className="mt-3">
+                                    <span className="text-sm text-muted-foreground">Response Body:</span>
+                                    <pre className="text-xs mt-2 p-3 bg-muted/50 rounded-lg overflow-x-auto max-h-48 overflow-y-auto font-mono">
                                       {log.response_body}
                                     </pre>
                                   </div>
@@ -243,8 +279,8 @@ export default function Logs() {
               ))}
               
               {filteredLogs.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableRow className="border-border/40">
+                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
                     No send logs found.
                   </TableCell>
                 </TableRow>
