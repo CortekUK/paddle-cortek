@@ -277,7 +277,7 @@ export function AuthPage() {
                   </div>
                 </div>
                 {password && confirmPassword && password !== confirmPassword && <p className="text-sm text-destructive">Passwords do not match</p>}
-                <Button type="submit" className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300" disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8} variant="hero">
+                <Button type="submit" className="w-full h-12 rounded-xl bg-primary/10 border border-primary text-primary hover:bg-primary/20 transition-all duration-300" disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword || password.length < 8}>
                    {loading ? 'Creating account...' : 'Create account'}
                  </Button>
               </form>
