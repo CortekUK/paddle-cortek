@@ -11,14 +11,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Menu } from 'lucide-react';
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { profile, signOut } = useAuth();
   const { highestRole, loading } = useUserRole();
 
   return (
-    <header className="h-14 border-b border-border bg-background/95 backdrop-blur-sm px-6 flex items-center justify-end">
+    <header className="h-14 border-b border-border bg-background/95 backdrop-blur-sm px-6 flex items-center justify-between">
+      {/* Mobile menu button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="lg:hidden"
+        onClick={onMenuClick}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
+      <div className="hidden lg:block" /> {/* Spacer for desktop */}
+      
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2 h-9">
