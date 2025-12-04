@@ -588,7 +588,7 @@ Register now - spaces are limited!`);
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Trophy className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
               <CardTitle className="text-lg font-semibold">
                 Find Events
@@ -761,7 +761,7 @@ Register now - spaces are limited!`);
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
-                <MessageSquare className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
               <CardTitle className="text-lg font-semibold">Message Builder</CardTitle>
             </div>
