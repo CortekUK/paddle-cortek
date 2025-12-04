@@ -1867,17 +1867,12 @@ ${matchUrl}`;
         
         <TabsContent value="discovery">
           <Card className={cardClass}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="text-left pb-4">
+              <div className="flex items-center gap-4">
                 <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                   <Search className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
                 </div>
-                <div>
-                  <CardTitle>Tenant Discovery</CardTitle>
-                  <CardDescription>
-                    Discover Playtomic tenant information from a club URL
-                  </CardDescription>
-                </div>
+                <CardTitle>Tenant Discovery</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1936,17 +1931,12 @@ ${matchUrl}`;
 
         <TabsContent value="fetch">
           <Card className={cardClass}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="text-left pb-4">
+              <div className="flex items-center gap-4">
                 <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                   <Play className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
                 </div>
-                <div>
-                  <CardTitle>API Fetch Runner</CardTitle>
-                  <CardDescription>
-                    Test Playtomic API endpoints with various parameters
-                  </CardDescription>
-                </div>
+                <CardTitle>API Fetch Runner</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
