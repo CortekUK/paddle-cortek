@@ -28,14 +28,14 @@ export default function Billing() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2">
               <h3 className="font-semibold">Free Trial</h3>
-              <p className="text-sm text-muted-foreground">
-                Full access to all features during trial period
-              </p>
+              <Badge variant="secondary">Active</Badge>
             </div>
-            <Badge variant="secondary">Active</Badge>
+            <p className="text-sm text-muted-foreground">
+              Full access to all features during trial period
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
