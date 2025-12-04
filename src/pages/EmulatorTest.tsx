@@ -1,12 +1,14 @@
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { TestTube, Send, CheckCircle, XCircle } from 'lucide-react';
+import { Send, CheckCircle, XCircle, Activity, Info } from 'lucide-react';
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 export default function EmulatorTest() {
   const [testing, setTesting] = useState(false);
@@ -33,7 +35,6 @@ export default function EmulatorTest() {
 
       if (error) throw error;
 
-      // Use the first result for display
       const firstResult = data?.results?.[0];
       setLastResult({
         success: data.success,
@@ -74,126 +75,140 @@ export default function EmulatorTest() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <TestTube className="h-8 w-8" />
-          Emulator Test
-        </h1>
-        <p className="text-muted-foreground">
-          Quick health check for your emulator endpoint. Sends a test message and displays the raw response.
-        </p>
+    <div className="space-y-6">
+      {/* Gradient Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-8 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold">Emulator Test</h1>
+          <p className="text-muted-foreground mt-1">Quick health check for your emulator endpoint.</p>
+        </div>
       </div>
 
-      {/* Test Control */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Health Check</CardTitle>
-          <CardDescription>
-            Send a test message to verify the emulator is responding correctly.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button 
-            onClick={handleTest}
-            disabled={testing}
-            className="w-full"
-            size="lg"
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {testing ? 'Testing Connection...' : 'Send Test Message'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Last Test Result */}
-      {lastResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {lastResult.success ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : (
-                <XCircle className="h-5 w-5 text-red-500" />
-              )}
-              Last Test Result
-              <Badge variant={lastResult.success ? "default" : "destructive"}>
-                {lastResult.success ? 'Success' : 'Failed'}
-              </Badge>
-            </CardTitle>
-            <CardDescription>
-              Tested at {new Date(lastResult.timestamp).toLocaleString()}
-            </CardDescription>
+      <div className="max-w-4xl space-y-6">
+        {/* Health Check Card */}
+        <Card className={cardClass}>
+          <CardHeader className="text-left">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <CardTitle>Health Check</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {lastResult.url && (
-              <div>
-                <h4 className="font-semibold text-sm mb-2">Request URL</h4>
-                <div className="bg-muted p-3 rounded-md">
-                  <code className="text-sm font-mono">{lastResult.url}</code>
-                </div>
-              </div>
-            )}
-
-            {lastResult.status && (
-              <div>
-                <h4 className="font-semibold text-sm mb-2">Status Code</h4>
-                <Badge 
-                  variant={
-                    lastResult.status >= 200 && lastResult.status < 300 
-                      ? "default" 
-                      : "destructive"
-                  }
-                >
-                  {lastResult.status}
-                </Badge>
-              </div>
-            )}
-
-            {lastResult.response && (
-              <div>
-                <h4 className="font-semibold text-sm mb-2">Response Body</h4>
-                <Textarea
-                  value={lastResult.response}
-                  readOnly
-                  className="font-mono text-sm min-h-32"
-                />
-              </div>
-            )}
-
-            {lastResult.error && (
-              <div>
-                <h4 className="font-semibold text-sm mb-2">Error Details</h4>
-                <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
-                  <code className="text-sm text-red-700 dark:text-red-300">
-                    {lastResult.error}
-                  </code>
-                </div>
-              </div>
-            )}
+          <CardContent>
+            <Button 
+              onClick={handleTest}
+              disabled={testing}
+              className="w-full rounded-xl"
+              size="lg"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              {testing ? 'Testing Connection...' : 'Send Test Message'}
+            </Button>
           </CardContent>
         </Card>
-      )}
 
-      {/* Test Message Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>About This Test</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>This test sends a canned message with the following properties:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Message: "Test message from CORTEK Admin Panel"</li>
-            <li>Groups: ["test_group"]</li>
-            <li>Uses your location's configured emulator URL</li>
-            <li>Includes proper RFC 3986 URL encoding</li>
-            <li>Times out after 10 seconds</li>
-          </ul>
-          <p className="mt-3">
-            This helps diagnose connectivity issues without affecting your main Send Message flow.
-          </p>
-        </CardContent>
-      </Card>
+        {/* Last Test Result Card */}
+        {lastResult && (
+          <Card className={cardClass}>
+            <CardHeader className="text-left">
+              <div className="flex items-center gap-4">
+                {lastResult.success ? (
+                  <div className="p-2.5 rounded-lg bg-green-100/50 dark:bg-green-900/20">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" strokeWidth={1.5} />
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-lg bg-red-100/50 dark:bg-red-900/20">
+                    <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" strokeWidth={1.5} />
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <CardTitle>Last Test Result</CardTitle>
+                  <Badge variant={lastResult.success ? "default" : "destructive"}>
+                    {lastResult.success ? 'Success' : 'Failed'}
+                  </Badge>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2 ml-[52px]">
+                Tested at {new Date(lastResult.timestamp).toLocaleString()}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {lastResult.url && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Request URL</h4>
+                  <div className="bg-muted p-3 rounded-lg">
+                    <code className="text-sm font-mono">{lastResult.url}</code>
+                  </div>
+                </div>
+              )}
+
+              {lastResult.status && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Status Code</h4>
+                  <Badge 
+                    variant={
+                      lastResult.status >= 200 && lastResult.status < 300 
+                        ? "default" 
+                        : "destructive"
+                    }
+                  >
+                    {lastResult.status}
+                  </Badge>
+                </div>
+              )}
+
+              {lastResult.response && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Response Body</h4>
+                  <Textarea
+                    value={lastResult.response}
+                    readOnly
+                    className="font-mono text-sm min-h-32 rounded-lg"
+                  />
+                </div>
+              )}
+
+              {lastResult.error && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Error Details</h4>
+                  <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                    <code className="text-sm text-red-700 dark:text-red-300">
+                      {lastResult.error}
+                    </code>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* About This Test Card */}
+        <Card className={cardClass}>
+          <CardHeader className="text-left">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+                <Info className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+              </div>
+              <CardTitle>About This Test</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2 text-left">
+            <p>This test sends a canned message with the following properties:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Message: "Test message from CORTEK Admin Panel"</li>
+              <li>Groups: ["test_group"]</li>
+              <li>Uses your location's configured emulator URL</li>
+              <li>Includes proper RFC 3986 URL encoding</li>
+              <li>Times out after 10 seconds</li>
+            </ul>
+            <p className="mt-3">
+              This helps diagnose connectivity issues without affecting your main Send Message flow.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
