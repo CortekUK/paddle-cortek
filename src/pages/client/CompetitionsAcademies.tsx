@@ -823,7 +823,8 @@ Register now - spaces are limited!`);
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="sm" onClick={handleNewTemplate} className="h-9 px-3 rounded-lg">
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-1" />
+                New
               </Button>
             </div>
           </div>
