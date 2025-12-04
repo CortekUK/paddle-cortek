@@ -9,12 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { 
   Send, 
   FileText, 
-  MapPin, 
   Clock,
-  CheckCircle, 
-  XCircle,
   AlertTriangle,
-  ArrowRight
+  BarChart3,
+  Users,
+  Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,15 +27,23 @@ interface DashboardStats {
 const quickAccessItems = [
   {
     title: 'Send Message',
-    description: 'Compose and send messages',
     href: '/admin/send-message',
     icon: Send,
   },
   {
     title: 'View Logs',
-    description: 'Check sending history',
     href: '/admin/logs',
     icon: FileText,
+  },
+  {
+    title: 'Users',
+    href: '/admin/users',
+    icon: Users,
+  },
+  {
+    title: 'Settings',
+    href: '/admin/setup',
+    icon: Settings,
   },
 ];
 
@@ -200,22 +207,23 @@ export default function Dashboard() {
           <Card className={cardClass}>
             <CardContent className="p-6 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Status</p>
-              <div className="flex items-center justify-center gap-2 mt-3">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <span className="text-xl font-bold tracking-tight">Active</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">System operational</p>
+              <p className="text-4xl font-bold tracking-tight mt-2 text-emerald-500">Active</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {stats.locationName?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') || 'System operational'}
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Quick Access Section */}
         <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4 text-center">Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
+              <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
+            </div>
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Quick Access</h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {quickAccessItems.map((item) => (
               <Card
                 key={item.href}
@@ -225,15 +233,12 @@ export default function Dashboard() {
                 )}
                 onClick={() => navigate(item.href)}
               >
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-purple-100/50 dark:bg-purple-900/20 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
-                    <item.icon className="h-5 w-5 text-purple-600 dark:text-purple-400 transition-colors" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex-1 min-w-0 text-center">
-                    <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                <CardContent className="p-5 flex flex-col items-center text-center gap-3">
+                  <item.icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
+                  <h3 className="text-sm font-medium text-foreground">{item.title}</h3>
+                  <Badge variant="outline" className="text-[10px] text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30">
+                    Active
+                  </Badge>
                 </CardContent>
               </Card>
             ))}
