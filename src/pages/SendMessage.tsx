@@ -11,7 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare, ChevronDown } from 'lucide-react';
+import { Send, Clock, CheckCircle, XCircle, ExternalLink, MessageSquare, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RecentSend {
@@ -28,6 +28,7 @@ export default function SendMessage() {
   const [message, setMessage] = useState('');
   const [groups, setGroups] = useState('');
   const [sending, setSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
   const [recentSends, setRecentSends] = useState<RecentSend[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -100,6 +101,10 @@ export default function SendMessage() {
       
       setMessage('');
       setGroups('');
+      
+      // Show success animation
+      setSendSuccess(true);
+      setTimeout(() => setSendSuccess(false), 2000);
       
       setTimeout(fetchRecentSends, 1000);
     } catch (error: any) {
@@ -189,12 +194,29 @@ export default function SendMessage() {
 
               <Button 
                 type="submit" 
-                disabled={sending || !message.trim() || !groups.trim()}
-                className="w-full"
+                disabled={sending || sendSuccess || !message.trim() || !groups.trim()}
+                className={cn(
+                  "w-full transition-all duration-300",
+                  sendSuccess && "bg-emerald-500 hover:bg-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-600"
+                )}
                 size="lg"
               >
-                <Send className="h-4 w-4 mr-2" />
-                {sending ? 'Sending...' : 'Send Message'}
+                {sendSuccess ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2 animate-scale-in" />
+                    <span className="animate-fade-in">Message Sent!</span>
+                  </>
+                ) : sending ? (
+                  <>
+                    <Send className="h-4 w-4 mr-2 animate-pulse" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Message
+                  </>
+                )}
               </Button>
             </form>
 
