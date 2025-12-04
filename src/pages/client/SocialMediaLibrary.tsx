@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Upload, Image, Calendar, Download, ExternalLink, Edit, Trash2, Play, Copy, PauseCircle, PlayCircle, XCircle, ListChecks } from 'lucide-react';
+import { Plus, Image, Calendar, Download, ExternalLink, Edit, Trash2, Play, Copy, PauseCircle, PlayCircle, XCircle, ListChecks } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOrganizationAuth } from '@/hooks/useOrganizationAuth';
 import { toast } from 'sonner';
 import TemplateDesigner from '@/components/social/TemplateDesigner';
 import { Lightbox } from '@/components/ui/lightbox';
 import { format } from 'date-fns';
+
+const cardClass = "bg-white/70 dark:bg-card/70 backdrop-blur-sm rounded-2xl shadow-lg border border-border/60 dark:border-white/[0.12] overflow-hidden";
 
 const SocialMediaLibrary = () => {
   const { organization } = useOrganizationAuth();
@@ -268,29 +269,50 @@ const SocialMediaLibrary = () => {
     }
   };
 
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+      case 'PAUSED':
+        return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20';
+      case 'CANCELLED':
+      case 'COMPLETED':
+        return 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-64"></div>
-          <div className="h-4 bg-muted rounded w-96"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-muted rounded"></div>
-            ))}
+      <div className="relative space-y-8">
+        <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+          <div className="relative">
+            <div className="h-8 bg-muted/50 rounded w-64 animate-pulse"></div>
+            <div className="h-4 bg-muted/50 rounded w-96 mt-2 animate-pulse"></div>
           </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-64 bg-muted/50 rounded-2xl animate-pulse"></div>
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Social Media Library</h1>
-        <p className="text-muted-foreground">
-          Create templates and manage your generated social media posts
-        </p>
+    <div className="relative space-y-8">
+      {/* Page Header Banner */}
+      <div className="relative -mx-8 -mt-8 px-8 py-10 mb-4 bg-gradient-to-r from-primary/20 via-purple-500/15 to-primary/10 dark:from-primary/15 dark:via-purple-500/10 dark:to-primary/8 border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative text-left">
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Social Media Library</h1>
+          <p className="text-muted-foreground mt-1.5">
+            Create templates and manage your generated social media posts
+          </p>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -309,9 +331,9 @@ const SocialMediaLibrary = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="templates" className="space-y-4">
+        <TabsContent value="templates" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Templates</h2>
+            <p className="text-sm text-muted-foreground">Design reusable post layouts</p>
             <Button 
               className="flex items-center gap-2"
               onClick={() => {
@@ -326,26 +348,14 @@ const SocialMediaLibrary = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.length === 0 ? (
-              <Card className="border-dashed border-2 flex flex-col items-center justify-center p-8 min-h-[300px]">
-                <Upload className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Create your first template</h3>
-                <p className="text-muted-foreground text-center mb-4">
-                  Design a social media template with custom layouts and styling
+              <div className="col-span-full border-2 border-dashed border-border/60 rounded-2xl flex flex-col items-center justify-center p-12 text-center">
+                <p className="text-muted-foreground">
+                  Create your first template to start generating social posts
                 </p>
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    setEditingTemplate(null);
-                    setShowDesigner(true);
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Template
-                </Button>
-              </Card>
+              </div>
             ) : (
               templates.map((template) => (
-                <Card key={template.id} className="overflow-hidden">
+                <Card key={template.id} className={cardClass}>
                   <div className="aspect-square bg-muted relative">
                     {template.bg_url ? (
                       <img 
@@ -355,7 +365,7 @@ const SocialMediaLibrary = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image className="h-16 w-16 text-muted-foreground" />
+                        <Image className="h-16 w-16 text-muted-foreground/30" />
                       </div>
                     )}
                   </div>
@@ -400,35 +410,25 @@ const SocialMediaLibrary = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="renders" className="space-y-4">
+        <TabsContent value="renders" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Rendered Posts</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                Filter
-              </Button>
-              <Button variant="outline" size="sm">
-                Sort
-              </Button>
-            </div>
+            <p className="text-sm text-muted-foreground">Generated posts ready to download</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {renders.length === 0 ? (
-              <Card className="border-dashed border-2 flex flex-col items-center justify-center p-8 min-h-[300px]">
-                <Image className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">No renders yet</h3>
-                <p className="text-muted-foreground text-center mb-4">
-                  Generate your first social media post from any of the feature pages
+              <div className="col-span-full border-2 border-dashed border-border/60 rounded-2xl flex flex-col items-center justify-center p-12 text-center">
+                <p className="text-muted-foreground">
+                  Generated posts will appear here after rendering
                 </p>
-              </Card>
+              </div>
             ) : (
               renders.map((render) => {
                 const imageUrl = render.image_url || render.imageUrl || '';
                 const isValidUrl = imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
                 
                 return (
-                  <Card key={render.id} className="overflow-hidden">
+                  <Card key={render.id} className={cardClass}>
                     <div className="aspect-square bg-muted relative cursor-pointer group" onClick={() => handleOpenImage(render)}>
                       {isValidUrl ? (
                         <>
@@ -469,7 +469,7 @@ const SocialMediaLibrary = () => {
                       )}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                         <div className="bg-white/90 rounded-full p-2">
-                          <ExternalLink className="h-4 w-4 text-gray-700" />
+                          <ExternalLink className="h-4 w-4 text-foreground" />
                         </div>
                       </div>
                     </div>
@@ -542,52 +542,50 @@ const SocialMediaLibrary = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="schedules" className="space-y-4">
+        <TabsContent value="schedules" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Schedules</h2>
-            <div className="text-sm text-muted-foreground">Manage scheduled social renders</div>
+            <p className="text-sm text-muted-foreground">Manage scheduled social renders</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {schedules.length === 0 ? (
-              <Card className="border-dashed border-2 flex flex-col items-center justify-center p-8 min-h-[200px]">
-                <ListChecks className="h-10 w-10 text-muted-foreground mb-2" />
-                <div className="text-sm text-muted-foreground">No schedules yet</div>
-              </Card>
+              <div className="col-span-full border-2 border-dashed border-border/60 rounded-2xl flex flex-col items-center justify-center p-12 text-center">
+                <p className="text-muted-foreground">No schedules yet</p>
+              </div>
             ) : (
               schedules.map((s) => (
-                <Card key={s.id} className="p-4 flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm font-medium">{s.source?.replace(/_/g,' ') || 'Social'}</div>
-                    <div className="text-xs px-2 py-1 rounded border">
+                <Card key={s.id} className={`${cardClass} p-5`}>
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-medium">{s.source?.replace(/_/g,' ') || 'Social'}</h3>
+                    <Badge variant="outline" className={getStatusBadgeClass(s.status)}>
                       {s.status}
-                    </div>
+                    </Badge>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Type: {s.frequency} • TZ: {s.tz}
+                  <div className="space-y-1.5 text-sm text-muted-foreground mb-4">
+                    <p>Frequency: {s.frequency} • TZ: {s.tz}</p>
+                    <p>Next run: {s.next_run_at_utc ? format(new Date(s.next_run_at_utc), 'MMM d, HH:mm') : '–'}</p>
+                    <p>Last run: {s.last_run_at_utc ? format(new Date(s.last_run_at_utc), 'MMM d, HH:mm') : '–'}</p>
                   </div>
-                  <div className="text-xs">Next run: {s.next_run_at_utc ? new Date(s.next_run_at_utc).toLocaleString() : '-'}</div>
-                  <div className="text-xs">Last run: {s.last_run_at_utc ? new Date(s.last_run_at_utc).toLocaleString() : '-'}</div>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="default" size="sm" onClick={() => handleRunNow(s.id)} className="gap-1">
-                      <Play className="h-4 w-4" /> Run Now
+                      <Play className="h-3.5 w-3.5" /> Run Now
                     </Button>
                     {s.status !== 'PAUSED' && s.status !== 'COMPLETED' && s.status !== 'CANCELLED' && (
                       <Button variant="outline" size="sm" onClick={() => handleScheduleAction(s.id, 'pause')} className="gap-1">
-                        <PauseCircle className="h-4 w-4" /> Pause
+                        <PauseCircle className="h-3.5 w-3.5" /> Pause
                       </Button>
                     )}
                     {s.status === 'PAUSED' && (
                       <Button variant="outline" size="sm" onClick={() => handleScheduleAction(s.id, 'resume')} className="gap-1">
-                        <PlayCircle className="h-4 w-4" /> Resume
+                        <PlayCircle className="h-3.5 w-3.5" /> Resume
                       </Button>
                     )}
                     {s.status !== 'CANCELLED' && s.status !== 'COMPLETED' && (
                       <Button variant="outline" size="sm" onClick={() => handleScheduleAction(s.id, 'cancel')} className="gap-1">
-                        <XCircle className="h-4 w-4" /> Cancel
+                        <XCircle className="h-3.5 w-3.5" /> Cancel
                       </Button>
                     )}
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteSchedule(s.id)} className="gap-1">
-                      <Trash2 className="h-4 w-4" /> Delete
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </Card>
