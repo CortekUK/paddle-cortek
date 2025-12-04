@@ -169,7 +169,7 @@ export default function ClientSettings() {
 
       {/* WhatsApp Group Names */}
       <Card className={cardClass}>
-        <CardHeader>
+        <CardHeader className="border-b border-border/60">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
@@ -276,7 +276,7 @@ export default function ClientSettings() {
 
       {/* Club Information */}
       <Card className={cardClass}>
-        <CardHeader>
+        <CardHeader className="border-b border-border/60">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
               <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
@@ -338,7 +338,7 @@ export default function ClientSettings() {
 
       {/* Trial Management */}
       <Card className={`${cardClass} border-destructive/20`}>
-        <CardHeader>
+        <CardHeader className="border-b border-border/60">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-destructive/10">
               <AlertTriangle className="h-4 w-4 text-destructive" strokeWidth={1.5} />
