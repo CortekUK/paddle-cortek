@@ -157,7 +157,7 @@ export default function Setup() {
       <div className="max-w-2xl mx-auto">
         <Card className={cardClass}>
           <CardHeader className="text-left">
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4">
               <div className="p-2.5 rounded-lg bg-purple-100/50 dark:bg-purple-900/20">
                 <Settings className="h-5 w-5 text-purple-600 dark:text-purple-400" strokeWidth={1.5} />
               </div>
