@@ -880,40 +880,40 @@ Register now - spaces are limited!`);
               </div>
             </div>
           </div>
-        </CardContent>
 
-        {/* Send Message Footer */}
-        <div className="-mx-6 px-6 py-4 rounded-b-lg bg-muted/30 dark:bg-muted/20 border-t border-border/40">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="whatsappGroupFooter" className="text-sm font-medium whitespace-nowrap">WhatsApp Group:</Label>
-            <Input
-              id="whatsappGroupFooter"
-              value={whatsappGroup}
-              onChange={(e) => setWhatsappGroup(e.target.value)}
-              placeholder="Enter group name"
-              className="flex-1 h-9 rounded-lg text-sm"
-            />
-            <Button 
-              onClick={handleSendMessage} 
-              disabled={sendingMessage || !summaryText}
-              size="sm"
-              className="h-9 px-4 rounded-lg bg-primary/10 border border-primary text-primary hover:bg-primary/20"
-            >
-              {sendingMessage ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-              ) : (
-                <Send className="h-4 w-4 mr-1.5" />
-              )}
-              {sendingMessage ? 'Sending...' : 'Send Now'}
-            </Button>
+          {/* Send Message Footer */}
+          <div className="bg-muted/30 dark:bg-muted/20 -mx-6 px-6 py-4 rounded-b-lg border-t border-border/40">
+            <div className="flex items-center gap-4">
+              <Label htmlFor="whatsappGroupFooter" className="text-sm font-medium whitespace-nowrap">WhatsApp Group:</Label>
+              <Input
+                id="whatsappGroupFooter"
+                value={whatsappGroup}
+                onChange={(e) => setWhatsappGroup(e.target.value)}
+                placeholder="Enter group name"
+                className="flex-1 h-9 rounded-lg text-sm"
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={sendingMessage || !summaryText}
+                size="sm"
+                className="h-9 px-4 rounded-lg bg-primary/10 border border-primary text-primary hover:bg-primary/20"
+              >
+                {sendingMessage ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                ) : (
+                  <Send className="h-4 w-4 mr-1.5" />
+                )}
+                {sendingMessage ? 'Sending...' : 'Send Now'}
+              </Button>
+            </div>
+            {sendResult && (
+              <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className="mt-3">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{sendResult.message}</AlertDescription>
+              </Alert>
+            )}
           </div>
-          {sendResult && (
-            <Alert variant={sendResult.status === 'success' ? 'default' : 'destructive'} className="mt-3">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{sendResult.message}</AlertDescription>
-            </Alert>
-          )}
-        </div>
+        </CardContent>
       </Card>
 
       {/* Scheduled Sends */}
