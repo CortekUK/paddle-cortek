@@ -72,7 +72,6 @@ export function Header({ onMenuClick }: HeaderProps) {
                       {profile?.email ? getInitials(profile.email) : 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:inline text-sm text-foreground">{profile?.email}</span>
                   {!loading && (
                     <Badge variant="secondary" className="text-[10px] font-medium uppercase tracking-wide px-1.5 py-0">
                       {highestRole()}
